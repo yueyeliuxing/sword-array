@@ -1,4 +1,4 @@
-package com.zq.sword.array.conf.listener;
+package com.zq.sword.array.common.event;
 
 /**
  * 数据改变时的监听器

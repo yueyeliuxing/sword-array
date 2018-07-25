@@ -1,4 +1,4 @@
-package com.zq.sword.array.conf.listener;
+package com.zq.sword.array.common.event;
 
 import lombok.Data;
 import lombok.ToString;

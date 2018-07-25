@@ -1,4 +1,4 @@
-package com.zq.sword.array.conf.listener;
+package com.zq.sword.array.common.event;
 
 /**
  * @program: sword-array

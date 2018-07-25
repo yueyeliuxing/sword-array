@@ -3,7 +3,7 @@ package com.zq.sword.array.conf.service;
 import com.zq.sword.array.common.service.Service;
 import com.zq.sword.array.common.node.NodeServerId;
 import com.zq.sword.array.common.node.NodeServerInfo;
-import com.zq.sword.array.conf.listener.DataEventListener;
+import com.zq.sword.array.common.event.DataEventListener;
 
 import java.util.List;
 

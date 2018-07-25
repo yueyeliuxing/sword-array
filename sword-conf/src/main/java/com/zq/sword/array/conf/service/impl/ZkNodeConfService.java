@@ -5,18 +5,14 @@ import com.zq.sword.array.common.service.ServiceConfig;
 import com.zq.sword.array.common.node.NodeServerConfig;
 import com.zq.sword.array.common.node.NodeServerId;
 import com.zq.sword.array.conf.helper.ZkTreePathHelper;
-import com.zq.sword.array.conf.listener.DataEvent;
-import com.zq.sword.array.conf.listener.DataEventType;
-import com.zq.sword.array.conf.listener.DataEventListener;
+import com.zq.sword.array.common.event.DataEvent;
+import com.zq.sword.array.common.event.DataEventType;
+import com.zq.sword.array.common.event.DataEventListener;
 import com.zq.sword.array.conf.service.NodeConfService;
 import com.zq.sword.array.conf.service.DataConfService;
 import org.I0Itec.zkclient.IZkDataListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.ByteArrayInputStream;
-import java.nio.charset.Charset;
-import java.util.Properties;
 
 /**
  * @program: sword-array
