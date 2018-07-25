@@ -5,8 +5,8 @@ import com.zq.sword.array.conf.ConfServiceServer;
 import com.zq.sword.array.conf.service.DataConsumptionConfService;
 import com.zq.sword.array.conf.service.NamingConfService;
 import com.zq.sword.array.conf.service.NodeConfService;
-import com.zq.sword.array.conf.service.ZkService;
-import com.zq.sword.array.conf.service.impl.DefaultZkService;
+import com.zq.sword.array.conf.service.DataConfService;
+import com.zq.sword.array.conf.service.impl.ZkDataConfService;
 import com.zq.sword.array.conf.service.impl.ZkDataConsumptionConfService;
 import com.zq.sword.array.conf.service.impl.ZkNamingConfService;
 import com.zq.sword.array.conf.service.impl.ZkNodeConfService;
@@ -20,9 +20,9 @@ import com.zq.sword.array.conf.service.impl.ZkNodeConfService;
 public class DefaultConfServiceServer extends AbstractServer implements ConfServiceServer {
 
     public DefaultConfServiceServer() {
-        ZkService zkService = new DefaultZkService();
-        registerService(NodeConfService.class, new ZkNodeConfService(zkService));
-        registerService(NamingConfService.class, new ZkNamingConfService(zkService));
-        registerService(DataConsumptionConfService.class, new ZkDataConsumptionConfService(zkService));
+        DataConfService dataConfService = new ZkDataConfService();
+        registerService(NodeConfService.class, new ZkNodeConfService(dataConfService));
+        registerService(NamingConfService.class, new ZkNamingConfService(dataConfService));
+        registerService(DataConsumptionConfService.class, new ZkDataConsumptionConfService(dataConfService));
     }
 }

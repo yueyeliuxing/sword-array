@@ -6,7 +6,7 @@ import com.zq.sword.array.common.node.NodeConsumptionInfo;
 import com.zq.sword.array.common.node.NodeServerId;
 import com.zq.sword.array.conf.helper.ZkTreePathHelper;
 import com.zq.sword.array.conf.service.DataConsumptionConfService;
-import com.zq.sword.array.conf.service.ZkService;
+import com.zq.sword.array.conf.service.DataConfService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,16 +19,16 @@ import java.util.List;
  **/
 public class ZkDataConsumptionConfService extends AbstractService implements DataConsumptionConfService {
 
-    private ZkService zkService;
+    private DataConfService dataConfService;
 
-    public ZkDataConsumptionConfService(ZkService zkService) {
-        this.zkService = zkService;
+    public ZkDataConsumptionConfService(DataConfService dataConfService) {
+        this.dataConfService = dataConfService;
     }
 
     @Override
     public void start(ServiceConfig serviceConfig) {
-        if(!zkService.isStart()){
-            zkService.start();
+        if(!dataConfService.isStart()){
+            dataConfService.start();
         }
         start();
     }
@@ -36,13 +36,13 @@ public class ZkDataConsumptionConfService extends AbstractService implements Dat
     @Override
     public void writeNodeConsumptionInfo(NodeConsumptionInfo nodeConsumptionInfo) {
         String consumeOtherNodeServerDataPath = ZkTreePathHelper.getConsumeOtherNodeServerDataPath(nodeConsumptionInfo.getId(), nodeConsumptionInfo.getConsumeUnitName());
-        zkService.writeData(consumeOtherNodeServerDataPath, nodeConsumptionInfo.getDataItemId());
+        dataConfService.writeData(consumeOtherNodeServerDataPath, nodeConsumptionInfo.getDataItemId());
     }
 
     @Override
     public List<NodeConsumptionInfo> listNodeConsumptionInfo(NodeServerId nodeServerId) {
         List<NodeConsumptionInfo> nodeConsumptionInfos = new ArrayList<>();
-        String unitNameData = zkService.readData(ZkTreePathHelper.getUnitNamePath(nodeServerId));
+        String unitNameData = dataConfService.readData(ZkTreePathHelper.getUnitNamePath(nodeServerId));
         String[] unitNames = unitNameData.split("|");
         if(unitNames != null && unitNames.length > 0) {
             for (String unitName : unitNames) {
@@ -50,7 +50,7 @@ public class ZkDataConsumptionConfService extends AbstractService implements Dat
                     continue;
                 }
                 String consumeOtherNodeServerDataPath = ZkTreePathHelper.getConsumeOtherNodeServerDataPath(nodeServerId, unitName);
-                String data = zkService.readData(consumeOtherNodeServerDataPath);
+                String data = dataConfService.readData(consumeOtherNodeServerDataPath);
                 NodeConsumptionInfo nodeConsumptionInfo = new NodeConsumptionInfo();
                 nodeConsumptionInfo.setDataItemId(data);
                 NodeServerId id = new NodeServerId();

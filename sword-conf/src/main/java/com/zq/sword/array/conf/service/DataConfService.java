@@ -12,7 +12,7 @@ import java.util.List;
  * @author: zhouqi1
  * @create: 2018-07-24 10:26
  **/
-public interface ZkService extends Service {
+public interface DataConfService extends Service {
 
     void registerChildChangeListener(String parentPath, IZkChildListener childListener);
 

@@ -19,7 +19,7 @@ public interface NodeConfService extends Service {
      * @param nodeServerId
      * @param dataEventListener
      */
-    void registerNodeServerConfigChangeListenter(NodeServerId nodeServerId, DataEventListener dataEventListener);
+    void registerNodeServerConfigListener(NodeServerId nodeServerId, DataEventListener<NodeServerConfig> dataEventListener);
 
 
     /**

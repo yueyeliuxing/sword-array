@@ -20,14 +20,14 @@ public interface NamingConfService extends Service {
      * @param nodeServerId
      * @param dataEventListener
      */
-    void registerMasterNodeServerChangeListener(NodeServerId nodeServerId, DataEventListener dataEventListener);
+    void registerMasterNodeServerChangeListener(NodeServerId nodeServerId, DataEventListener<NodeServerInfo> dataEventListener);
 
     /**
      * 注册节点服务配置改变的监听器
      * @param nodeServerId
      * @param dataEventListener
      */
-    void registerOtherMasterNodeServerInfoChangeListener(NodeServerId nodeServerId, DataEventListener dataEventListener);
+    void registerOtherMasterNodeServerInfoChangeListener(NodeServerId nodeServerId, DataEventListener<NodeServerInfo> dataEventListener);
 
 
     /**

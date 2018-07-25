@@ -3,7 +3,7 @@ package com.zq.sword.array.conf.service.impl;
 import com.zq.sword.array.common.service.AbstractService;
 import com.zq.sword.array.common.service.ServiceConfig;
 import com.zq.sword.array.common.node.NodeServerConfigKey;
-import com.zq.sword.array.conf.service.ZkService;
+import com.zq.sword.array.conf.service.DataConfService;
 import org.I0Itec.zkclient.IZkChildListener;
 import org.I0Itec.zkclient.IZkDataListener;
 import org.I0Itec.zkclient.ZkClient;
@@ -18,7 +18,7 @@ import java.util.List;
  * @author: zhouqi1
  * @create: 2018-07-24 10:26
  **/
-public class DefaultZkService extends AbstractService implements ZkService {
+public class ZkDataConfService extends AbstractService implements DataConfService {
 
     private ZkClient zkClient;
 

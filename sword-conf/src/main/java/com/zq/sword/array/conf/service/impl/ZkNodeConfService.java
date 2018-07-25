@@ -9,7 +9,7 @@ import com.zq.sword.array.conf.listener.DataEvent;
 import com.zq.sword.array.conf.listener.DataEventType;
 import com.zq.sword.array.conf.listener.DataEventListener;
 import com.zq.sword.array.conf.service.NodeConfService;
-import com.zq.sword.array.conf.service.ZkService;
+import com.zq.sword.array.conf.service.DataConfService;
 import org.I0Itec.zkclient.IZkDataListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,29 +28,29 @@ public class ZkNodeConfService extends AbstractService implements NodeConfServic
 
     private Logger logger = LoggerFactory.getLogger(ZkNodeConfService.class);
 
-    private ZkService zkService;
+    private DataConfService dataConfService;
 
-    public ZkNodeConfService(ZkService zkService) {
-        this.zkService = zkService;
+    public ZkNodeConfService(DataConfService dataConfService) {
+        this.dataConfService = dataConfService;
     }
 
     @Override
     public void start(ServiceConfig serviceConfig) {
-        if(!zkService.isStart()){
-            zkService.start();
+        if(!dataConfService.isStart()){
+            dataConfService.start();
         }
         start();
     }
 
     @Override
-    public void registerNodeServerConfigChangeListenter(NodeServerId nodeServerId, DataEventListener dataEventListener) {
-        zkService.registerDataChangeListener(ZkTreePathHelper.getNodeServerConfigPath(nodeServerId), new IZkDataListener(){
+    public void registerNodeServerConfigListener(NodeServerId nodeServerId, DataEventListener<NodeServerConfig> dataEventListener) {
+        dataConfService.registerDataChangeListener(ZkTreePathHelper.getNodeServerConfigPath(nodeServerId), new IZkDataListener(){
 
             @Override
             public void handleDataChange(String dataPath, Object data) throws Exception {
-                DataEvent dataEvent = new DataEvent();
+                DataEvent<NodeServerConfig> dataEvent = new DataEvent<>();
                 dataEvent.setType(DataEventType.NODE_CONFIG_DATA_CHANGE);
-                dataEvent.setData(data);
+                dataEvent.setData(new NodeServerConfig(data.toString()));
                 dataEventListener.listen(dataEvent);
             }
 
@@ -65,15 +65,7 @@ public class ZkNodeConfService extends AbstractService implements NodeConfServic
 
     @Override
     public NodeServerConfig getNodeServerConfig(NodeServerId nodeServerId) {
-        Properties properties = null;
-        String serverConfig = zkService.readData(ZkTreePathHelper.getNodeServerConfigPath(nodeServerId));
-        try{
-            properties = new Properties();
-            properties.load(new ByteArrayInputStream(serverConfig.getBytes(Charset.defaultCharset())));
-            return new NodeServerConfig(properties);
-        }catch (Exception e){
-            logger.error("加载服务配置文件转换为Properties出错", e);
-            return null;
-        }
+        String serverConfig = dataConfService.readData(ZkTreePathHelper.getNodeServerConfigPath(nodeServerId));
+        return new NodeServerConfig(serverConfig);
     }
 }
