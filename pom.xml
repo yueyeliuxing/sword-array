@@ -22,6 +22,8 @@
 		<module>sword-redis</module>
 		<module>sword-conf</module>
 		<module>sword-data</module>
+		<module>sword-data-lqueue</module>
+		<module>sword-data-rqueue</module>
 		<module>sword-data-pull</module>
 		<module>sword-data-push</module>
 		<module>sword-redis-client</module>
