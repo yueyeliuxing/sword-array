@@ -38,9 +38,5 @@ public enum DataEventType {
      */
     NODE_OTHER_MASTER_DATA_DELETE,
 
-    /**
-     * 当前Master节点的slava节点变化
-     */
-    NODE_MASTER_SLAVE_CHANGE,
     ;
 }
