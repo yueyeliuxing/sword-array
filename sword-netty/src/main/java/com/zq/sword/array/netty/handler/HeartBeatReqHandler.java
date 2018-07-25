@@ -1,0 +1,71 @@
+package com.zq.sword.array.netty.handler;
+
+import com.zq.redis.piper.netty.message.Header;
+import com.zq.redis.piper.netty.message.MessageType;
+import com.zq.redis.piper.netty.message.NettyMessage;
+import io.netty.channel.ChannelHandlerAdapter;
+import io.netty.channel.ChannelHandlerContext;
+
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * @program: sword-array
+ * @description: 心跳请求处理器
+ * @author: zhouqi1
+ * @create: 2018-07-06 14:54
+ **/
+public class HeartBeatReqHandler extends ChannelHandlerAdapter {
+
+    private volatile ScheduledFuture<?> heartBeat;
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        if(heartBeat != null) {
+            heartBeat.cancel(true);
+            heartBeat = null;
+        }
+        ctx.fireExceptionCaught(cause);
+    }
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        super.channelActive(ctx);
+    }
+
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        NettyMessage message = (NettyMessage)msg;
+        if(message.getHeader() != null && message.getHeader().getType() == MessageType.LOGIN_RESP.value()){
+            heartBeat = ctx.executor().scheduleAtFixedRate(new HeartBeatReqHandler.HeartBeatTask(ctx), 0, 5000, TimeUnit.MILLISECONDS);
+        } else if (message.getHeader() != null && message.getHeader().getType() == MessageType.HEARTBEAT_RESP.value()) {
+            System.out.println("Client receive server heart beat message : --->" + message);
+        }else {
+            ctx.fireChannelRead(msg);
+        }
+    }
+
+    public class HeartBeatTask implements Runnable {
+
+        private final ChannelHandlerContext ctx;
+
+        public HeartBeatTask(ChannelHandlerContext ctx) {
+            this.ctx = ctx;
+        }
+
+        @Override
+        public void run() {
+            NettyMessage heatBeat = buildHeatBeat();
+            System.out.println("Client send heart beat message to server : --> " + heatBeat);
+            ctx.writeAndFlush(heatBeat);
+        }
+
+        private NettyMessage buildHeatBeat() {
+            NettyMessage message = new NettyMessage();
+            Header header = new Header();
+            header.setType(MessageType.HEARTBEAT_REQ.value());
+            message.setHeader(header);
+            return message;
+        }
+    }
+}
