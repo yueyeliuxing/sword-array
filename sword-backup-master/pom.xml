@@ -44,9 +44,9 @@
 		<relativePath>../</relativePath>
 	</parent>
 
-	<artifactId>sword-data-push</artifactId>
+	<artifactId>sword-backup-master</artifactId>
 	<packaging>jar</packaging>
-	<name>sword-data-push</name>
+	<name>sword-backup-master</name>
 
 
 	<dependencies>

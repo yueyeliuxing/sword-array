@@ -24,10 +24,12 @@
 		<module>sword-data</module>
 		<module>sword-data-lqueue</module>
 		<module>sword-data-rqueue</module>
-		<module>sword-data-pull</module>
-		<module>sword-data-push</module>
+		<module>sword-backup-master</module>
+		<module>sword-backup-slave</module>
 		<module>sword-redis-client</module>
 		<module>sword-redis-slave</module>
+		<module>sword-transfer-server</module>
+		<module>sword-transfer-client</module>
 		<module>sword-node-server</module>
 	</modules>
 
