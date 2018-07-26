@@ -1,0 +1,86 @@
+package com.zq.sword.array.data.rqueue.service.impl;
+
+import com.zq.sword.array.common.event.DataEvent;
+import com.zq.sword.array.common.event.DataEventListener;
+import com.zq.sword.array.common.event.DataEventType;
+import com.zq.sword.array.common.node.NodeServerConfigKey;
+import com.zq.sword.array.common.node.NodeServerId;
+import com.zq.sword.array.common.service.AbstractService;
+import com.zq.sword.array.common.service.ServiceConfig;
+import com.zq.sword.array.data.rqueue.domain.DataIndex;
+import com.zq.sword.array.data.rqueue.domain.DataItem;
+import com.zq.sword.array.data.rqueue.manager.FileDataIndexManager;
+import com.zq.sword.array.data.rqueue.manager.FileDataItemManager;
+import com.zq.sword.array.data.rqueue.manager.MemoryDataIndexManager;
+import com.zq.sword.array.data.rqueue.manager.impl.FileDataIndexManagerImpl;
+import com.zq.sword.array.data.rqueue.manager.impl.FileDataItemManagerImpl;
+import com.zq.sword.array.data.rqueue.manager.impl.MemoryDataIndexManagerImpl;
+import com.zq.sword.array.data.rqueue.service.RightQueueService;
+
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * @program: sword-array
+ * @description: 文件系统Right队列存储
+ * @author: zhouqi1
+ * @create: 2018-07-23 17:52
+ **/
+public class FileSystemRightQueueService extends AbstractService implements RightQueueService {
+
+    private FileDataIndexManager fileDataIndexManager;
+
+    private FileDataItemManager fileDataItemManager;
+
+    private MemoryDataIndexManager memoryDataIndexManager;
+
+    private Map<NodeServerId, DataEventListener<DataItem>> dataEventListeners;
+
+    public FileSystemRightQueueService() {
+        dataEventListeners = new ConcurrentHashMap<>();
+    }
+
+    @Override
+    public void start(ServiceConfig serviceConfig) {
+        String dataIndexFilePath = serviceConfig.getProperty(NodeServerConfigKey.T_RIGHT_DATA_INDEX_FILE_PATH);
+        String dataItemFilePath = serviceConfig.getProperty(NodeServerConfigKey.T_RIGHT_DATA_INDEX_FILE_PATH);
+        fileDataIndexManager = new FileDataIndexManagerImpl(dataIndexFilePath);
+        fileDataItemManager = new FileDataItemManagerImpl(dataItemFilePath);
+        memoryDataIndexManager = new MemoryDataIndexManagerImpl(fileDataIndexManager.listDataIndex());
+    }
+
+    @Override
+    public void registerDataItemListener(NodeServerId nodeServerId, DataEventListener<DataItem> dataItemDataEventListener) {
+        dataEventListeners.put(nodeServerId, dataItemDataEventListener);
+    }
+
+    @Override
+    public void push(DataItem dataItem) {
+        DataIndex dataIndex = fileDataItemManager.addDataItem(dataItem);
+        memoryDataIndexManager.addDataIndex(dataIndex);
+
+        //数据添加通知监听器
+        if(dataEventListeners != null && !dataEventListeners.isEmpty()){
+            for(NodeServerId nodeServerId : dataEventListeners.keySet()){
+                DataEventListener<DataItem> dataItemDataEventListener = dataEventListeners.get(nodeServerId);
+                DataEvent<DataItem> dataEvent = new DataEvent<>();
+                dataEvent.setType(DataEventType.NODE_DATA_ITEM_CHANGE);
+                dataEvent.setData(dataItem);
+                dataItemDataEventListener.listen(dataEvent);
+            }
+        }
+    }
+
+    @Override
+    public List<DataItem> pollAfterId(Long id) {
+        return pollAfterId(id, null);
+    }
+
+    @Override
+    public List<DataItem> pollAfterId(Long id, Integer maxNum) {
+        DataIndex dataIndex = memoryDataIndexManager.getDataIndex(id);
+        return fileDataItemManager.listDataItemAfterIndex(dataIndex, maxNum);
+    }
+
+}

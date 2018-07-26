@@ -51,6 +51,16 @@
 
 	<dependencies>
 
+		<dependency>
+			<groupId>com.zq.sword</groupId>
+			<artifactId>sword-common</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+
+
+
 	</dependencies>
 
 </project>

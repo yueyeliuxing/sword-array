@@ -38,5 +38,10 @@ public enum DataEventType {
      */
     NODE_OTHER_MASTER_DATA_DELETE,
 
+    /**
+     * 节点数据改变
+     */
+    NODE_DATA_ITEM_CHANGE,
+
     ;
 }

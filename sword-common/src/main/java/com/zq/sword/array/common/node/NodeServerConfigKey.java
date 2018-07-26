@@ -22,4 +22,14 @@ public class NodeServerConfigKey {
      * Redis连接地址
      */
     public static final String REDIS_CONNECT_ADDR = "redis.connect.addr";
+
+    /**
+     * T-Right队列数据索引文件存储地址
+     */
+    public static final String T_RIGHT_DATA_INDEX_FILE_PATH = "t-right.data.index.file.path";
+
+    /**
+     * T-Right队列数据文件存储地址
+     */
+    public static final String T_RIGHT_DATA_ITEM_FILE_PATH = "t-right.data.item.file.path";
 }
