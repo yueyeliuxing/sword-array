@@ -1,15 +1,15 @@
-package com.zq.sword.array.conf.service.impl;
+package com.zq.sword.array.metadata.service.impl;
 
 import com.zq.sword.array.common.service.AbstractService;
 import com.zq.sword.array.common.service.ServiceConfig;
 import com.zq.sword.array.common.node.NodeServerConfig;
 import com.zq.sword.array.common.node.NodeServerId;
-import com.zq.sword.array.conf.helper.ZkTreePathHelper;
+import com.zq.sword.array.metadata.helper.ZkTreePathHelper;
 import com.zq.sword.array.common.event.DataEvent;
 import com.zq.sword.array.common.event.DataEventType;
 import com.zq.sword.array.common.event.DataEventListener;
-import com.zq.sword.array.conf.service.NodeConfService;
-import com.zq.sword.array.conf.service.DataConfService;
+import com.zq.sword.array.metadata.service.NodeConfService;
+import com.zq.sword.array.metadata.service.DataConfService;
 import org.I0Itec.zkclient.IZkDataListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

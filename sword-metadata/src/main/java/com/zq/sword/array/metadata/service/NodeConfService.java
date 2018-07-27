@@ -1,4 +1,4 @@
-package com.zq.sword.array.conf.service;
+package com.zq.sword.array.metadata.service;
 
 import com.zq.sword.array.common.service.Service;
 import com.zq.sword.array.common.node.NodeServerConfig;

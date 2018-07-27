@@ -1,12 +1,12 @@
-package com.zq.sword.array.conf.service.impl;
+package com.zq.sword.array.metadata.service.impl;
 
 import com.zq.sword.array.common.service.AbstractService;
 import com.zq.sword.array.common.service.ServiceConfig;
 import com.zq.sword.array.common.node.NodeConsumptionInfo;
 import com.zq.sword.array.common.node.NodeServerId;
-import com.zq.sword.array.conf.helper.ZkTreePathHelper;
-import com.zq.sword.array.conf.service.DataConsumptionConfService;
-import com.zq.sword.array.conf.service.DataConfService;
+import com.zq.sword.array.metadata.helper.ZkTreePathHelper;
+import com.zq.sword.array.metadata.service.DataConsumptionConfService;
+import com.zq.sword.array.metadata.service.DataConfService;
 
 import java.util.ArrayList;
 import java.util.List;

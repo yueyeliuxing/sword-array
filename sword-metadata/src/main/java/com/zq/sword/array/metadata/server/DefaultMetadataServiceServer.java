@@ -1,15 +1,15 @@
-package com.zq.sword.array.conf.server;
+package com.zq.sword.array.metadata.server;
 
 import com.zq.sword.array.common.service.AbstractServer;
-import com.zq.sword.array.conf.MetadataServiceServer;
-import com.zq.sword.array.conf.service.DataConsumptionConfService;
-import com.zq.sword.array.conf.service.NamingConfService;
-import com.zq.sword.array.conf.service.NodeConfService;
-import com.zq.sword.array.conf.service.DataConfService;
-import com.zq.sword.array.conf.service.impl.ZkDataConfService;
-import com.zq.sword.array.conf.service.impl.ZkDataConsumptionConfService;
-import com.zq.sword.array.conf.service.impl.ZkNamingConfService;
-import com.zq.sword.array.conf.service.impl.ZkNodeConfService;
+import com.zq.sword.array.metadata.MetadataServiceServer;
+import com.zq.sword.array.metadata.service.DataConsumptionConfService;
+import com.zq.sword.array.metadata.service.NamingConfService;
+import com.zq.sword.array.metadata.service.NodeConfService;
+import com.zq.sword.array.metadata.service.DataConfService;
+import com.zq.sword.array.metadata.service.impl.ZkDataConfService;
+import com.zq.sword.array.metadata.service.impl.ZkDataConsumptionConfService;
+import com.zq.sword.array.metadata.service.impl.ZkNamingConfService;
+import com.zq.sword.array.metadata.service.impl.ZkNodeConfService;
 
 /**
  * @program: sword-array

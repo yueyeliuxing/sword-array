@@ -1,9 +1,9 @@
-package com.zq.sword.array.conf.service.impl;
+package com.zq.sword.array.metadata.service.impl;
 
 import com.zq.sword.array.common.service.AbstractService;
 import com.zq.sword.array.common.service.ServiceConfig;
 import com.zq.sword.array.common.node.NodeServerConfigKey;
-import com.zq.sword.array.conf.service.DataConfService;
+import com.zq.sword.array.metadata.service.DataConfService;
 import org.I0Itec.zkclient.IZkChildListener;
 import org.I0Itec.zkclient.IZkDataListener;
 import org.I0Itec.zkclient.ZkClient;

@@ -1,4 +1,4 @@
-package com.zq.sword.array.conf.helper;
+package com.zq.sword.array.metadata.helper;
 
 import com.zq.sword.array.common.node.NodeServerInfo;
 

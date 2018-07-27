@@ -1,4 +1,4 @@
-package com.zq.sword.array.conf;
+package com.zq.sword.array.metadata;
 
 import com.zq.sword.array.common.service.Server;
 
