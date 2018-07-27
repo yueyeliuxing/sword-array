@@ -44,9 +44,9 @@
 		<relativePath>../</relativePath>
 	</parent>
 
-	<artifactId>sword-conf</artifactId>
+	<artifactId>sword-metadata</artifactId>
 	<packaging>jar</packaging>
-	<name>sword-conf</name>
+	<name>sword-metadata</name>
 
 	<dependencies>
 		<dependency>

@@ -20,7 +20,7 @@
 		<module>sword-common</module>
 		<module>sword-netty</module>
 		<module>sword-redis</module>
-		<module>sword-conf</module>
+		<module>sword-metadata</module>
 		<module>sword-data</module>
 		<module>sword-data-lqueue</module>
 		<module>sword-data-rqueue</module>

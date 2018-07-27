@@ -1,7 +1,7 @@
 package com.zq.sword.array.conf.server;
 
 import com.zq.sword.array.common.service.AbstractServer;
-import com.zq.sword.array.conf.ConfServiceServer;
+import com.zq.sword.array.conf.MetadataServiceServer;
 import com.zq.sword.array.conf.service.DataConsumptionConfService;
 import com.zq.sword.array.conf.service.NamingConfService;
 import com.zq.sword.array.conf.service.NodeConfService;
@@ -17,9 +17,9 @@ import com.zq.sword.array.conf.service.impl.ZkNodeConfService;
  * @author: zhouqi1
  * @create: 2018-07-23 20:25
  **/
-public class DefaultConfServiceServer extends AbstractServer implements ConfServiceServer {
+public class DefaultMetadataServiceServer extends AbstractServer implements MetadataServiceServer {
 
-    public DefaultConfServiceServer() {
+    public DefaultMetadataServiceServer() {
         DataConfService dataConfService = new ZkDataConfService();
         registerService(NodeConfService.class, new ZkNodeConfService(dataConfService));
         registerService(NamingConfService.class, new ZkNamingConfService(dataConfService));
