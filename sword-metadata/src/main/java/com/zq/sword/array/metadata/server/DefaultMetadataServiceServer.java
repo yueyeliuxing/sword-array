@@ -7,9 +7,9 @@ import com.zq.sword.array.metadata.service.NamingConfService;
 import com.zq.sword.array.metadata.service.NodeConfService;
 import com.zq.sword.array.metadata.service.DataConfService;
 import com.zq.sword.array.metadata.service.impl.ZkDataConfService;
-import com.zq.sword.array.metadata.service.impl.ZkDataConsumptionConfService;
-import com.zq.sword.array.metadata.service.impl.ZkNamingConfService;
-import com.zq.sword.array.metadata.service.impl.ZkNodeConfService;
+import com.zq.sword.array.metadata.service.impl.DefaultDataConsumptionConfService;
+import com.zq.sword.array.metadata.service.impl.DefaultNamingConfService;
+import com.zq.sword.array.metadata.service.impl.DefaultNodeConfService;
 
 /**
  * @program: sword-array
@@ -21,8 +21,8 @@ public class DefaultMetadataServiceServer extends AbstractServer implements Meta
 
     public DefaultMetadataServiceServer() {
         DataConfService dataConfService = new ZkDataConfService();
-        registerService(NodeConfService.class, new ZkNodeConfService(dataConfService));
-        registerService(NamingConfService.class, new ZkNamingConfService(dataConfService));
-        registerService(DataConsumptionConfService.class, new ZkDataConsumptionConfService(dataConfService));
+        registerService(NodeConfService.class, new DefaultNodeConfService(dataConfService));
+        registerService(NamingConfService.class, new DefaultNamingConfService(dataConfService));
+        registerService(DataConsumptionConfService.class, new DefaultDataConsumptionConfService(dataConfService));
     }
 }

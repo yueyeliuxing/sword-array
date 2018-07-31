@@ -1,10 +1,10 @@
 package com.zq.sword.array.metadata.service;
 
+import com.zq.sword.array.common.event.DataEventListener;
+import com.zq.sword.array.common.node.*;
 import com.zq.sword.array.common.service.Service;
-import org.I0Itec.zkclient.IZkChildListener;
-import org.I0Itec.zkclient.IZkDataListener;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * @program: sword-array
@@ -14,25 +14,69 @@ import java.util.List;
  **/
 public interface DataConfService extends Service {
 
-    void registerChildChangeListener(String parentPath, IZkChildListener childListener);
 
-    void registerDataChangeListener(String path, IZkDataListener dataListener);
+    /**
+     * 得到本机房所有单元的元数据信息
+     * @return
+     */
+    Map<NodeServerId, NodeMetadataInfo> getAllUnitMetadataInfo(NodeServerId nodeServerId);
 
-    void createEphemeral(String path);
+    /**
+     * 得到本机房所有单元的元数据信息
+     * @return
+     */
+    Map<NodeServerId, NodeMetadataInfo> getAllUnitMetadataInfo(NodeServerId nodeServerId, DataEventListener<NodeMetadataInfo> unitsMetadataInfoListener);
 
-    void createEphemeral(String path, Object data);
+    /**
+     * 得到本机房代理单元的元数据信息
+     * @return
+     */
+    Map<NodeServerId, NodeMetadataInfo> getAllProxyUnitMetadataInfo(NodeServerId nodeServerId);
 
-    void createPersistent(String path);
+    /**
+     * 得到本机房代理单元的元数据信息
+     * @return
+     */
+    Map<NodeServerId, NodeMetadataInfo> getAllProxyUnitMetadataInfo(NodeServerId nodeServerId, DataEventListener<NodeMetadataInfo> proxyUnitsMetadataInfoListener);
 
-    void createPersistent(String path, Object data);
+    /**
+     * 得到本机房其他机房代理的元数据信息
+     * @return
+     */
+    Map<NodeServerId, NodeMetadataInfo> getAllOtherProxyUnitMetadataInfo(NodeServerId nodeServerId);
 
-    void writeData(String path, String value);
+    /**
+     * 得到本机房其他机房代理的元数据信息
+     * @return
+     */
+    Map<NodeServerId, NodeMetadataInfo> getAllOtherProxyUnitMetadataInfo(NodeServerId nodeServerId, DataEventListener<NodeMetadataInfo> otherDcProxyMetadataInfoListener);
 
-    String readData(String path);
+    /**
+     * 获取指定Id的元数据信息
+     * @param nodeServerId
+     * @return
+     */
+    NodeMetadataInfo getMetadataInfo(NodeServerId nodeServerId);
 
-    boolean exists(String path);
+    /**
+     * 获取指定Id的元数据信息
+     * @param nodeServerId
+     * @return
+     */
+    NodeMetadataInfo getMetadataInfo(NodeServerId nodeServerId, DataEventListener<NodeMetadataInfo> metadataInfoListener);
 
-    List<String> getChildren(String path);
 
-    boolean delete(String path);
+    /**
+     * 设置元数据的master信息
+     * @param nodeServerId
+     * @param nodeServerInfo
+     */
+    boolean setNodeServerMetadataMasterInfo(NodeServerId nodeServerId, NodeServerInfo nodeServerInfo);
+
+    /**
+     * 设置元数据的master信息
+     * @param nodeServerId
+     * @param nodeConsumptionInfo
+     */
+    void setNodeServerMetadataConsumeUnitData(NodeServerId nodeServerId, NodeConsumptionInfo nodeConsumptionInfo);
 }

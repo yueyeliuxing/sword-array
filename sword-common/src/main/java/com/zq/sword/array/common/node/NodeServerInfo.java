@@ -17,10 +17,6 @@ public class NodeServerInfo {
 
     private NodeServerId id;
 
-    private NodeServerType type;
-
-    private NodeServerRole role;
-
     private String serverAddress;
 
     private int port;

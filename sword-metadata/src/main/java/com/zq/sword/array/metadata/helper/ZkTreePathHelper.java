@@ -10,24 +10,36 @@ import com.zq.sword.array.common.node.NodeServerId;
  **/
 public class ZkTreePathHelper {
 
-    private static final String ZK_ROOT = "/sword";
+    public static final String ZK_ROOT = "/sword";
 
-    private static final String ZK_SWORD_UNITS= "/units";
+    public static final String ZK_SWORD_UNITS= "/units";
 
-    private static final String ZK_SWORD_PIPER = "/piper";
+    public static final String ZK_SWORD_PROXY_UNITS= "/own-proxy-unit";
 
-    private static final String ZK_SWORD_PIPER_TYPE = "/type";
+    public static final String ZK_SWORD_OTHER_PROXY_UNITS= "/other-proxy-units";
 
-    private static final String ZK_SWORD_PIPER_MASTER = "/master/running";
+    public static final String ZK_SWORD_PIPER = "/piper";
 
-    private static final String ZK_SWORD_PIPER_SLAVE = "/slave";
+    public static final String ZK_SWORD_PIPER_MASTER = "/master";
 
-    private static final String ZK_SWORD_PIPER_DATA = "/data";
+    public static final String ZK_SWORD_PIPER_MASTER_RUNNING = "/running";
 
-    private static final String ZK_SWORD_PIPER_CONFIG = "/config";
+    public static final String ZK_SWORD_PIPER_DATA = "/data";
+
+    public static final String ZK_SWORD_PIPER_CONFIG = "/config";
 
     public static String getRealPath(String path) {
         return ZK_ROOT+path;
+    }
+
+    /**
+     * 获取服务节点的父路径
+     * @param nodeServerId
+     * @return
+     */
+    public static String getNodeServerPath(NodeServerId nodeServerId){
+        return getRealPath(String.format("/%s/%s/%s%s/%s", nodeServerId.getDcName(),nodeServerId.getUnitCategoryName(),
+                nodeServerId.getUnitName(), ZK_SWORD_PIPER, nodeServerId.getServerName()));
     }
 
     /**
@@ -51,20 +63,12 @@ public class ZkTreePathHelper {
         String[] pathItems = nodeServerMasterPath.split("/");
         NodeServerId nodeServerId = new NodeServerId();
         nodeServerId.setDcName(pathItems[1]);
-        nodeServerId.setUnitName(pathItems[2]);
-        nodeServerId.setServerName(pathItems[4]);
+        nodeServerId.setUnitCategoryName(pathItems[2]);
+        nodeServerId.setUnitName(pathItems[3]);
+        nodeServerId.setServerName(pathItems[5]);
         return nodeServerId;
     }
 
-    /**
-     * 得到节点对应的类型节点路径
-     * @param nodeServerId
-     * @return
-     */
-    public static String getNodeServerTypePath(NodeServerId nodeServerId) {
-        return getRealPath(String.format("/%s/%s%s/%s%s", nodeServerId.getDcName(),nodeServerId.getUnitName(),
-                ZK_SWORD_PIPER, nodeServerId.getServerName(), ZK_SWORD_PIPER_TYPE));
-    }
 
     /**
      * 转换得到piper服务的启动配置项
@@ -87,23 +91,32 @@ public class ZkTreePathHelper {
     }
 
     /**
-     * 转换得到piper服务的slave
+     * 转换得到piper服务的Master
      * @param nodeServerId
      * @return
      */
-    public static String getNodeServerSlavePath(NodeServerId nodeServerId) {
-        return getRealPath(String.format("/%s/%s%s/%s%s", nodeServerId.getDcName(),nodeServerId.getUnitName(),
-                ZK_SWORD_PIPER, nodeServerId.getServerName(), ZK_SWORD_PIPER_SLAVE));
+    public static String getNodeServerMasterRunningPath(NodeServerId nodeServerId) {
+        return getRealPath(String.format("/%s/%s%s/%s%s%s", nodeServerId.getDcName(),nodeServerId.getUnitName(),
+                ZK_SWORD_PIPER, nodeServerId.getServerName(), ZK_SWORD_PIPER_MASTER, ZK_SWORD_PIPER_MASTER_RUNNING));
     }
+    /**
+     *  parentPath 获取master running节点
+     * @param nodeServerParentPath
+     * @return
+     */
+    public static String getNodeServerMasterRunningPath(String nodeServerParentPath) {
+        return getRealPath(String.format("%s%s%s", nodeServerParentPath, ZK_SWORD_PIPER_MASTER, ZK_SWORD_PIPER_MASTER_RUNNING));
+    }
+
 
     /**
      * 转换得到piper服务的Master
      * @param nodeServerId
      * @return
      */
-    public static String getConsumeOtherNodeServerDataPath(NodeServerId nodeServerId, String otherUnitName) {
-        return getRealPath(String.format("/%s/%s%s/%s%s/%s/%s", nodeServerId.getDcName(),nodeServerId.getUnitName(),
-                ZK_SWORD_PIPER, nodeServerId.getServerName(), ZK_SWORD_PIPER_DATA, otherUnitName, nodeServerId.getServerName()));
+    public static String getConsumeOtherNodeServerDataPath(NodeServerId nodeServerId, String otherUnitCategoryName, String otherUnitName) {
+        return getRealPath(String.format("/%s/%s%s/%s%s/%s", nodeServerId.getDcName(),nodeServerId.getUnitName(),
+                ZK_SWORD_PIPER, nodeServerId.getServerName(), ZK_SWORD_PIPER_DATA, String.format("%s|%s", otherUnitCategoryName, otherUnitName)));
     }
 
 }

@@ -1,6 +1,7 @@
 package com.zq.sword.array.common.node;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
@@ -11,11 +12,15 @@ import lombok.ToString;
  **/
 @Data
 @ToString
+@NoArgsConstructor
 public class NodeConsumptionInfo {
 
     private NodeServerId id;
 
-    private String consumeUnitName;
-
     private String dataItemId;
+
+    public NodeConsumptionInfo(NodeServerId id, String dataItemId) {
+        this.id = id;
+        this.dataItemId = dataItemId;
+    }
 }
