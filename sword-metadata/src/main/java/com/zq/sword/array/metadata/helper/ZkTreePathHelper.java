@@ -43,15 +43,6 @@ public class ZkTreePathHelper {
     }
 
     /**
-     * 获取所有单元的名称
-     * @param nodeServerId
-     * @return
-     */
-    public static String getUnitNamePath(NodeServerId nodeServerId) {
-        return getRealPath(String.format("/%s%s", nodeServerId.getDcName(), ZK_SWORD_UNITS));
-    }
-
-    /**
      * 解析节点路径获取nodeServerId
      * @param nodeServerMasterPath
      * @return
@@ -76,8 +67,8 @@ public class ZkTreePathHelper {
      * @return
      */
     public static String getNodeServerConfigPath(NodeServerId nodeServerId) {
-        return getRealPath(String.format("/%s/%s%s/%s%s", nodeServerId.getDcName(),nodeServerId.getUnitName(),
-                ZK_SWORD_PIPER, nodeServerId.getServerName(), ZK_SWORD_PIPER_CONFIG));
+        return getRealPath(String.format("/%s/%s/%s%s/%s%s", nodeServerId.getDcName(),nodeServerId.getUnitCategoryName(),
+                nodeServerId.getUnitName(), ZK_SWORD_PIPER, nodeServerId.getServerName(), ZK_SWORD_PIPER_CONFIG));
     }
 
     /**
@@ -86,8 +77,8 @@ public class ZkTreePathHelper {
      * @return
      */
     public static String getNodeServerMasterPath(NodeServerId nodeServerId) {
-        return getRealPath(String.format("/%s/%s%s/%s%s", nodeServerId.getDcName(),nodeServerId.getUnitName(),
-                ZK_SWORD_PIPER, nodeServerId.getServerName(), ZK_SWORD_PIPER_MASTER));
+        return getRealPath(String.format("/%s/%s/%s%s/%s%s", nodeServerId.getDcName(),nodeServerId.getUnitCategoryName(),
+                nodeServerId.getUnitName(), ZK_SWORD_PIPER, nodeServerId.getServerName(), ZK_SWORD_PIPER_MASTER));
     }
 
     /**
@@ -96,16 +87,8 @@ public class ZkTreePathHelper {
      * @return
      */
     public static String getNodeServerMasterRunningPath(NodeServerId nodeServerId) {
-        return getRealPath(String.format("/%s/%s%s/%s%s%s", nodeServerId.getDcName(),nodeServerId.getUnitName(),
-                ZK_SWORD_PIPER, nodeServerId.getServerName(), ZK_SWORD_PIPER_MASTER, ZK_SWORD_PIPER_MASTER_RUNNING));
-    }
-    /**
-     *  parentPath 获取master running节点
-     * @param nodeServerParentPath
-     * @return
-     */
-    public static String getNodeServerMasterRunningPath(String nodeServerParentPath) {
-        return getRealPath(String.format("%s%s%s", nodeServerParentPath, ZK_SWORD_PIPER_MASTER, ZK_SWORD_PIPER_MASTER_RUNNING));
+        return getRealPath(String.format("/%s/%s/%s%s/%s%s%s", nodeServerId.getDcName(),nodeServerId.getUnitCategoryName(),
+                nodeServerId.getUnitName(), ZK_SWORD_PIPER, nodeServerId.getServerName(), ZK_SWORD_PIPER_MASTER, ZK_SWORD_PIPER_MASTER_RUNNING));
     }
 
 
@@ -115,7 +98,7 @@ public class ZkTreePathHelper {
      * @return
      */
     public static String getConsumeOtherNodeServerDataPath(NodeServerId nodeServerId, String otherUnitCategoryName, String otherUnitName) {
-        return getRealPath(String.format("/%s/%s%s/%s%s/%s", nodeServerId.getDcName(),nodeServerId.getUnitName(),
+        return getRealPath(String.format("/%s/%s/%s%s/%s%s/%s", nodeServerId.getDcName(),nodeServerId.getUnitCategoryName(),nodeServerId.getUnitName(),
                 ZK_SWORD_PIPER, nodeServerId.getServerName(), ZK_SWORD_PIPER_DATA, String.format("%s|%s", otherUnitCategoryName, otherUnitName)));
     }
 
