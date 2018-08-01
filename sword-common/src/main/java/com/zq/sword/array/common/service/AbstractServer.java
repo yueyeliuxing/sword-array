@@ -91,6 +91,9 @@ public abstract class AbstractServer extends AbstractLifecycle implements Server
             service.start();
         }
         services.put(serviceClass.getName(), service);
+
+        //服务添加到服务上下文
+        ServiceContext.getInstance().registerService(serviceClass, service);
     }
 
     @Override
