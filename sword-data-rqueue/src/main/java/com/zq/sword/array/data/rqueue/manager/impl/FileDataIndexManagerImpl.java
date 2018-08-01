@@ -111,4 +111,13 @@ public class FileDataIndexManagerImpl implements FileDataIndexManager {
         return dataIndices;
 
     }
+
+    @Override
+    public void removeDataIndex(Date date) {
+        String filePath = getDataIndexFilePath(DateUtil.formatDate(date, DateUtil.YYYY_MM_DD));
+        File dataItemFile = new File(filePath);
+        if(dataItemFile.exists()){
+            dataItemFile.delete();
+        }
+    }
 }

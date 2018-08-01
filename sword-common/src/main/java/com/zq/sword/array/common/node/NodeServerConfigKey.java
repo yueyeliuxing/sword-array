@@ -32,4 +32,14 @@ public class NodeServerConfigKey {
      * T-Right队列数据文件存储地址
      */
     public static final String T_RIGHT_DATA_ITEM_FILE_PATH = "t-right.data.item.file.path";
+
+    /**
+     * T-Right队列索引数据持久化策略--内存中添加的数目
+     */
+    public static final String T_RIGHT_DATA_INDEX_PERSISTENCE_NUM = "t-right.data.index.persistence.num";
+
+    /**
+     * T-Right队列索引数据持久化策略--空闲时间
+     */
+    public static final String T_RIGHT_DATA_INDEX_PERSISTENCE_FREE_TIME = "t-right.data.index.persistence.free.time";
 }

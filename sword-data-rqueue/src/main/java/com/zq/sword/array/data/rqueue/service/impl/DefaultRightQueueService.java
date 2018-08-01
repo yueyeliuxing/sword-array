@@ -15,6 +15,8 @@ import com.zq.sword.array.data.rqueue.manager.MemoryDataIndexManager;
 import com.zq.sword.array.data.rqueue.manager.impl.FileDataIndexManagerImpl;
 import com.zq.sword.array.data.rqueue.manager.impl.FileDataItemManagerImpl;
 import com.zq.sword.array.data.rqueue.manager.impl.MemoryDataIndexManagerImpl;
+import com.zq.sword.array.data.rqueue.service.DataIndexService;
+import com.zq.sword.array.data.rqueue.service.DataItemService;
 import com.zq.sword.array.data.rqueue.service.RightQueueService;
 
 import java.util.List;
@@ -27,27 +29,24 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author: zhouqi1
  * @create: 2018-07-23 17:52
  **/
-public class FileSystemRightQueueService extends AbstractService implements RightQueueService {
+public class DefaultRightQueueService extends AbstractService implements RightQueueService {
 
-    private FileDataIndexManager fileDataIndexManager;
+    private DataItemService dataItemService;
 
-    private FileDataItemManager fileDataItemManager;
-
-    private MemoryDataIndexManager memoryDataIndexManager;
+    private DataIndexService dataIndexService;
 
     private Map<NodeServerId, DataEventListener<DataItem>> dataEventListeners;
 
-    public FileSystemRightQueueService() {
+    public DefaultRightQueueService() {
         dataEventListeners = new ConcurrentHashMap<>();
+        dataItemService = new DefaultDataItemService();
+        dataIndexService = new DefaultDataIndexService();
     }
 
     @Override
     public void start(ServiceConfig serviceConfig) {
-        String dataIndexFilePath = serviceConfig.getProperty(NodeServerConfigKey.T_RIGHT_DATA_INDEX_FILE_PATH);
-        String dataItemFilePath = serviceConfig.getProperty(NodeServerConfigKey.T_RIGHT_DATA_INDEX_FILE_PATH);
-        fileDataIndexManager = new FileDataIndexManagerImpl(dataIndexFilePath);
-        fileDataItemManager = new FileDataItemManagerImpl(dataItemFilePath);
-        memoryDataIndexManager = new MemoryDataIndexManagerImpl(fileDataIndexManager.listDataIndex());
+        dataItemService.start(serviceConfig);
+        dataIndexService.start(serviceConfig);
     }
 
     @Override
@@ -57,8 +56,8 @@ public class FileSystemRightQueueService extends AbstractService implements Righ
 
     @Override
     public void push(DataItem dataItem) {
-        DataIndex dataIndex = fileDataItemManager.addDataItem(dataItem);
-        memoryDataIndexManager.addDataIndex(dataIndex);
+        DataIndex dataIndex = dataItemService.addDataItem(dataItem);
+        dataIndexService.addDataIndex(dataIndex);
 
         //数据添加通知监听器
         if(dataEventListeners != null && !dataEventListeners.isEmpty()){
@@ -79,8 +78,8 @@ public class FileSystemRightQueueService extends AbstractService implements Righ
 
     @Override
     public List<DataItem> pollAfterId(Long id, Integer maxNum) {
-        DataIndex dataIndex = memoryDataIndexManager.getDataIndex(id);
-        return fileDataItemManager.listDataItemAfterIndex(dataIndex, maxNum);
+        DataIndex dataIndex = dataIndexService.getDataIndex(id);
+        return dataItemService.listDataItemAfterIndex(dataIndex, maxNum);
     }
 
 }

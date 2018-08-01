@@ -25,9 +25,13 @@ public class MemoryDataIndexManagerImpl implements MemoryDataIndexManager {
      */
     private Map<String, List<Long>> dataIdTimeDic;
 
-    public MemoryDataIndexManagerImpl(List<DataIndex> dataIndexs){
+    public MemoryDataIndexManagerImpl(){
         dataIndexDic = new ConcurrentHashMap<>();
         dataIdTimeDic = new ConcurrentHashMap<>();
+    }
+
+    @Override
+    public void load(List<DataIndex> dataIndexs){
         if(dataIndexs != null && !dataIndexs.isEmpty()){
             dataIndexs.forEach(dataIndex -> {
                 addDataIndex(dataIndex);
@@ -65,8 +69,8 @@ public class MemoryDataIndexManagerImpl implements MemoryDataIndexManager {
      * @param date
      */
     @Override
-    public void removeDataIndex(String date){
-        List<Long> dataIdList = dataIdTimeDic.get(date);
+    public void removeDataIndex(Date date){
+        List<Long> dataIdList = dataIdTimeDic.get(DateUtil.formatDate(date, DateUtil.YYYY_MM_DD));
         if(dataIdList != null && !dataIdList.isEmpty()){
             for(Long dataId : dataIdList){
                 dataIndexDic.remove(dataId);

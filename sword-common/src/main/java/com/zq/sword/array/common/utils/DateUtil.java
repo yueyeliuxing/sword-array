@@ -1,6 +1,7 @@
 package com.zq.sword.array.common.utils;
 
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
@@ -29,6 +30,28 @@ public class DateUtil {
      */
     public static String getCurrentDate(){
         return formatDate(new Date(), YYYY_MM_DD);
+    }
+
+    /**
+     * 日期加几天
+     * @param date
+     * @param days
+     * @return
+     */
+    public static Date plusDays(Date date, int days){
+        LocalDate localDate = new LocalDate(date);
+        return localDate.plusDays(days).toDate();
+    }
+
+    /**
+     * 日期减几天
+     * @param date
+     * @param days
+     * @return
+     */
+    public static Date minusDays(Date date, int days){
+        LocalDate localDate = new LocalDate(date);
+        return localDate.minusDays(days).toDate();
     }
 
     /**

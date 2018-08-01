@@ -10,9 +10,7 @@ public interface FileDataItemManager {
 
     DataIndex addDataItem(DataItem dataItems);
 
-    List<DataItem> listDataItemAfterIndex(DataIndex dataIndex);
-
     List<DataItem> listDataItemAfterIndex(DataIndex dataIndex, Integer num);
 
-    void removeDataIndex(Date date);
+    void removeDataItem(Date date);
 }

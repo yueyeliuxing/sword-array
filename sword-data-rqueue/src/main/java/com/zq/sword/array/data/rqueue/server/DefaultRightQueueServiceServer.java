@@ -3,7 +3,7 @@ package com.zq.sword.array.data.rqueue.server;
 import com.zq.sword.array.common.service.AbstractServer;
 import com.zq.sword.array.data.rqueue.RightQueueServiceServer;
 import com.zq.sword.array.data.rqueue.service.RightQueueService;
-import com.zq.sword.array.data.rqueue.service.impl.FileSystemRightQueueService;
+import com.zq.sword.array.data.rqueue.service.impl.DefaultRightQueueService;
 
 /**
  * @program: sword-array
@@ -14,6 +14,6 @@ import com.zq.sword.array.data.rqueue.service.impl.FileSystemRightQueueService;
 public class DefaultRightQueueServiceServer extends AbstractServer implements RightQueueServiceServer {
 
     public DefaultRightQueueServiceServer() {
-        registerService(RightQueueService.class, new FileSystemRightQueueService());
+        registerService(RightQueueService.class, new DefaultRightQueueService());
     }
 }

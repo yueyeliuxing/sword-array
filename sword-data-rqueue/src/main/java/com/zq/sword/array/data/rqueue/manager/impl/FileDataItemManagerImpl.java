@@ -74,16 +74,6 @@ public class FileDataItemManagerImpl implements FileDataItemManager {
      * @return
      */
     @Override
-    public List<DataItem> listDataItemAfterIndex(DataIndex dataIndex){
-        return listDataItemAfterIndex(dataIndex, null);
-    }
-
-    /**
-     * 获取指定索引的数据
-     * @param dataIndex
-     * @return
-     */
-    @Override
     public List<DataItem> listDataItemAfterIndex(DataIndex dataIndex, Integer num){
         List<DataItem> dataIndices = new ArrayList<>();
         long valuePos = dataIndex.getValuePosition();
@@ -101,10 +91,12 @@ public class FileDataItemManagerImpl implements FileDataItemManager {
      * @param date
      */
     @Override
-    public void removeDataIndex(Date date){
+    public void removeDataItem(Date date){
         String dateValue = DateUtil.formatDate(date, DateUtil.YYYY_MM_DD);
         String dataItemFilePath = getDataItemFilePath(dateValue);
         File dataItemFile = new File(dataItemFilePath);
-        dataItemFile.delete();
+        if(dataItemFile.exists()){
+            dataItemFile.delete();
+        }
     }
 }

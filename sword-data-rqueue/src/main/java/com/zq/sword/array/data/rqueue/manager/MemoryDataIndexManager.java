@@ -2,7 +2,16 @@ package com.zq.sword.array.data.rqueue.manager;
 
 import com.zq.sword.array.data.rqueue.domain.DataIndex;
 
+import java.util.Date;
+import java.util.List;
+
 public interface MemoryDataIndexManager {
+
+    /**
+     * 加载数据
+     * @param dataIndexs
+     */
+    void load(List<DataIndex> dataIndexs);
 
     /**
      * 添加数据索引
@@ -21,5 +30,5 @@ public interface MemoryDataIndexManager {
      * 删除数据索引
      * @param date
      */
-    void removeDataIndex(String date);
+    void removeDataIndex(Date date);
 }
