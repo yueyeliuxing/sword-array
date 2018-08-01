@@ -14,7 +14,6 @@ import java.util.Map;
  **/
 public interface DataConfService extends Service {
 
-
     /**
      * 得到本机房所有单元的元数据信息
      * @return

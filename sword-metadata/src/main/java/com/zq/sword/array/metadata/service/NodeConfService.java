@@ -19,12 +19,5 @@ public interface NodeConfService extends Service {
      * @param nodeServerId 服务ID
      * @return 配置信息
      */
-    NodeServerConfig getNodeServerConfig(NodeServerId nodeServerId);
-
-    /**
-     * 获取指定服务ID的服务配置信息
-     * @param nodeServerId 服务ID
-     * @return 配置信息
-     */
     NodeServerConfig getNodeServerConfig(NodeServerId nodeServerId, DataEventListener<NodeMetadataInfo> dataEventListener);
 }

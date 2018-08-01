@@ -36,12 +36,6 @@ public class DefaultNodeConfService extends AbstractService implements NodeConfS
     }
 
     @Override
-    public NodeServerConfig getNodeServerConfig(NodeServerId nodeServerId) {
-        NodeMetadataInfo nodeMetadataInfo = dataConfService.getMetadataInfo(nodeServerId);
-        return nodeMetadataInfo.getConfig();
-    }
-
-    @Override
     public NodeServerConfig getNodeServerConfig(NodeServerId nodeServerId, DataEventListener<NodeMetadataInfo> dataEventListener) {
         NodeMetadataInfo nodeMetadataInfo = dataConfService.getMetadataInfo(nodeServerId, dataEventListener);
         return nodeMetadataInfo.getConfig();

@@ -49,17 +49,17 @@ public class DefaultNamingConfService extends AbstractService implements NamingC
     }
 
     @Override
-    public NodeServerInfo getNodeServerInfo(NodeServerId nodeServerId) {
-        NodeMetadataInfo nodeMetadataInfo = dataConfService.getMetadataInfo(nodeServerId);
+    public NodeServerInfo getNodeServerInfo(NodeServerId nodeServerId, DataEventListener<NodeMetadataInfo> nodeMetadataInfoDataEventListener) {
+        NodeMetadataInfo nodeMetadataInfo = dataConfService.getMetadataInfo(nodeServerId, nodeMetadataInfoDataEventListener);
         return nodeMetadataInfo.getInfo();
     }
 
     @Override
-    public Map<NodeServerId, NodeServerInfo> getConsumeDataMasterNodeServerInfo(NodeServerId nodeServerId) {
+    public Map<NodeServerId, NodeServerInfo> getConsumeDataMasterNodeServerInfo(NodeServerId nodeServerId, DataEventListener<NodeMetadataInfo> nodeMetadataInfoDataEventListener) {
         Map<NodeServerId, NodeServerInfo> nodeServerInfos = new HashMap<>();
-        Map<NodeServerId, NodeMetadataInfo> unitsNodeMetadataInfo =  dataConfService.getAllUnitMetadataInfo(nodeServerId);
-        Map<NodeServerId, NodeMetadataInfo> proxyUnitsNodeMetadataInfo =  dataConfService.getAllProxyUnitMetadataInfo(nodeServerId);
-        Map<NodeServerId, NodeMetadataInfo> otherProxyUnitsNodeMetadataInfo =  dataConfService.getAllOtherProxyUnitMetadataInfo(nodeServerId);
+        Map<NodeServerId, NodeMetadataInfo> unitsNodeMetadataInfo =  dataConfService.getAllUnitMetadataInfo(nodeServerId, nodeMetadataInfoDataEventListener);
+        Map<NodeServerId, NodeMetadataInfo> proxyUnitsNodeMetadataInfo =  dataConfService.getAllProxyUnitMetadataInfo(nodeServerId, nodeMetadataInfoDataEventListener);
+        Map<NodeServerId, NodeMetadataInfo> otherProxyUnitsNodeMetadataInfo =  dataConfService.getAllOtherProxyUnitMetadataInfo(nodeServerId, nodeMetadataInfoDataEventListener);
 
         Map<NodeServerId, NodeMetadataInfo> nodeMetadataInfoMap = new HashMap<>();
         switch (nodeServerId.getType()){

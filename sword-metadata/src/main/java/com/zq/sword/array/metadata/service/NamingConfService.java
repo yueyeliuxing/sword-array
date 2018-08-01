@@ -29,12 +29,11 @@ public interface NamingConfService extends Service {
      * @param nodeServerId
      * @return
      */
-    NodeServerInfo getNodeServerInfo(NodeServerId nodeServerId);
-
+    NodeServerInfo getNodeServerInfo(NodeServerId nodeServerId, DataEventListener<NodeMetadataInfo> nodeMetadataInfoDataEventListener);
 
     /**
      * 获取其他PiperMaster服务的IP port 的数据信息
      * @return IP port 信息
      */
-    Map<NodeServerId, NodeServerInfo> getConsumeDataMasterNodeServerInfo(NodeServerId nodeServerId);
+    Map<NodeServerId, NodeServerInfo> getConsumeDataMasterNodeServerInfo(NodeServerId nodeServerId, DataEventListener<NodeMetadataInfo> nodeMetadataInfoDataEventListener);
 }

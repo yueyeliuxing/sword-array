@@ -50,17 +50,17 @@ public class ZkDataConfService extends AbstractService implements DataConfServic
     /**
      * 单元元数据监听器
      */
-    private volatile DataEventListener<NodeMetadataInfo> unitsMetadataInfoListener;
+    private List<DataEventListener<NodeMetadataInfo>> unitsMetadataInfoListeners;
 
     /**
      * 代理单元元数据监听器
      */
-    private volatile DataEventListener<NodeMetadataInfo> proxyUnitsMetadataInfoListener;
+    private List<DataEventListener<NodeMetadataInfo>> proxyUnitsMetadataInfoListeners;
 
     /**
      * 其他机房代理元数据监听器
      */
-    private volatile DataEventListener<NodeMetadataInfo> otherDcProxyMetadataInfoListener;
+    private List<DataEventListener<NodeMetadataInfo>> otherDcProxyMetadataInfoListeners;
 
 
     /**
@@ -74,13 +74,9 @@ public class ZkDataConfService extends AbstractService implements DataConfServic
         unitMetadataDic = new ConcurrentHashMap<>();
         proxyUnitMetadataDic = new ConcurrentHashMap<>();
         otherProxyUnitMetadataDic = new ConcurrentHashMap<>();
-    }
-
-    public ZkDataConfService(DataEventListener<NodeMetadataInfo> nodeMetadataInfoListener) {
-        this();
-        this.unitsMetadataInfoListener = nodeMetadataInfoListener;
-        this.proxyUnitsMetadataInfoListener = nodeMetadataInfoListener;
-        this.otherDcProxyMetadataInfoListener = nodeMetadataInfoListener;
+        this.unitsMetadataInfoListeners = new CopyOnWriteArrayList<>();
+        this.proxyUnitsMetadataInfoListeners = new CopyOnWriteArrayList<>();
+        this.otherDcProxyMetadataInfoListeners = new CopyOnWriteArrayList<>();
     }
 
     @Override
@@ -202,11 +198,13 @@ public class ZkDataConfService extends AbstractService implements DataConfServic
                             nodeServerInfo.setId(nodeServerId);
                             nodeMetadataInfo.setInfo(nodeServerInfo);
 
-                            if(unitsMetadataInfoListener != null){
+                            if(unitsMetadataInfoListeners != null){
                                 DataEvent<NodeMetadataInfo> dataEvent = new DataEvent<>();
                                 dataEvent.setType(DataEventType.NODE_MASTER_DATA_CHANGE);
                                 dataEvent.setData(nodeMetadataInfo);
-                                unitsMetadataInfoListener.listen(dataEvent);
+                                unitsMetadataInfoListeners.forEach(listenter->{
+                                    listenter.listen(dataEvent);
+                                });
                             }
 
                         }
@@ -217,11 +215,13 @@ public class ZkDataConfService extends AbstractService implements DataConfServic
                             nodeMetadataInfo.setInfo(null);
 
                             //有监听器发送监听数据
-                            if(unitsMetadataInfoListener != null){
+                            if(unitsMetadataInfoListeners != null){
                                 DataEvent<NodeMetadataInfo> dataEvent = new DataEvent();
                                 dataEvent.setType(DataEventType.NODE_MASTER_DATA_DELETE);
                                 dataEvent.setData(nodeMetadataInfo);
-                                unitsMetadataInfoListener.listen(dataEvent);
+                                unitsMetadataInfoListeners.forEach(listenter->{
+                                    listenter.listen(dataEvent);
+                                });
                             }
                         }
                     });
@@ -242,11 +242,14 @@ public class ZkDataConfService extends AbstractService implements DataConfServic
                             nodeServerInfo.setId(nodeServerId);
                             nodeMetadataInfo.setInfo(nodeServerInfo);
 
-                            if(proxyUnitsMetadataInfoListener != null){
+                            if(proxyUnitsMetadataInfoListeners != null){
                                 DataEvent<NodeMetadataInfo> dataEvent = new DataEvent<>();
                                 dataEvent.setType(DataEventType.NODE_MASTER_DATA_CHANGE);
                                 dataEvent.setData(nodeMetadataInfo);
-                                proxyUnitsMetadataInfoListener.listen(dataEvent);
+
+                                proxyUnitsMetadataInfoListeners.forEach(listenter->{
+                                    listenter.listen(dataEvent);
+                                });
                             }
                         }
 
@@ -254,11 +257,13 @@ public class ZkDataConfService extends AbstractService implements DataConfServic
                         public void handleDataDeleted(String dataPath) throws Exception {
                             nodeMetadataInfo.setInfo(null);
 
-                            if(proxyUnitsMetadataInfoListener != null){
+                            if(proxyUnitsMetadataInfoListeners != null){
                                 DataEvent<NodeMetadataInfo> dataEvent = new DataEvent();
                                 dataEvent.setType(DataEventType.NODE_MASTER_DATA_DELETE);
                                 dataEvent.setData(nodeMetadataInfo);
-                                proxyUnitsMetadataInfoListener.listen(dataEvent);
+                                proxyUnitsMetadataInfoListeners.forEach(listenter->{
+                                    listenter.listen(dataEvent);
+                                });
                             }
                         }
                     });
@@ -278,11 +283,14 @@ public class ZkDataConfService extends AbstractService implements DataConfServic
                             nodeServerInfo.setId(nodeServerId);
                             nodeMetadataInfo.setInfo(nodeServerInfo);
 
-                            if(otherDcProxyMetadataInfoListener != null){
+                            if(otherDcProxyMetadataInfoListeners != null){
                                 DataEvent<NodeMetadataInfo> dataEvent = new DataEvent<>();
                                 dataEvent.setType(DataEventType.NODE_MASTER_DATA_CHANGE);
                                 dataEvent.setData(nodeMetadataInfo);
-                                otherDcProxyMetadataInfoListener.listen(dataEvent);
+
+                                otherDcProxyMetadataInfoListeners.forEach(listenter->{
+                                    listenter.listen(dataEvent);
+                                });
                             }
                         }
 
@@ -291,11 +299,14 @@ public class ZkDataConfService extends AbstractService implements DataConfServic
 
                             nodeMetadataInfo.setInfo(null);
 
-                            if(otherDcProxyMetadataInfoListener != null){
+                            if(otherDcProxyMetadataInfoListeners != null){
                                 DataEvent<NodeMetadataInfo> dataEvent = new DataEvent();
                                 dataEvent.setType(DataEventType.NODE_MASTER_DATA_DELETE);
                                 dataEvent.setData(nodeMetadataInfo);
-                                otherDcProxyMetadataInfoListener.listen(dataEvent);
+
+                                otherDcProxyMetadataInfoListeners.forEach(listenter->{
+                                    listenter.listen(dataEvent);
+                                });
                             }
                         }
                     });
@@ -328,7 +339,7 @@ public class ZkDataConfService extends AbstractService implements DataConfServic
     @Override
     public Map<NodeServerId, NodeMetadataInfo> getAllUnitMetadataInfo(NodeServerId nodeServerId, DataEventListener<NodeMetadataInfo> unitsMetadataInfoListener) {
         if(unitsMetadataInfoListener != null){
-            this.unitsMetadataInfoListener = unitsMetadataInfoListener;
+            this.unitsMetadataInfoListeners.add(unitsMetadataInfoListener);
         }
         return Collections.unmodifiableMap(unitMetadataDic);
     }
@@ -341,7 +352,7 @@ public class ZkDataConfService extends AbstractService implements DataConfServic
     @Override
     public Map<NodeServerId, NodeMetadataInfo> getAllProxyUnitMetadataInfo(NodeServerId nodeServerId, DataEventListener<NodeMetadataInfo> proxyUnitsMetadataInfoListener) {
         if(proxyUnitsMetadataInfoListener != null){
-            this.proxyUnitsMetadataInfoListener = proxyUnitsMetadataInfoListener;
+            this.proxyUnitsMetadataInfoListeners.add(proxyUnitsMetadataInfoListener);
         }
         return Collections.unmodifiableMap(proxyUnitMetadataDic);
     }
@@ -354,7 +365,7 @@ public class ZkDataConfService extends AbstractService implements DataConfServic
     @Override
     public Map<NodeServerId, NodeMetadataInfo> getAllOtherProxyUnitMetadataInfo(NodeServerId nodeServerId, DataEventListener<NodeMetadataInfo> otherDcProxyMetadataInfoListener) {
         if(otherDcProxyMetadataInfoListener != null){
-            this.otherDcProxyMetadataInfoListener = otherDcProxyMetadataInfoListener;
+            this.otherDcProxyMetadataInfoListeners.add(otherDcProxyMetadataInfoListener);
         }
         return Collections.unmodifiableMap(otherProxyUnitMetadataDic);
     }
