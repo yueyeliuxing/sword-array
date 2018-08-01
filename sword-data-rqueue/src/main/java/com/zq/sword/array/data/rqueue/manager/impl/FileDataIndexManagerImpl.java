@@ -98,11 +98,11 @@ public class FileDataIndexManagerImpl implements FileDataIndexManager {
             for (File childFile : childFiles){
                 String fileName = childFile.getName();
                 Date date = DateUtil.parseDate(fileName, DateUtil.YYYY_MM_DD);
-                if(date == null || date.before(startDate)){
+                if(startDate != null && date.before(startDate)){
                     continue;
                 }
                 List<String> dataLines = FileUtil.readLines(childFile);
-                if(dataIndices != null && !dataIndices.isEmpty()){
+                if(dataLines != null && !dataLines.isEmpty()){
                     List<DataIndex> childDataIndex = dataLines.stream().map(DataIndexHelper::getDataIndex).collect(Collectors.toList());
                     dataIndices.addAll(childDataIndex);
                 }

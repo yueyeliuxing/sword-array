@@ -42,4 +42,9 @@ public class NodeServerConfigKey {
      * T-Right队列索引数据持久化策略--空闲时间
      */
     public static final String T_RIGHT_DATA_INDEX_PERSISTENCE_FREE_TIME = "t-right.data.index.persistence.free.time";
+
+    /**
+     * T-Left队列数据文件存储地址
+     */
+    public static final String T_LEFT_DATA_ITEM_FILE_PATH = "t-left.data.item.file.path";
 }
