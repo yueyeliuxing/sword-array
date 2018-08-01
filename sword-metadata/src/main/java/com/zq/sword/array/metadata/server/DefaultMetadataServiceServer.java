@@ -25,10 +25,6 @@ public class DefaultMetadataServiceServer extends AbstractServer implements Meta
         this(new ZkDataConfService());
     }
 
-    public DefaultMetadataServiceServer(DataEventListener<NodeMetadataInfo> nodeMetadataInfoListener) {
-        this(new ZkDataConfService(nodeMetadataInfoListener));
-    }
-
     public DefaultMetadataServiceServer(DataConfService dataConfService) {
         registerService(NodeConfService.class, new DefaultNodeConfService(dataConfService));
         registerService(NamingConfService.class, new DefaultNamingConfService(dataConfService));
