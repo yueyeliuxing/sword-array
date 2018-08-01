@@ -12,7 +12,7 @@ import io.netty.channel.ChannelHandlerContext;
  * @author: zhouqi1
  * @create: 2018-07-06 15:07
  **/
-public class HeartBeatRespHandler extends ChannelHandlerAdapter {
+public class HeartBeatRespHandler extends TransferHandler {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         super.exceptionCaught(ctx, cause);

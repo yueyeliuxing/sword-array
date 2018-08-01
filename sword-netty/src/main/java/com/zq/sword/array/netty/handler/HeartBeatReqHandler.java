@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  * @author: zhouqi1
  * @create: 2018-07-06 14:54
  **/
-public class HeartBeatReqHandler extends ChannelHandlerAdapter {
+public class HeartBeatReqHandler extends TransferHandler {
 
     private volatile ScheduledFuture<?> heartBeat;
 

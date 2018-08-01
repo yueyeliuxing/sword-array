@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author: zhouqi1
  * @create: 2018-07-06 14:30
  **/
-public class LoginAuthRespHandler extends ChannelHandlerAdapter {
+public class LoginAuthRespHandler extends TransferHandler {
 
     private Map<String, Boolean> nodeCheck = new ConcurrentHashMap<>();
 

@@ -29,16 +29,6 @@ public enum DataEventType {
     NODE_MASTER_DATA_DELETE,
 
     /**
-     * 其他节点Master running 临时节点数据修改
-     */
-    NODE_OTHER_MASTER_DATA_CHANGE,
-
-    /**
-     * 其他节点Master running 临时节点删除
-     */
-    NODE_OTHER_MASTER_DATA_DELETE,
-
-    /**
      * 节点数据改变
      */
     NODE_DATA_ITEM_CHANGE,

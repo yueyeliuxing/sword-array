@@ -12,7 +12,7 @@ import io.netty.channel.ChannelHandlerContext;
  * @author: zhouqi1
  * @create: 2018-07-06 13:52
  **/
-public class LoginAuthReqHandler extends ChannelHandlerAdapter {
+public class LoginAuthReqHandler extends TransferHandler {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         ctx.fireExceptionCaught(cause);
