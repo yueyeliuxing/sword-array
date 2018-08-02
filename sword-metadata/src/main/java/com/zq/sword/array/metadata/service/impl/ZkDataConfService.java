@@ -157,7 +157,7 @@ public class ZkDataConfService extends AbstractService implements DataConfServic
 
                                                                         String consumeData = zkClient.readData(consumeMetadataPath);
                                                                         NodeServerId consumeNodeServerId = new NodeServerId(dcName, cNames[0], cNames[1], serverName);
-                                                                        consumeDataMap.put(consumeNodeServerId, new NodeConsumptionInfo(consumeNodeServerId, consumeData));
+                                                                        consumeDataMap.put(consumeNodeServerId, new NodeConsumptionInfo(consumeNodeServerId, Long.parseLong(consumeData)));
 
                                                                     }
                                                                     nodeMetadataInfo.setConsumeData(consumeDataMap);

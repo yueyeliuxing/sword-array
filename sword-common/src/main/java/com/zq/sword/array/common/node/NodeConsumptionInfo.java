@@ -17,9 +17,9 @@ public class NodeConsumptionInfo {
 
     private NodeServerId id;
 
-    private String dataItemId;
+    private Long dataItemId;
 
-    public NodeConsumptionInfo(NodeServerId id, String dataItemId) {
+    public NodeConsumptionInfo(NodeServerId id, Long dataItemId) {
         this.id = id;
         this.dataItemId = dataItemId;
     }
