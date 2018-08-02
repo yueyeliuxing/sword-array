@@ -13,7 +13,7 @@ import java.io.Serializable;
  **/
 @Data
 @ToString
-public final class NettyMessage implements Serializable {
+public final class TransferMessage implements Serializable {
 
     private static final long serialVersionUID = -2547176236114990872L;
     /**

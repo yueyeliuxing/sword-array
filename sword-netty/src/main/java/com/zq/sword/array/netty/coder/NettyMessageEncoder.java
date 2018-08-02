@@ -1,7 +1,7 @@
 package com.zq.sword.array.netty.coder;
 
 import com.zq.sword.array.netty.message.Header;
-import com.zq.sword.array.netty.message.NettyMessage;
+import com.zq.sword.array.netty.message.TransferMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -16,7 +16,7 @@ import java.util.Map;
  * @author: zhouqi1
  * @create: 2018-07-06 10:40
  **/
-public final class NettyMessageEncoder extends MessageToMessageEncoder<NettyMessage> {
+public final class NettyMessageEncoder extends MessageToMessageEncoder<TransferMessage> {
 
     private NettyMarshallingEncoder nettyMarshallingEncoder;
 
@@ -25,7 +25,7 @@ public final class NettyMessageEncoder extends MessageToMessageEncoder<NettyMess
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, NettyMessage msg, List<Object> out) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, TransferMessage msg, List<Object> out) throws Exception {
         if(msg == null || msg.getHeader() == null) {
             throw new Exception("The encode message is null");
         }

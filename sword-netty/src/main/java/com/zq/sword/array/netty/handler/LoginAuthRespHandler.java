@@ -2,8 +2,7 @@ package com.zq.sword.array.netty.handler;
 
 import com.zq.sword.array.netty.message.Header;
 import com.zq.sword.array.netty.message.MessageType;
-import com.zq.sword.array.netty.message.NettyMessage;
-import io.netty.channel.ChannelHandlerAdapter;
+import com.zq.sword.array.netty.message.TransferMessage;
 import io.netty.channel.ChannelHandlerContext;
 
 import java.net.InetSocketAddress;
@@ -36,11 +35,11 @@ public class LoginAuthRespHandler extends TransferHandler {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        NettyMessage message = (NettyMessage)msg;
+        TransferMessage message = (TransferMessage)msg;
 
         if(message.getHeader() != null && message.getHeader().getType() == MessageType.LOGIN_REQ.value()) {
             String nodeIndex = ctx.channel().remoteAddress().toString();
-            NettyMessage loginResp = null;
+            TransferMessage loginResp = null;
             if(nodeCheck.containsKey(nodeIndex)) {
                 loginResp = buildResponse((byte)-1);
             }else {
@@ -65,8 +64,8 @@ public class LoginAuthRespHandler extends TransferHandler {
         }
     }
 
-    private NettyMessage buildResponse(byte body) {
-        NettyMessage message = new NettyMessage();
+    private TransferMessage buildResponse(byte body) {
+        TransferMessage message = new TransferMessage();
         Header header = new Header();
         header.setType(MessageType.LOGIN_RESP.value());
         message.setHeader(header);

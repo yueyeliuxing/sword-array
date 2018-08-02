@@ -2,8 +2,7 @@ package com.zq.sword.array.netty.handler;
 
 import com.zq.sword.array.netty.message.Header;
 import com.zq.sword.array.netty.message.MessageType;
-import com.zq.sword.array.netty.message.NettyMessage;
-import io.netty.channel.ChannelHandlerAdapter;
+import com.zq.sword.array.netty.message.TransferMessage;
 import io.netty.channel.ChannelHandlerContext;
 
 /**
@@ -25,10 +24,10 @@ public class HeartBeatRespHandler extends TransferHandler {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        NettyMessage message = (NettyMessage)msg;
+        TransferMessage message = (TransferMessage)msg;
         if(message != null && message.getHeader().getType() == MessageType.HEARTBEAT_REQ.value()) {
             System.out.println("Receive client heart beat message : --> " + message);
-            NettyMessage heartBeat = buildHeartBeat();
+            TransferMessage heartBeat = buildHeartBeat();
             System.out.println("Send heart beat response message to client : -->" + heartBeat);
             ctx.writeAndFlush(heartBeat);
         }else {
@@ -36,8 +35,8 @@ public class HeartBeatRespHandler extends TransferHandler {
         }
     }
 
-    private NettyMessage buildHeartBeat() {
-        NettyMessage message = new NettyMessage();
+    private TransferMessage buildHeartBeat() {
+        TransferMessage message = new TransferMessage();
         Header header = new Header();
         header.setType(MessageType.HEARTBEAT_RESP.value());
         message.setHeader(header);

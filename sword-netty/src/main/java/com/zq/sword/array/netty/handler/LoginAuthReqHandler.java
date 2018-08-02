@@ -2,8 +2,7 @@ package com.zq.sword.array.netty.handler;
 
 import com.zq.sword.array.netty.message.Header;
 import com.zq.sword.array.netty.message.MessageType;
-import com.zq.sword.array.netty.message.NettyMessage;
-import io.netty.channel.ChannelHandlerAdapter;
+import com.zq.sword.array.netty.message.TransferMessage;
 import io.netty.channel.ChannelHandlerContext;
 
 /**
@@ -25,7 +24,7 @@ public class LoginAuthReqHandler extends TransferHandler {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-       NettyMessage message = (NettyMessage)msg;
+       TransferMessage message = (TransferMessage)msg;
 
        if(message.getHeader() != null && message.getHeader().getType() == MessageType.LOGIN_RESP.value()) {
            byte loginResult = (byte)message.getBody();
@@ -40,8 +39,8 @@ public class LoginAuthReqHandler extends TransferHandler {
        }
     }
 
-    private NettyMessage buildLogReq() {
-        NettyMessage message = new NettyMessage();
+    private TransferMessage buildLogReq() {
+        TransferMessage message = new TransferMessage();
         Header header = new Header();
         header.setType(MessageType.LOGIN_REQ.value());
         message.setHeader(header);

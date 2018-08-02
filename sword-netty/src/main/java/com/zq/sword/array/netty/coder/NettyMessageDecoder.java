@@ -1,7 +1,7 @@
 package com.zq.sword.array.netty.coder;
 
 import com.zq.sword.array.netty.message.Header;
-import com.zq.sword.array.netty.message.NettyMessage;
+import com.zq.sword.array.netty.message.TransferMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
@@ -30,7 +30,7 @@ public class NettyMessageDecoder extends LengthFieldBasedFrameDecoder {
          if(frame == null){
              return null;
          }
-        NettyMessage message = new NettyMessage();
+        TransferMessage message = new TransferMessage();
         Header header = new Header();
         header.setCrcCode(in.readInt());
         header.setLength(in.readInt());

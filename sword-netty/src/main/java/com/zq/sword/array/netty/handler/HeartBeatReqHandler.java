@@ -2,8 +2,7 @@ package com.zq.sword.array.netty.handler;
 
 import com.zq.sword.array.netty.message.Header;
 import com.zq.sword.array.netty.message.MessageType;
-import com.zq.sword.array.netty.message.NettyMessage;
-import io.netty.channel.ChannelHandlerAdapter;
+import com.zq.sword.array.netty.message.TransferMessage;
 import io.netty.channel.ChannelHandlerContext;
 
 import java.util.concurrent.ScheduledFuture;
@@ -35,7 +34,7 @@ public class HeartBeatReqHandler extends TransferHandler {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        NettyMessage message = (NettyMessage)msg;
+        TransferMessage message = (TransferMessage)msg;
         if(message.getHeader() != null && message.getHeader().getType() == MessageType.LOGIN_RESP.value()){
             heartBeat = ctx.executor().scheduleAtFixedRate(new HeartBeatReqHandler.HeartBeatTask(ctx), 0, 5000, TimeUnit.MILLISECONDS);
         } else if (message.getHeader() != null && message.getHeader().getType() == MessageType.HEARTBEAT_RESP.value()) {
@@ -55,13 +54,13 @@ public class HeartBeatReqHandler extends TransferHandler {
 
         @Override
         public void run() {
-            NettyMessage heatBeat = buildHeatBeat();
+            TransferMessage heatBeat = buildHeatBeat();
             System.out.println("Client send heart beat message to server : --> " + heatBeat);
             ctx.writeAndFlush(heatBeat);
         }
 
-        private NettyMessage buildHeatBeat() {
-            NettyMessage message = new NettyMessage();
+        private TransferMessage buildHeatBeat() {
+            TransferMessage message = new TransferMessage();
             Header header = new Header();
             header.setType(MessageType.HEARTBEAT_REQ.value());
             message.setHeader(header);

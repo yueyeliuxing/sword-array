@@ -16,6 +16,9 @@ public enum MessageType {
     LOGIN_RESP((byte)4),
     HEARTBEAT_REQ((byte)5),
     HEARTBEAT_RESP((byte)6),
+
+    POLL_TRANSFER_DATA_REQ((byte)7),
+    POLL_TRANSFER_DATA_RESP((byte)8),
     ;
 
     MessageType(byte value) {
