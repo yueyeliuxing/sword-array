@@ -16,7 +16,7 @@ public class NodeServerInfoHelper {
      * @return
      */
     public static String getNodeServerInfoData(NodeServerInfo nodeServerInfo) {
-        return String.format("%s:%s", nodeServerInfo.getServerAddress(), nodeServerInfo.getPort());
+        return String.format("%s:%s:%s", nodeServerInfo.getServerAddress(), nodeServerInfo.getPort(), nodeServerInfo.getBackupPort());
     }
 
     /**
@@ -30,7 +30,7 @@ public class NodeServerInfoHelper {
             if(items.length != 2) {
                 return null;
             }
-            return new NodeServerInfo(items[0], Integer.parseInt(items[1]));
+            return new NodeServerInfo(items[0], Integer.parseInt(items[1]), Integer.parseInt(items[2]));
         }
         return null;
     }

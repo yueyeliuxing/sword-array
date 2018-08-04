@@ -27,7 +27,7 @@ public interface LeftQueueService extends Service {
     /**
      * 删除数据
      */
-    void removeDataItem();
+    void removeDataItem(DataItem dataItem);
 
 
     /**

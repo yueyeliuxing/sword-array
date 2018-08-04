@@ -21,8 +21,11 @@ public class NodeServerInfo {
 
     private int port;
 
-    public NodeServerInfo(String serverAddress, int port) {
+    private int backupPort;
+
+    public NodeServerInfo(String serverAddress, int port, int backupPort) {
         this.serverAddress = serverAddress;
         this.port = port;
+        this.backupPort = backupPort;
     }
 }

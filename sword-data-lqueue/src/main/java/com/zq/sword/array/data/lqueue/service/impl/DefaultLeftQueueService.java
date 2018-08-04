@@ -43,8 +43,8 @@ public class DefaultLeftQueueService extends AbstractService implements LeftQueu
     }
 
     @Override
-    public void removeDataItem() {
-        dataStorageQueueService.removeDataItem();
+    public void removeDataItem(DataItem dataItem) {
+        dataStorageQueueService.removeDataItem(dataItem);
     }
 
     @Override
