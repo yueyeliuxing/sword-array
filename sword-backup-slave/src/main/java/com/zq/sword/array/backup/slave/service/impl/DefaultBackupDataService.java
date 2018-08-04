@@ -53,7 +53,7 @@ public class DefaultBackupDataService extends AbstractTaskService implements Bac
             }
         });
 
-        initClient(masterNodeServerInfo);
+        startClient(masterNodeServerInfo);
 
     }
 
@@ -62,8 +62,9 @@ public class DefaultBackupDataService extends AbstractTaskService implements Bac
     }
 
 
-    private void initClient(NodeServerInfo masterNodeServerInfo){
+    private void startClient(NodeServerInfo masterNodeServerInfo){
         transferClient = getTransferClient(masterNodeServerInfo);
+        transferClient.connect();
     }
 
     private TransferClient getTransferClient(NodeServerInfo masterNodeServerInfo){
