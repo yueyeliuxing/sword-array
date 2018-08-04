@@ -8,6 +8,8 @@ import com.zq.sword.array.data.lqueue.service.ConsumedDataQueueService;
 import com.zq.sword.array.data.lqueue.service.DataStorageQueueService;
 import com.zq.sword.array.data.lqueue.service.LeftQueueService;
 
+import java.util.List;
+
 /**
  * @program: sword-array
  * @description: 数据存储队列服务
@@ -60,6 +62,16 @@ public class DefaultLeftQueueService extends AbstractService implements LeftQueu
     @Override
     public boolean containsConsumedDataItem(DataItem dataItem) {
         return consumedDataQueueService.containsDataItem(dataItem);
+    }
+
+    @Override
+    public List<DataItem> pollAfterId(Long id) {
+        return null;
+    }
+
+    @Override
+    public List<DataItem> pollAfterId(Long id, Integer maxNum) {
+        return null;
     }
 
 

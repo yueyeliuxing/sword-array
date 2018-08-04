@@ -2,6 +2,8 @@ package com.zq.sword.array.data.lqueue.manager.impl;
 
 import com.zq.sword.array.data.lqueue.domain.DataItem;
 import com.zq.sword.array.data.lqueue.manager.MemoryDataQueueManager;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -50,5 +52,31 @@ public class MemoryDataQueueManagerImpl implements MemoryDataQueueManager {
     @Override
     public void removeDataItem(DataItem dataItem) {
         dataItemQueue.remove();
+    }
+
+    @Override
+    public List<DataItem> pollAfterId(Long id) {
+        List<DataItem> dataItems = new ArrayList<>();
+        if(!dataItemQueue.isEmpty()){
+            for (DataItem dataItem : dataItemQueue){
+                if(dataItem.getId() >= id){
+                    dataItems.add(dataItem);
+                }
+            }
+        }
+        return dataItems;
+    }
+
+    @Override
+    public List<DataItem> pollAfterId(Long id, Integer maxNum) {
+        List<DataItem> dataItems = new ArrayList<>();
+        if(!dataItemQueue.isEmpty()){
+            for (DataItem dataItem : dataItemQueue){
+                if(dataItem.getId() >= id && dataItems.size() <= maxNum){
+                    dataItems.add(dataItem);
+                }
+            }
+        }
+        return dataItems;
     }
 }

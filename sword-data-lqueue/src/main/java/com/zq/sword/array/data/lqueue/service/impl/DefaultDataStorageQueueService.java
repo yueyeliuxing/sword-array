@@ -81,5 +81,15 @@ public class DefaultDataStorageQueueService extends AbstractTaskService implemen
         dataQueuePersistenceManager.removeDataItem(dataItem);
     }
 
+    @Override
+    public List<DataItem> pollAfterId(Long id) {
+        return null;
+    }
+
+    @Override
+    public List<DataItem> pollAfterId(Long id, Integer maxNum) {
+        return null;
+    }
+
 
 }

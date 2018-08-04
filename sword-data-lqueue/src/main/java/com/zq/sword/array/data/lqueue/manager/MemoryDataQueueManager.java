@@ -33,4 +33,19 @@ public interface MemoryDataQueueManager {
      * 删除数据
      */
     void removeDataItem(DataItem dataItem);
+
+    /**
+     * 获取指定ID之后的数据项
+     * @param id 数据项ID
+     * @return 数据项
+     */
+    List<DataItem> pollAfterId(Long id);
+
+    /**
+     * 获取指定ID之后的数据项
+     * @param id 数据项ID
+     * @param maxNum 最大获取的数目
+     * @return 数据项
+     */
+    List<DataItem> pollAfterId(Long id, Integer maxNum);
 }

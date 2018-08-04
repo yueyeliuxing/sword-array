@@ -49,7 +49,7 @@ public class PullBackupDataHandler extends TransferHandler {
         TransferMessage message = (TransferMessage)msg;
         LeftQueueService leftQueueService = getLeftQueueService();
         RightQueueService rightQueueService = getRightQueueService();
-        if(message.getHeader() != null && message.getHeader().getType() == MessageType.POLL_T_LEFT_DATA_TRANSFER_RESP.value()) {
+        if(message.getHeader() != null && message.getHeader().getType() == MessageType.POLL_T_LEFT_DATA_BACKUP_RESP.value()) {
             Long lastDataItemId = getLastLeftQueueDataItemId();
             List<DataItem> dataItems = (List<DataItem>)message.getBody();
             if(dataItems != null && !dataItems.isEmpty()){

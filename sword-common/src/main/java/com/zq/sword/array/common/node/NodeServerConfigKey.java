@@ -52,4 +52,9 @@ public class NodeServerConfigKey {
      * 节点数据传输服务启动的端口
      */
     public static final String NODE_SERVER_START_PORT = "node.server.start.port";
+
+    /**
+     * 节点数据备份传输服务启动的端口
+     */
+    public static final String NODE_SERVER_BACKUP_START_PORT = "node.server.backup.start.port";
 }
