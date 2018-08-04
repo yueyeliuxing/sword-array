@@ -8,5 +8,5 @@ import com.zq.sword.array.common.service.TaskService;
  * @author: zhouqi1
  * @create: 2018-08-04 13:47
  **/
-public interface BackupDataService extends TaskService {
+public interface SlaveBackupDataService extends TaskService {
 }

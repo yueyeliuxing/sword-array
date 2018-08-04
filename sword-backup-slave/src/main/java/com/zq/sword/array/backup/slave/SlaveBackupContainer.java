@@ -8,5 +8,5 @@ import com.zq.sword.array.common.service.Container;
  * @author: zhouqi1.
  * @create: 2018-08-04 12:03
  **/
-public interface BackupSlaveContainer extends Container {
+public interface SlaveBackupContainer extends Container {
 }

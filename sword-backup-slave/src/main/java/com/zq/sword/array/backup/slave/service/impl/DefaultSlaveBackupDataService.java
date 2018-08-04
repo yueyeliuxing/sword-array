@@ -1,7 +1,7 @@
 package com.zq.sword.array.backup.slave.service.impl;
 
 import com.zq.sword.array.backup.slave.handler.PullBackupDataHandler;
-import com.zq.sword.array.backup.slave.service.BackupDataService;
+import com.zq.sword.array.backup.slave.service.SlaveBackupDataService;
 import com.zq.sword.array.common.event.DataEvent;
 import com.zq.sword.array.common.event.DataEventListener;
 import com.zq.sword.array.common.node.NodeMetadataInfo;
@@ -21,7 +21,7 @@ import com.zq.sword.array.netty.client.TransferClient;
  * @author: zhouqi1
  * @create: 2018-08-04 13:47
  **/
-public class DefaultBackupDataService extends AbstractTaskService implements BackupDataService {
+public class DefaultSlaveBackupDataService extends AbstractTaskService implements SlaveBackupDataService {
 
     private TransferClient transferClient;
 
