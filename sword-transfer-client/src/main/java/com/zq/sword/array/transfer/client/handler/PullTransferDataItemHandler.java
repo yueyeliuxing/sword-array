@@ -52,7 +52,7 @@ public class PullTransferDataItemHandler extends TransferHandler {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         TransferMessage message = (TransferMessage)msg;
 
-        if(message.getHeader() != null && message.getHeader().getType() == MessageType.POLL_TRANSFER_DATA_RESP.value()) {
+        if(message.getHeader() != null && message.getHeader().getType() == MessageType.POLL_T_LEFT_DATA_TRANSFER_RESP.value()) {
             Long lastDataItemId = getDataItemId();
             List<DataItem> dataItems = (List<DataItem>)message.getBody();
             if(dataItems != null && !dataItems.isEmpty()){
@@ -72,7 +72,7 @@ public class PullTransferDataItemHandler extends TransferHandler {
     private TransferMessage buildPollTransferMessageReq(Long dataItemId) {
         TransferMessage message = new TransferMessage();
         Header header = new Header();
-        header.setType(MessageType.POLL_TRANSFER_DATA_REQ.value());
+        header.setType(MessageType.POLL_T_LEFT_DATA_TRANSFER_REQ.value());
         message.setHeader(header);
         message.setBody(dataItemId);
         return message;

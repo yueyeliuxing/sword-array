@@ -15,9 +15,16 @@ public class MemoryDataQueueManagerImpl implements MemoryDataQueueManager {
 
     private ConcurrentLinkedQueue<DataItem> dataItemQueue;
 
+    private Long lastDataItemId;
+
 
     public MemoryDataQueueManagerImpl(){
         dataItemQueue = new ConcurrentLinkedQueue<>();
+    }
+
+    @Override
+    public Long getLastDataItemId() {
+        return lastDataItemId;
     }
 
     @Override
@@ -32,6 +39,7 @@ public class MemoryDataQueueManagerImpl implements MemoryDataQueueManager {
     @Override
     public void addDataItem(DataItem dataItem){
         dataItemQueue.add(dataItem);
+        lastDataItemId = dataItem.getId();
     }
 
     @Override

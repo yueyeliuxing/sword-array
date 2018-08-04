@@ -17,11 +17,17 @@ public enum MessageType {
     HEARTBEAT_REQ((byte)5),
     HEARTBEAT_RESP((byte)6),
 
-    POLL_TRANSFER_DATA_REQ((byte)7),
-    POLL_TRANSFER_DATA_RESP((byte)8),
+    POLL_T_LEFT_DATA_TRANSFER_REQ((byte)7),
+    POLL_T_LEFT_DATA_TRANSFER_RESP((byte)8),
 
-    PUSH_TRANSFER_DATA_REQ((byte)9),
-    PUSH_TRANSFER_DATA_RESP((byte)10),
+    PUSH_T_RIGHT_DATA_TRANSFER__REQ((byte)9),
+    PUSH_T_RIGHT_DATA_TRANSFER_RESP((byte)10),
+
+    POLL_T_RIGHT_DATA_BACKUP_REQ((byte)11),
+    POLL_T_RIGHT_DATA_BACKUP_RESP((byte)12),
+
+    POLL_T_LEFT_DATA_BACKUP_REQ((byte)13),
+    POLL_T_LEFT_DATA_BACKUP_RESP((byte)14),
     ;
 
     MessageType(byte value) {

@@ -60,6 +60,11 @@ public class DefaultDataStorageQueueService extends AbstractTaskService implemen
 
 
     @Override
+    public Long getLastDataItemId() {
+        return memoryDataQueueManager.getLastDataItemId();
+    }
+
+    @Override
     public void addDataItem(DataItem item) {
         memoryDataQueueManager.addDataItem(item);
         dataQueuePersistenceManager.persistenceDataItem(item);

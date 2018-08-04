@@ -14,6 +14,12 @@ import com.zq.sword.array.data.lqueue.domain.DataItem;
 public interface LeftQueueService extends Service {
 
     /**
+     * 获取最新的id
+     * @return
+     */
+    Long getLastDataItemId();
+
+    /**
      * 添加数据
      * @param item
      */

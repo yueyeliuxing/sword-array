@@ -17,6 +17,12 @@ import java.util.List;
 public interface DataItemService extends TaskService {
 
     /**
+     * 获取最新的id
+     * @return
+     */
+    Long getLastDataItemId();
+
+    /**
      * 添加数据项
      * @param dataItem
      * @return

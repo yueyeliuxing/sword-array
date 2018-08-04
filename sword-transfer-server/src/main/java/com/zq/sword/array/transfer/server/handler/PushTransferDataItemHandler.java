@@ -2,7 +2,6 @@ package com.zq.sword.array.transfer.server.handler;
 
 import com.zq.sword.array.common.event.DataEvent;
 import com.zq.sword.array.common.event.DataEventListener;
-import com.zq.sword.array.common.node.NodeConsumptionInfo;
 import com.zq.sword.array.common.node.NodeServerId;
 import com.zq.sword.array.common.service.ServiceContext;
 import com.zq.sword.array.data.rqueue.domain.DataItem;
@@ -53,7 +52,7 @@ public class PushTransferDataItemHandler extends TransferHandler {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         TransferMessage message = (TransferMessage)msg;
 
-        if(message.getHeader() != null && message.getHeader().getType() == MessageType.PUSH_TRANSFER_DATA_RESP.value()) {
+        if(message.getHeader() != null && message.getHeader().getType() == MessageType.PUSH_T_RIGHT_DATA_TRANSFER__REQ.value()) {
             Long dataItemId = (Long)message.getBody();
             List<DataItem> dataItems = rightQueueService.pollAfterId(dataItemId);
             ctx.fireChannelRead(buildPushTransferMessageResp(dataItems));
@@ -65,7 +64,7 @@ public class PushTransferDataItemHandler extends TransferHandler {
     private TransferMessage buildPushTransferMessageResp(List<DataItem> dataItems) {
         TransferMessage message = new TransferMessage();
         Header header = new Header();
-        header.setType(MessageType.PUSH_TRANSFER_DATA_RESP.value());
+        header.setType(MessageType.PUSH_T_RIGHT_DATA_TRANSFER_RESP.value());
         message.setHeader(header);
         message.setBody(dataItems);
         return message;

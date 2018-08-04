@@ -22,6 +22,8 @@ import java.util.concurrent.TimeUnit;
  **/
 public class DefaultDataItemService extends AbstractTaskService implements DataItemService {
 
+    private Long lastDataItemId;
+
     private FileDataItemManager fileDataItemManager;
 
     private int dataItemFileRetainDays = 7;
@@ -30,6 +32,8 @@ public class DefaultDataItemService extends AbstractTaskService implements DataI
     public void start(ServiceConfig serviceConfig) {
         String dataItemFilePath = serviceConfig.getProperty(NodeServerConfigKey.T_RIGHT_DATA_ITEM_FILE_PATH);
         fileDataItemManager = new FileDataItemManagerImpl(dataItemFilePath);
+
+        lastDataItemId = fileDataItemManager.getLastDataItemId();
 
         //初始化任务
         initTasks();
@@ -44,7 +48,13 @@ public class DefaultDataItemService extends AbstractTaskService implements DataI
 
 
     @Override
+    public Long getLastDataItemId() {
+        return lastDataItemId;
+    }
+
+    @Override
     public DataIndex addDataItem(DataItem dataItem) {
+        lastDataItemId = dataItem.getId();
         return fileDataItemManager.addDataItem(dataItem);
     }
 

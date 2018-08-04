@@ -50,7 +50,40 @@
 
 
 	<dependencies>
+		<dependency>
+			<groupId>com.zq.sword</groupId>
+			<artifactId>sword-common</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
 
+		<dependency>
+			<groupId>com.zq.sword</groupId>
+			<artifactId>sword-data-lqueue</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.zq.sword</groupId>
+			<artifactId>sword-data-rqueue</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.zq.sword</groupId>
+			<artifactId>sword-metadata</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.zq.sword</groupId>
+			<artifactId>sword-netty</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 </project>

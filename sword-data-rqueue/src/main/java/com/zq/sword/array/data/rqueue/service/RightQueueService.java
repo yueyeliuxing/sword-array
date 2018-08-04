@@ -23,6 +23,12 @@ public interface RightQueueService extends Service {
     void registerDataItemListener(NodeServerId nodeServerId, DataEventListener<DataItem> dataItemDataEventListener);
 
     /**
+     * 获取最新的id
+     * @return
+     */
+    Long getLastDataItemId();
+
+    /**
      * 添加数据项
      * @param dataItem
      */

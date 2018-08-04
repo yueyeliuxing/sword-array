@@ -7,6 +7,12 @@ import java.util.List;
 public interface MemoryDataQueueManager {
 
     /**
+     * 获取最新的id
+     * @return
+     */
+    Long getLastDataItemId();
+
+    /**
      * 加载数据
      * @param dataItems
      */

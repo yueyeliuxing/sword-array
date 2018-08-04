@@ -33,6 +33,11 @@ public class DefaultLeftQueueService extends AbstractService implements LeftQueu
 
 
     @Override
+    public Long getLastDataItemId() {
+        return dataStorageQueueService.getLastDataItemId();
+    }
+
+    @Override
     public void addDataItem(DataItem item) {
         dataStorageQueueService.addDataItem(item);
     }

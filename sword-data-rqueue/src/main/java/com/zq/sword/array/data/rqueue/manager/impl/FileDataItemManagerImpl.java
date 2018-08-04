@@ -27,6 +27,8 @@ public class FileDataItemManagerImpl implements FileDataItemManager {
 
     private static final String DATA_ITEM_FILE_SUFFIX = ".data";
 
+    private static final String LAST_DATA_ITEM_ID_FILE_NAME = "last_data_item.id";
+
     /**
      * 数据文件路径
      */
@@ -42,6 +44,24 @@ public class FileDataItemManagerImpl implements FileDataItemManager {
      */
     private String getDataItemFilePath(String fileName){
         return String.format("%s/%s%s", dataItemFilePath, fileName, DATA_ITEM_FILE_SUFFIX);
+    }
+
+    /**
+     * 获取索引文件路径
+     * @return
+     */
+    private String getLastDataItemIdFilePath(){
+        return String.format("%s/%s", dataItemFilePath, LAST_DATA_ITEM_ID_FILE_NAME);
+    }
+
+    @Override
+    public Long getLastDataItemId() {
+        File lastDataItemIdFile = new File(getLastDataItemIdFilePath());
+        List<String> dataLines = FileUtil.readLines(lastDataItemIdFile);
+        if(dataLines != null && !dataLines.isEmpty()){
+            return Long.parseLong(dataLines.get(0));
+        }
+        return 0L;
     }
 
     /**
@@ -65,6 +85,14 @@ public class FileDataItemManagerImpl implements FileDataItemManager {
         dataIndex.setFileId(fileName);
         dataIndex.setTimestamp(dataItem.getTimestamp());
         dataIndex.setValueLength(Long.valueOf(dataLine.length()));
+
+
+        //保存iD
+        File lastDataItemIdFile = new File(getLastDataItemIdFilePath());
+        if(lastDataItemIdFile.exists()){
+            lastDataItemIdFile.delete();
+        }
+        FileUtil.appendLine(lastDataItemIdFile, String.valueOf(dataItem.getId()));
         return dataIndex;
     }
 

@@ -55,6 +55,11 @@ public class DefaultRightQueueService extends AbstractService implements RightQu
     }
 
     @Override
+    public Long getLastDataItemId() {
+        return null;
+    }
+
+    @Override
     public void push(DataItem dataItem) {
         DataIndex dataIndex = dataItemService.addDataItem(dataItem);
         dataIndexService.addDataIndex(dataIndex);

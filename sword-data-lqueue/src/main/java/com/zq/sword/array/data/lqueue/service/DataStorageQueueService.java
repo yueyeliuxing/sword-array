@@ -13,6 +13,12 @@ import com.zq.sword.array.data.lqueue.domain.DataItem;
 public interface DataStorageQueueService extends TaskService{
 
     /**
+     * 获取最新的id
+     * @return
+     */
+    Long getLastDataItemId();
+
+    /**
      * 添加数据
      * @param item
      */
