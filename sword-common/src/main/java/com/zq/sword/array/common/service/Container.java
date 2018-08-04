@@ -8,7 +8,7 @@ import com.zq.sword.array.common.service.Lifecycle;
  * @author: zhouqi1
  * @create: 2018-07-25 10:44
  **/
-public interface Server extends Lifecycle {
+public interface Container extends Lifecycle {
 
     /**
      * 开启服务

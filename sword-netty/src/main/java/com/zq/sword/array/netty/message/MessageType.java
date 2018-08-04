@@ -19,6 +19,9 @@ public enum MessageType {
 
     POLL_TRANSFER_DATA_REQ((byte)7),
     POLL_TRANSFER_DATA_RESP((byte)8),
+
+    PUSH_TRANSFER_DATA_REQ((byte)9),
+    PUSH_TRANSFER_DATA_RESP((byte)10),
     ;
 
     MessageType(byte value) {

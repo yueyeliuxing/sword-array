@@ -1,6 +1,6 @@
 package com.zq.sword.array.transfer.client;
 
-import com.zq.sword.array.common.service.Server;
+import com.zq.sword.array.common.service.Container;
 
 /**
  * @program: sword-array
@@ -8,5 +8,5 @@ import com.zq.sword.array.common.service.Server;
  * @author: zhouqi1
  * @create: 2018-08-01 17:23
  **/
-public interface TransferClientContainer extends Server {
+public interface TransferClientContainer extends Container {
 }

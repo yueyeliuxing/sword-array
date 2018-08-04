@@ -1,6 +1,6 @@
 package com.zq.sword.array.metadata.container;
 
-import com.zq.sword.array.common.service.AbstractServer;
+import com.zq.sword.array.common.service.AbstractContainer;
 import com.zq.sword.array.metadata.MetadataServiceContainer;
 import com.zq.sword.array.metadata.service.DataConsumptionConfService;
 import com.zq.sword.array.metadata.service.NamingConfService;
@@ -17,7 +17,7 @@ import com.zq.sword.array.metadata.service.impl.DefaultNodeConfService;
  * @author: zhouqi1
  * @create: 2018-07-23 20:25
  **/
-public class DefaultMetadataServiceContainer extends AbstractServer implements MetadataServiceContainer {
+public class DefaultMetadataServiceContainer extends AbstractContainer implements MetadataServiceContainer {
 
     public DefaultMetadataServiceContainer() {
         this(new ZkDataConfService());

@@ -1,0 +1,67 @@
+package com.zq.sword.array.transfer.server.handler;
+
+import com.zq.sword.array.common.node.NodeConsumptionInfo;
+import com.zq.sword.array.common.node.NodeServerId;
+import com.zq.sword.array.common.service.ServiceContext;
+import com.zq.sword.array.data.rqueue.domain.DataItem;
+import com.zq.sword.array.data.rqueue.service.RightQueueService;
+import com.zq.sword.array.netty.handler.TransferHandler;
+import com.zq.sword.array.netty.message.Header;
+import com.zq.sword.array.netty.message.MessageType;
+import com.zq.sword.array.netty.message.TransferMessage;
+import io.netty.channel.ChannelHandlerContext;
+
+import java.util.List;
+
+/**
+ * @program: sword-array
+ * @description: 数据想传输处理器
+ * @author: zhouqi1
+ * @create: 2018-08-01 20:44
+ **/
+public class PushTransferDataItemHandler extends TransferHandler {
+
+    private NodeServerId nodeServerId;
+
+    private NodeServerId clientNodeServerId;
+
+    private RightQueueService rightQueueService;
+
+    public PushTransferDataItemHandler(NodeServerId nodeServerId, NodeServerId clientNodeServerId) {
+        this.nodeServerId = nodeServerId;
+        this.clientNodeServerId = clientNodeServerId;
+        rightQueueService = ServiceContext.getInstance().findService(RightQueueService.class);
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        ctx.fireExceptionCaught(cause);
+    }
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+       super.channelActive(ctx);
+    }
+
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        TransferMessage message = (TransferMessage)msg;
+
+        if(message.getHeader() != null && message.getHeader().getType() == MessageType.PUSH_TRANSFER_DATA_RESP.value()) {
+            Long dataItemId = (Long)message.getBody();
+            List<DataItem> dataItems = rightQueueService.pollAfterId(dataItemId);
+            ctx.fireChannelRead(buildPushTransferMessageResp(dataItems));
+        }else {
+            ctx.fireChannelRead(msg);
+        }
+    }
+
+    private TransferMessage buildPushTransferMessageResp(List<DataItem> dataItems) {
+        TransferMessage message = new TransferMessage();
+        Header header = new Header();
+        header.setType(MessageType.PUSH_TRANSFER_DATA_RESP.value());
+        message.setHeader(header);
+        message.setBody(dataItems);
+        return message;
+    }
+}

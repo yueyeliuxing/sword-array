@@ -1,6 +1,6 @@
 package com.zq.sword.array.data.lqueue;
 
-import com.zq.sword.array.common.service.Server;
+import com.zq.sword.array.common.service.Container;
 
 /**
  * @program: sword-array
@@ -8,6 +8,6 @@ import com.zq.sword.array.common.service.Server;
  * @author: zhouqi1
  * @create: 2018-07-23 19:31
  **/
-public interface LeftQueueServiceContainer extends Server {
+public interface LeftQueueServiceContainer extends Container {
 
 }

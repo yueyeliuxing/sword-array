@@ -21,7 +21,7 @@ import java.util.Map;
  * @author: zhouqi1
  * @create: 2018-08-01 20:44
  **/
-public class TransferDataItemHandler extends TransferHandler {
+public class PullTransferDataItemHandler extends TransferHandler {
 
     private NodeServerId nodeServerId;
 
@@ -31,7 +31,7 @@ public class TransferDataItemHandler extends TransferHandler {
 
     private DataConsumptionConfService dataConsumptionConfService;
 
-    public TransferDataItemHandler(NodeServerId nodeServerId, NodeServerId clientNodeServerId) {
+    public PullTransferDataItemHandler(NodeServerId nodeServerId, NodeServerId clientNodeServerId) {
         this.nodeServerId = nodeServerId;
         this.clientNodeServerId = clientNodeServerId;
         leftQueueService = ServiceContext.getInstance().findService(LeftQueueService.class);

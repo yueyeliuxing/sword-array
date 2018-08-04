@@ -1,8 +1,5 @@
 package com.zq.sword.array.common.service;
 
-import com.zq.sword.array.common.service.AbstractLifecycle;
-import com.zq.sword.array.common.service.Service;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -12,11 +9,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author: zhouqi1
  * @create: 2018-07-23 19:25
  **/
-public abstract class AbstractServer extends AbstractLifecycle implements Server {
+public abstract class AbstractContainer extends AbstractLifecycle implements Container {
 
     private Map<String, Service> services;
 
-    public AbstractServer() {
+    public AbstractContainer() {
         services = new ConcurrentHashMap<>();
     }
 

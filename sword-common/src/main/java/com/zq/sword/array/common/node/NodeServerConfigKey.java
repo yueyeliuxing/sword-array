@@ -47,4 +47,9 @@ public class NodeServerConfigKey {
      * T-Left队列数据文件存储地址
      */
     public static final String T_LEFT_DATA_ITEM_FILE_PATH = "t-left.data.item.file.path";
+
+    /**
+     * 节点数据传输服务启动的端口
+     */
+    public static final String NODE_SERVER_START_PORT = "node.server.start.port";
 }

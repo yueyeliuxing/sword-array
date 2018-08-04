@@ -1,6 +1,6 @@
 package com.zq.sword.array.data.lqueue.container;
 
-import com.zq.sword.array.common.service.AbstractServer;
+import com.zq.sword.array.common.service.AbstractContainer;
 import com.zq.sword.array.data.lqueue.LeftQueueServiceContainer;
 import com.zq.sword.array.data.lqueue.service.LeftQueueService;
 import com.zq.sword.array.data.lqueue.service.impl.DefaultLeftQueueService;
@@ -11,7 +11,7 @@ import com.zq.sword.array.data.lqueue.service.impl.DefaultLeftQueueService;
  * @author: zhouqi1
  * @create: 2018-07-23 19:31
  **/
-public class DefaultLeftQueueServiceContainer extends AbstractServer implements LeftQueueServiceContainer {
+public class DefaultLeftQueueServiceContainer extends AbstractContainer implements LeftQueueServiceContainer {
 
     public DefaultLeftQueueServiceContainer() {
         registerService(LeftQueueService.class, new DefaultLeftQueueService());

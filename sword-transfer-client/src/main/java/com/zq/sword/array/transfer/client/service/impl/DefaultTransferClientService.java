@@ -11,7 +11,7 @@ import com.zq.sword.array.common.service.ServiceContext;
 import com.zq.sword.array.metadata.service.NamingConfService;
 import com.zq.sword.array.netty.client.DefaultTransferClient;
 import com.zq.sword.array.netty.client.TransferClient;
-import com.zq.sword.array.transfer.client.handler.TransferDataItemHandler;
+import com.zq.sword.array.transfer.client.handler.PullTransferDataItemHandler;
 import com.zq.sword.array.transfer.client.service.TransferClientService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,7 +93,7 @@ public class DefaultTransferClientService extends AbstractTaskService implements
 
     private TransferClient getTransferClient(NodeServerId nodeServerId, NodeServerId clientNodeServerId, NodeServerInfo nodeServerInfo){
         TransferClient transferClient = new DefaultTransferClient(nodeServerInfo.getServerAddress(), nodeServerInfo.getPort());
-        transferClient.registerTransferHandler(new TransferDataItemHandler(nodeServerId, clientNodeServerId));
+        transferClient.registerTransferHandler(new PullTransferDataItemHandler(nodeServerId, clientNodeServerId));
         return transferClient;
     }
 
