@@ -8,5 +8,5 @@ import com.zq.sword.array.common.service.Server;
  * @author: zhouqi1
  * @create: 2018-08-01 17:23
  **/
-public interface TransferClientServer extends Server {
+public interface TransferClientContainer extends Server {
 }

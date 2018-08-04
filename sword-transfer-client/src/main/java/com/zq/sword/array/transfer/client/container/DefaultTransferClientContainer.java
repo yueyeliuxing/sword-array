@@ -1,8 +1,7 @@
-package com.zq.sword.array.transfer.client.server;
+package com.zq.sword.array.transfer.client.container;
 
 import com.zq.sword.array.common.service.AbstractServer;
-import com.zq.sword.array.common.service.Server;
-import com.zq.sword.array.transfer.client.TransferClientServer;
+import com.zq.sword.array.transfer.client.TransferClientContainer;
 import com.zq.sword.array.transfer.client.service.TransferClientService;
 import com.zq.sword.array.transfer.client.service.impl.DefaultTransferClientService;
 
@@ -12,8 +11,8 @@ import com.zq.sword.array.transfer.client.service.impl.DefaultTransferClientServ
  * @author: zhouqi1
  * @create: 2018-08-01 17:23
  **/
-public class DefaultTransferClientServer extends AbstractServer implements TransferClientServer {
-    public DefaultTransferClientServer() {
+public class DefaultTransferClientContainer extends AbstractServer implements TransferClientContainer {
+    public DefaultTransferClientContainer() {
         registerService(TransferClientService.class, new DefaultTransferClientService());
     }
 }

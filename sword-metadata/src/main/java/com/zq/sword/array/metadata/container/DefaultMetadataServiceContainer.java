@@ -1,9 +1,7 @@
-package com.zq.sword.array.metadata.server;
+package com.zq.sword.array.metadata.container;
 
-import com.zq.sword.array.common.event.DataEventListener;
-import com.zq.sword.array.common.node.NodeMetadataInfo;
 import com.zq.sword.array.common.service.AbstractServer;
-import com.zq.sword.array.metadata.MetadataServiceServer;
+import com.zq.sword.array.metadata.MetadataServiceContainer;
 import com.zq.sword.array.metadata.service.DataConsumptionConfService;
 import com.zq.sword.array.metadata.service.NamingConfService;
 import com.zq.sword.array.metadata.service.NodeConfService;
@@ -19,13 +17,13 @@ import com.zq.sword.array.metadata.service.impl.DefaultNodeConfService;
  * @author: zhouqi1
  * @create: 2018-07-23 20:25
  **/
-public class DefaultMetadataServiceServer extends AbstractServer implements MetadataServiceServer {
+public class DefaultMetadataServiceContainer extends AbstractServer implements MetadataServiceContainer {
 
-    public DefaultMetadataServiceServer() {
+    public DefaultMetadataServiceContainer() {
         this(new ZkDataConfService());
     }
 
-    public DefaultMetadataServiceServer(DataConfService dataConfService) {
+    public DefaultMetadataServiceContainer(DataConfService dataConfService) {
         registerService(NodeConfService.class, new DefaultNodeConfService(dataConfService));
         registerService(NamingConfService.class, new DefaultNamingConfService(dataConfService));
         registerService(DataConsumptionConfService.class, new DefaultDataConsumptionConfService(dataConfService));

@@ -8,6 +8,6 @@ import com.zq.sword.array.common.service.Server;
  * @author: zhouqi1
  * @create: 2018-07-23 19:31
  **/
-public interface LeftQueueServiceServer extends Server {
+public interface LeftQueueServiceContainer extends Server {
 
 }

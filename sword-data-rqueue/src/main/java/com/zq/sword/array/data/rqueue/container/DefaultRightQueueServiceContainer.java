@@ -1,7 +1,7 @@
-package com.zq.sword.array.data.rqueue.server;
+package com.zq.sword.array.data.rqueue.container;
 
 import com.zq.sword.array.common.service.AbstractServer;
-import com.zq.sword.array.data.rqueue.RightQueueServiceServer;
+import com.zq.sword.array.data.rqueue.RightQueueServiceContainer;
 import com.zq.sword.array.data.rqueue.service.RightQueueService;
 import com.zq.sword.array.data.rqueue.service.impl.DefaultRightQueueService;
 
@@ -11,9 +11,9 @@ import com.zq.sword.array.data.rqueue.service.impl.DefaultRightQueueService;
  * @author: zhouqi1
  * @create: 2018-07-23 19:31
  **/
-public class DefaultRightQueueServiceServer extends AbstractServer implements RightQueueServiceServer {
+public class DefaultRightQueueServiceContainer extends AbstractServer implements RightQueueServiceContainer {
 
-    public DefaultRightQueueServiceServer() {
+    public DefaultRightQueueServiceContainer() {
         registerService(RightQueueService.class, new DefaultRightQueueService());
     }
 }
