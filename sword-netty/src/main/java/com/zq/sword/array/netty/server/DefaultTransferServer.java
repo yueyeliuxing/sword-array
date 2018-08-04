@@ -43,12 +43,8 @@ public class DefaultTransferServer implements TransferServer {
         transferHandlers = new CopyOnWriteArrayList<>();
     }
 
-    public void bind() throws Exception {
-
-    }
-
     public static void main(String[] args) throws Exception{
-        new DefaultTransferServer("127.0.0.1", 6440).bind();
+        new DefaultTransferServer("127.0.0.1", 6440).start();
     }
 
     @Override
