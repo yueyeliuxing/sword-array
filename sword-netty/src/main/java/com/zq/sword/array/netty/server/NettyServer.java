@@ -1,4 +1,4 @@
-package com.zq.sword.array.netty;
+package com.zq.sword.array.netty.server;
 
 import com.zq.sword.array.netty.coder.NettyMessageDecoder;
 import com.zq.sword.array.netty.coder.NettyMessageEncoder;

@@ -43,7 +43,12 @@ public class DefaultTransferClient implements TransferClient {
         transferHandlers = new ArrayList<>();
     }
 
+    @Override
+    public void registerTransferHandler(TransferHandler transferHandler) {
+        transferHandlers.add(transferHandler);
+    }
 
+    @Override
     public void connect() {
         try{
             Bootstrap b = new Bootstrap();
@@ -90,22 +95,12 @@ public class DefaultTransferClient implements TransferClient {
     }
 
     @Override
-    public void registerTransferHandler(TransferHandler transferHandler) {
-        transferHandlers.add(transferHandler);
+    public void disconnect() {
+
     }
 
     @Override
-    public void start() {
+    public void reconnect() {
         connect();
-    }
-
-    @Override
-    public void shutdown() {
-
-    }
-
-    @Override
-    public void restart() {
-
     }
 }

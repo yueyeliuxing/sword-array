@@ -1,14 +1,15 @@
-package com.zq.sword.array.netty.client;
+package com.zq.sword.array.netty.server;
 
 import com.zq.sword.array.netty.handler.TransferHandler;
 
 /**
  * @program: sword-array
- * @description: 传输客户端
+ * @description: 传输服务
  * @author: zhouqi1
- * @create: 2018-08-01 20:00
+ * @create: 2018-08-04 10:28
  **/
-public interface TransferClient {
+public interface TransferServer {
+
 
     /**
      * 注册业务处理器
@@ -19,15 +20,15 @@ public interface TransferClient {
     /**
      * 开启
      */
-    void connect();
+    void start();
 
     /**
      * 关闭
      */
-    void disconnect();
+    void shutdown();
 
     /**
      * 重启
      */
-    void reconnect();
+    void restart();
 }

@@ -55,14 +55,14 @@ public class DefaultTransferClientService extends AbstractTaskService implements
                         if(transferClient != null){
                             NodeServerInfo nodeServerInfo = nodeMetadataInfo.getInfo();
                             TransferClient client = getTransferClient(nodeServerId, nodeId, nodeServerInfo);
-                            client.restart();
+                            client.reconnect();
                             transferClients.put(nodeId, client);
                         }
                         break;
                         //机器掉线
                     case NODE_MASTER_DATA_DELETE:
                         if(transferClient != null){
-                            transferClient.shutdown();
+                            transferClient.disconnect();
                         }
                         break;
                     default:
@@ -85,7 +85,7 @@ public class DefaultTransferClientService extends AbstractTaskService implements
         if(nodeServerInfoMap != null && !nodeServerInfoMap.isEmpty()){
             nodeServerInfoMap.forEach((clientNodeServerId, nodeServerInfo)->{
                 TransferClient transferClient = getTransferClient(nodeServerId, clientNodeServerId, nodeServerInfo);
-                transferClient.start();
+                transferClient.connect();
                 transferClients.put(clientNodeServerId, transferClient);
             });
         }
