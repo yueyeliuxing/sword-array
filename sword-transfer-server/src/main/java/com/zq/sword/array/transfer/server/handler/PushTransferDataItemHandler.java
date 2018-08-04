@@ -1,5 +1,7 @@
 package com.zq.sword.array.transfer.server.handler;
 
+import com.zq.sword.array.common.event.DataEvent;
+import com.zq.sword.array.common.event.DataEventListener;
 import com.zq.sword.array.common.node.NodeConsumptionInfo;
 import com.zq.sword.array.common.node.NodeServerId;
 import com.zq.sword.array.common.service.ServiceContext;
@@ -23,14 +25,18 @@ public class PushTransferDataItemHandler extends TransferHandler {
 
     private NodeServerId nodeServerId;
 
-    private NodeServerId clientNodeServerId;
-
     private RightQueueService rightQueueService;
 
-    public PushTransferDataItemHandler(NodeServerId nodeServerId, NodeServerId clientNodeServerId) {
+    public PushTransferDataItemHandler(NodeServerId nodeServerId) {
         this.nodeServerId = nodeServerId;
-        this.clientNodeServerId = clientNodeServerId;
         rightQueueService = ServiceContext.getInstance().findService(RightQueueService.class);
+        rightQueueService.registerDataItemListener(nodeServerId, new DataEventListener<DataItem>(){
+
+            @Override
+            public void listen(DataEvent<DataItem> dataEvent) {
+
+            }
+        });
     }
 
     @Override
