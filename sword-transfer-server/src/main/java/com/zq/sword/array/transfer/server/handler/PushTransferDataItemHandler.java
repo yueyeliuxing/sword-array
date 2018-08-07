@@ -52,7 +52,7 @@ public class PushTransferDataItemHandler extends TransferHandler {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         TransferMessage message = (TransferMessage)msg;
 
-        if(message.getHeader() != null && message.getHeader().getType() == MessageType.PUSH_T_RIGHT_DATA_TRANSFER_REQ.value()) {
+        if(message.getHeader() != null && message.getHeader().getType() == MessageType.POLL_DATA_TRANSFER_REQ.value()) {
             Long dataItemId = (Long)message.getBody();
             List<DataItem> dataItems = rightQueueService.pollAfterId(dataItemId);
             ctx.fireChannelRead(buildPushTransferMessageResp(dataItems));
@@ -64,7 +64,7 @@ public class PushTransferDataItemHandler extends TransferHandler {
     private TransferMessage buildPushTransferMessageResp(List<DataItem> dataItems) {
         TransferMessage message = new TransferMessage();
         Header header = new Header();
-        header.setType(MessageType.PUSH_T_RIGHT_DATA_TRANSFER_RESP.value());
+        header.setType(MessageType.PUSH_DATA_TRANSFER_RESP.value());
         message.setHeader(header);
         message.setBody(dataItems);
         return message;
