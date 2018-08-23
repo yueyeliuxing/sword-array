@@ -1,9 +1,6 @@
 package com.zq.sword.array.common.service;
 
 import com.zq.sword.array.common.task.Task;
-import com.zq.sword.array.common.task.TaskContext;
-
-import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
 /**
