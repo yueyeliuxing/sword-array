@@ -50,6 +50,25 @@
 
 
 	<dependencies>
+		<dependency>
+			<groupId>com.zq.sword</groupId>
+			<artifactId>sword-common</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.moilioncircle</groupId>
+			<artifactId>redis-replicator</artifactId>
+			<version>3.0.0-RC3</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.zq.sword</groupId>
+			<artifactId>sword-data-rqueue</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
 
 
 	</dependencies>

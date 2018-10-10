@@ -50,6 +50,24 @@
 
 
 	<dependencies>
+		<dependency>
+			<groupId>com.zq.sword</groupId>
+			<artifactId>sword-common</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.zq.sword</groupId>
+			<artifactId>sword-data-lqueue</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/redis.clients/jedis -->
+		<dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+			<version>2.9.0</version>
+		</dependency>
 
 
 	</dependencies>
