@@ -1,8 +1,7 @@
-package com.zq.sword.array.data.lqueue.service;
+package com.zq.sword.array.data.lqueue;
 
 
-import com.zq.sword.array.common.service.TaskService;
-import com.zq.sword.array.data.lqueue.domain.DataItem;
+import com.zq.sword.array.common.data.Sword;
 
 import java.util.List;
 
@@ -12,36 +11,36 @@ import java.util.List;
  * @author: zhouqi1
  * @create: 2018-08-01 11:47
  **/
-public interface DataStorageQueueService extends TaskService{
+public interface LeftOrderlyQueue<T extends Sword> {
 
     /**
      * 获取最新的id
      * @return
      */
-    Long getLastDataItemId();
+    Long getLastDataId();
 
     /**
      * 添加数据
-     * @param item
+     * @param data
      */
-    void addDataItem(DataItem item);
+    void push(T data);
 
     /**
      * 获取数据
      */
-    DataItem peekDataItem();
+    T poll();
 
     /**
-     * 删除数据
+     * 数据是否已被消费成功
      */
-    void removeDataItem(DataItem dataItem);
+    boolean containsConsumed(T data);
 
     /**
      * 获取指定ID之后的数据项
      * @param id 数据项ID
      * @return 数据项
      */
-    List<DataItem> pollAfterId(Long id);
+    List<T> pollAfterId(Long id);
 
     /**
      * 获取指定ID之后的数据项
@@ -49,5 +48,5 @@ public interface DataStorageQueueService extends TaskService{
      * @param maxNum 最大获取的数目
      * @return 数据项
      */
-    List<DataItem> pollAfterId(Long id, Integer maxNum);
+    List<T> pollAfterId(Long id, Integer maxNum);
 }

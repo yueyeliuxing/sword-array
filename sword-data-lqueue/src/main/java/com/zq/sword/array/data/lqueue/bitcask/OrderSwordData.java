@@ -1,17 +1,18 @@
-package com.zq.sword.array.data.lqueue.domain;
+package com.zq.sword.array.data.lqueue.bitcask;
 
+import com.zq.sword.array.common.data.Sword;
 import lombok.Data;
 import lombok.ToString;
 
 /**
  * @program: sword-array
- * @description: 数据项
+ * @description: 数据
  * @author: zhouqi1
- * @create: 2018-07-23 17:43
+ * @create: 2018-10-17 19:13
  **/
 @Data
 @ToString
-public class DataItem {
+public class OrderSwordData extends Sword {
 
     /**
      * 数据ID
@@ -32,6 +33,4 @@ public class DataItem {
      * crc校验值
      */
     private String crc;
-
-
 }
