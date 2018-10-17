@@ -1,4 +1,4 @@
-package com.zq.sword.array.data;
+package com.zq.sword.array.common.data;
 
 /**
  * @program: sword-array

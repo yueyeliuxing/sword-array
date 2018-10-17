@@ -1,5 +1,6 @@
-package com.zq.sword.array.data.rqueue.domain;
+package com.zq.sword.array.data.rqueue.bitcask.index;
 
+import com.zq.sword.array.common.data.Sword;
 import lombok.Data;
 import lombok.ToString;
 
@@ -11,7 +12,7 @@ import lombok.ToString;
  **/
 @Data
 @ToString
-public class DataIndex {
+public class SwordIndex extends Sword{
 
     /**
      * 数据ID
