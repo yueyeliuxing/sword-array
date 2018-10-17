@@ -1,17 +1,29 @@
 package com.zq.sword.array.data;
 
+import java.nio.ByteBuffer;
+
 /**
  * @program: sword-array
- * @description: 数据反序列化
+ * @description: 默认的数据序列化工具
  * @author: zhouqi1
- * @create: 2018-10-17 14:58
+ * @create: 2018-10-17 15:06
  **/
-public interface SwordDataDeserializer<T extends SwordData> {
+public class SwordDataDeserializer implements SwordDeserializer<SwordData> {
 
-    /**
-     * 数据反序列化成SwordData
-     * @param data 字节数组
-     * @return SwordData
-     */
-    T deserialize(byte[] data);
+    @Override
+    public SwordData deserialize(byte[] data) {
+        SwordData swordData = new SwordData();
+        ByteBuffer byteBuffer = ByteBuffer.wrap(data);
+        swordData.setId(byteBuffer.getLong());
+        int len = byteBuffer.getInt();
+        byte[] valueBytes = new byte[len];
+        byteBuffer.get(valueBytes);
+        swordData.setValue(new String(valueBytes));
+        swordData.setTimestamp(byteBuffer.getLong());
+        int crcLen = byteBuffer.getInt();
+        byte[] crcBytes = new byte[crcLen];
+        byteBuffer.get(crcBytes);
+        swordData.setCrc(new String(crcBytes));
+        return swordData;
+    }
 }
