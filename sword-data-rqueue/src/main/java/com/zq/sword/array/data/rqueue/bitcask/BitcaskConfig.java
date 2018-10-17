@@ -36,8 +36,8 @@ public class BitcaskConfig {
             return this;
         }
 
-        public BitcaskConfigBuilder setIndexFilePath(String dataFilePath){
-            bitcaskConfig.setDataFilePath(dataFilePath);
+        public BitcaskConfigBuilder setIndexFilePath(String indexFilePath){
+            bitcaskConfig.setIndexFilePath(indexFilePath);
             return this;
         }
 

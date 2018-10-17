@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -105,9 +106,14 @@ public class SwordDataProcessor {
         File swordDataFile = new File(swordDataFilePath);
 
         long pos = swordDataFile.length();
-        swordIndex.setValuePosition(pos+1);
+        swordIndex.setValuePosition(pos);
 
-        String dataLine = new String(swordSerializer.serialize(swordData));
+        String dataLine = null;
+        try {
+            dataLine = new String(swordSerializer.serialize(swordData), "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         FileUtil.appendLine(swordDataFile, dataLine);
 
         swordIndex.setDataId(swordData.getId());

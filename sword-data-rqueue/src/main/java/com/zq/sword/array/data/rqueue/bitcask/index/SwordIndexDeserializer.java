@@ -1,7 +1,10 @@
 package com.zq.sword.array.data.rqueue.bitcask.index;
 
 import com.zq.sword.array.common.data.SwordDeserializer;
+import com.zq.sword.array.common.utils.JsonUtil;
+import com.zq.sword.array.data.rqueue.bitcask.data.SwordData;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 
 /**
@@ -14,7 +17,7 @@ public class SwordIndexDeserializer implements SwordDeserializer<SwordIndex> {
 
     @Override
     public SwordIndex deserialize(byte[] data) {
-        SwordIndex swordIndex = new SwordIndex();
+        /*SwordIndex swordIndex = new SwordIndex();
         ByteBuffer byteBuffer = ByteBuffer.wrap(data);
         swordIndex.setDataId(byteBuffer.getLong());
         int len = byteBuffer.getInt();
@@ -24,6 +27,12 @@ public class SwordIndexDeserializer implements SwordDeserializer<SwordIndex> {
         swordIndex.setValueLength(byteBuffer.getLong());
         swordIndex.setValuePosition(byteBuffer.getLong());
         swordIndex.setTimestamp(byteBuffer.getLong());
-        return swordIndex;
+        return swordIndex;*/
+        try {
+            return JsonUtil.parse(new String(data, "utf-8"), SwordIndex.class);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

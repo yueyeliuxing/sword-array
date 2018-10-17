@@ -8,6 +8,8 @@ import com.zq.sword.array.data.rqueue.RightRandomQueue;
 import com.zq.sword.array.data.rqueue.bitcask.data.SwordDataProcessor;
 import com.zq.sword.array.data.rqueue.bitcask.index.SwordIndex;
 import com.zq.sword.array.data.rqueue.bitcask.index.SwordIndexProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -20,6 +22,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @create: 2018-10-17 15:20
  **/
 public class BitcaskRightRandomQueue implements RightRandomQueue<SwordData> {
+
+    private Logger logger = LoggerFactory.getLogger(BitcaskRightRandomQueue.class);
 
     /**
      * 数据处理器
@@ -88,6 +92,10 @@ public class BitcaskRightRandomQueue implements RightRandomQueue<SwordData> {
     @Override
     public List<SwordData> pollAfterId(Long id, Integer maxNum) {
         SwordIndex swordIndex = swordIndexProcessor.getSwordIndex(id);
+        if(swordIndex == null){
+            logger.error("无法获取指定ID{}的索引数据", id);
+            return null;
+        }
         return swordDataProcessor.listSwordDataAfterIndex(swordIndex, maxNum);
     }
 }
