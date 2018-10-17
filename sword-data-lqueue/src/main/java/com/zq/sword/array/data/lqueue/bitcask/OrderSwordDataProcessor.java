@@ -166,8 +166,12 @@ public class OrderSwordDataProcessor {
     public OrderSwordData pollOrderSwordData() {
         OrderSwordData orderSwordData = orderSwordDataQueue.poll();
 
-        orderSwordData.setValue(DATA_ITEM_DELETE_TAG);
-        addOrderSwordData(orderSwordData);
+        OrderSwordData delOrderSwordData = new OrderSwordData();
+        delOrderSwordData.setId(orderSwordData.getId());
+        delOrderSwordData.setValue(DATA_ITEM_DELETE_TAG);
+        delOrderSwordData.setTimestamp(orderSwordData.getTimestamp());
+        delOrderSwordData.setCrc(orderSwordData.getCrc());
+        addOrderSwordData(delOrderSwordData);
         return orderSwordData;
     }
     

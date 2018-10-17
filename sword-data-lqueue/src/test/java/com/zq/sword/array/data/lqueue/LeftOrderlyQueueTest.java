@@ -27,7 +27,7 @@ public class LeftOrderlyQueueTest {
     @Test
     public void push() {
         OrderSwordData orderSwordData = new OrderSwordData();
-        orderSwordData.setId(2L);
+        orderSwordData.setId(3L);
         orderSwordData.setValue("11212");
         orderSwordData.setTimestamp(System.currentTimeMillis());
         orderSwordData.setCrc("11212");

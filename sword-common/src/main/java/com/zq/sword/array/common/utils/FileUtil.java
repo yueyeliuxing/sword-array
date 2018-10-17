@@ -111,7 +111,7 @@ public class FileUtil{
      */
     public static void appendLine(File file, String dataLine){
         try{
-            Files.append(dataLine, file, Charsets.UTF_8);
+            Files.append(dataLine+System.lineSeparator(), file, Charsets.UTF_8);
         }catch (Exception e){
             logger.error(" Files.append", e);
         }
