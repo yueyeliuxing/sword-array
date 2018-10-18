@@ -1,7 +1,7 @@
 package com.zq.sword.array.data.lqueue;
 
+import com.zq.sword.array.common.data.SwordData;
 import com.zq.sword.array.data.lqueue.bitcask.BitcaskLeftOrderlyQueue;
-import com.zq.sword.array.data.lqueue.bitcask.OrderSwordData;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class LeftOrderlyQueueTest {
 
-    private LeftOrderlyQueue<OrderSwordData> leftOrderlyQueue;
+    private LeftOrderlyQueue<SwordData> leftOrderlyQueue;
 
     @Before
     public void setUp() throws Exception {
@@ -29,7 +29,7 @@ public class LeftOrderlyQueueTest {
     @Test
     public void push() throws IOException {
         for(int i = 1; i< 10; i++){
-            OrderSwordData orderSwordData = new OrderSwordData();
+            SwordData orderSwordData = new SwordData();
             orderSwordData.setId(Long.valueOf(i));
             orderSwordData.setValue("11212");
             orderSwordData.setTimestamp(System.currentTimeMillis());

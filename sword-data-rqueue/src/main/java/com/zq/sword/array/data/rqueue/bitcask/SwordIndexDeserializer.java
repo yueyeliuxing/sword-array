@@ -1,11 +1,9 @@
-package com.zq.sword.array.data.rqueue.bitcask.index;
+package com.zq.sword.array.data.rqueue.bitcask;
 
 import com.zq.sword.array.common.data.SwordDeserializer;
 import com.zq.sword.array.common.utils.JsonUtil;
-import com.zq.sword.array.data.rqueue.bitcask.data.SwordData;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
 
 /**
  * @program: sword-array

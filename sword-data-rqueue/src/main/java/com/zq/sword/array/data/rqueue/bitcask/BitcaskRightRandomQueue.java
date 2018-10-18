@@ -3,16 +3,12 @@ package com.zq.sword.array.data.rqueue.bitcask;
 import com.zq.sword.array.common.event.DataEvent;
 import com.zq.sword.array.common.event.DataEventListener;
 import com.zq.sword.array.common.event.DataEventType;
-import com.zq.sword.array.data.rqueue.bitcask.data.SwordData;
+import com.zq.sword.array.common.data.SwordData;
 import com.zq.sword.array.data.rqueue.RightRandomQueue;
-import com.zq.sword.array.data.rqueue.bitcask.data.SwordDataProcessor;
-import com.zq.sword.array.data.rqueue.bitcask.index.SwordIndex;
-import com.zq.sword.array.data.rqueue.bitcask.index.SwordIndexProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**

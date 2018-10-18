@@ -1,4 +1,4 @@
-package com.zq.sword.array.data.rqueue.bitcask.index;
+package com.zq.sword.array.data.rqueue.bitcask;
 
 import com.zq.sword.array.common.data.Sword;
 import lombok.Data;

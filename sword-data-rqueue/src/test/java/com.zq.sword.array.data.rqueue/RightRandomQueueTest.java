@@ -1,15 +1,12 @@
 package com.zq.sword.array.data.rqueue;
 
-import com.zq.sword.array.common.data.Sword;
 import com.zq.sword.array.data.rqueue.bitcask.BitcaskRightRandomQueue;
-import com.zq.sword.array.data.rqueue.bitcask.data.SwordData;
+import com.zq.sword.array.common.data.SwordData;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 public class RightRandomQueueTest {
 

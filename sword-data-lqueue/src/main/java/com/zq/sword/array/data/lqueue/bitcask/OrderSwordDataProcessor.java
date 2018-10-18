@@ -1,7 +1,6 @@
 package com.zq.sword.array.data.lqueue.bitcask;
 
-import com.zq.sword.array.common.data.SwordDeserializer;
-import com.zq.sword.array.common.data.SwordSerializer;
+import com.zq.sword.array.common.data.*;
 import com.zq.sword.array.common.utils.DateUtil;
 import com.zq.sword.array.common.utils.FileUtil;
 import com.zq.sword.array.data.lqueue.QueueState;
@@ -24,7 +23,7 @@ public class OrderSwordDataProcessor {
 
     private Logger logger = LoggerFactory.getLogger(OrderSwordDataProcessor.class);
 
-    private ConcurrentLinkedQueue<OrderSwordData> orderSwordDataQueue;
+    private ConcurrentLinkedQueue<SwordData> orderSwordDataQueue;
 
     private Long lastDataId;
 
@@ -47,12 +46,12 @@ public class OrderSwordDataProcessor {
     /**
      * 数据序列化器
      */
-    private SwordSerializer<OrderSwordData> swordSerializer;
+    private SwordSerializer<SwordData> swordSerializer;
 
     /**
      * 数据反序列化器
      */
-    private SwordDeserializer<OrderSwordData> swordDeserializer;
+    private SwordDeserializer<SwordData> swordDeserializer;
 
     private BitcaskLeftOrderlyQueue bitcaskLeftOrderlyQueue;
 
@@ -60,8 +59,8 @@ public class OrderSwordDataProcessor {
         this.dataFilePath = dataFilePath;
         this.bitcaskLeftOrderlyQueue = bitcaskLeftOrderlyQueue;
         orderSwordDataQueue = new ConcurrentLinkedQueue<>();
-        swordSerializer = new OrderSwordDataSerializer();
-        swordDeserializer = new OrderSwordDataDeserializer();
+        swordSerializer = new SwordDataSerializer();
+        swordDeserializer = new SwordDataDeserializer();
         orderSwordDataBackgroundExecutor = new OrderSwordDataBackgroundExecutor();
     }
 
@@ -77,16 +76,16 @@ public class OrderSwordDataProcessor {
      *初始化数据
      */
     private void initData(){
-        List<OrderSwordData> orderSwordDatas = getOrderSwordData();
+        List<SwordData> orderSwordDatas = getSwordData();
         orderSwordDatas.stream().filter(c->!DATA_ITEM_DELETE_TAG.equals(c.getValue())).forEach(c->{
             orderSwordDataQueue.add(c);
             lastDataId = c.getId();
         });
     }
 
-    private List<OrderSwordData> getOrderSwordData() {
-        List<OrderSwordData> orderSwordDatas = new ArrayList<>();
-        Map<Long, OrderSwordData> orderSwordDataMap = new HashMap<>();
+    private List<SwordData> getSwordData() {
+        List<SwordData> orderSwordDatas = new ArrayList<>();
+        Map<Long, SwordData> orderSwordDataMap = new HashMap<>();
         File[] childFiles = FileUtil.listChildFile(dataFilePath, DATA_ITEM_FILE_SUFFIX);
         if(childFiles != null && childFiles.length > 0){
             for (File childFile : childFiles){
@@ -116,11 +115,11 @@ public class OrderSwordDataProcessor {
 
             bitcaskLeftOrderlyQueue.setState(QueueState.STOP);
 
-            List<OrderSwordData> orderSwordDatas = getOrderSwordData();
+            List<SwordData> orderSwordDatas = getSwordData();
             if(orderSwordDatas != null && !orderSwordDatas.isEmpty()){
                 Set<Long> itemIds = new HashSet<>();
                 Map<String, File> fileMap = new HashMap<>();
-                for(OrderSwordData dataItem : orderSwordDatas){
+                for(SwordData dataItem : orderSwordDatas){
                     Long itemId = dataItem.getId();
                     if(itemIds.contains(itemId)){
                         continue;
@@ -156,43 +155,43 @@ public class OrderSwordDataProcessor {
 
     /**
      * 添加数据
-     * @param orderSwordData
+     * @param swordData
      */
-    public void addOrderSwordData(OrderSwordData orderSwordData){
-        orderSwordDataQueue.add(orderSwordData);
-        lastDataId = orderSwordData.getId();
+    public void addSwordData(SwordData swordData){
+        orderSwordDataQueue.add(swordData);
+        lastDataId = swordData.getId();
 
-        String fileName = DateUtil.formatDate(new Date(orderSwordData.getTimestamp()), DateUtil.YYYY_MM_DD);
+        String fileName = DateUtil.formatDate(new Date(swordData.getTimestamp()), DateUtil.YYYY_MM_DD);
         String dataItemFilePath = getDataItemFilePath(fileName);
         File dataItemFile = new File(dataItemFilePath);
         String dataLine = null;
         try {
-            dataLine = new String(swordSerializer.serialize(orderSwordData), "utf-8");
+            dataLine = new String(swordSerializer.serialize(swordData), "utf-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         FileUtil.appendLine(dataItemFile, dataLine);
     }
     
-    public OrderSwordData pollOrderSwordData() {
-        OrderSwordData orderSwordData = orderSwordDataQueue.poll();
-        if(orderSwordData != null){
-            OrderSwordData delOrderSwordData = new OrderSwordData();
-            delOrderSwordData.setId(orderSwordData.getId());
-            delOrderSwordData.setValue(DATA_ITEM_DELETE_TAG);
-            delOrderSwordData.setTimestamp(orderSwordData.getTimestamp());
-            delOrderSwordData.setCrc(orderSwordData.getCrc());
-            addOrderSwordData(delOrderSwordData);
+    public SwordData pollSwordData() {
+        SwordData swordData = orderSwordDataQueue.poll();
+        if(swordData != null){
+            SwordData delSwordData = new SwordData();
+            delSwordData.setId(swordData.getId());
+            delSwordData.setValue(DATA_ITEM_DELETE_TAG);
+            delSwordData.setTimestamp(swordData.getTimestamp());
+            delSwordData.setCrc(swordData.getCrc());
+            addSwordData(delSwordData);
         }
-        return orderSwordData;
+        return swordData;
     }
     
-    public List<OrderSwordData> pollAfterId(Long id, Integer maxNum) {
-        List<OrderSwordData> dataItems = new ArrayList<>();
+    public List<SwordData> pollAfterId(Long id, Integer maxNum) {
+        List<SwordData> dataItems = new ArrayList<>();
         if(!orderSwordDataQueue.isEmpty()){
-            for (OrderSwordData orderSwordData : orderSwordDataQueue){
-                if(orderSwordData.getId() >= id && (maxNum == null || dataItems.size() <= maxNum)){
-                    dataItems.add(orderSwordData);
+            for (SwordData swordData : orderSwordDataQueue){
+                if(swordData.getId() >= id && (maxNum == null || dataItems.size() <= maxNum)){
+                    dataItems.add(swordData);
                 }
             }
         }

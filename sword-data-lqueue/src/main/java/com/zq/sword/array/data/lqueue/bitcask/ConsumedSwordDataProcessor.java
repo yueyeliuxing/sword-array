@@ -1,5 +1,6 @@
 package com.zq.sword.array.data.lqueue.bitcask;
 
+import com.zq.sword.array.common.data.SwordData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.*;
@@ -16,12 +17,12 @@ public class ConsumedSwordDataProcessor {
 
     private Logger logger = LoggerFactory.getLogger(ConsumedSwordDataProcessor.class);
 
-    private Set<OrderSwordData> consumedOrderSwordDataSet;
+    private Set<SwordData> consumedSwordDataSet;
 
     private ConsumedSwordDataBackgroundExecutor consumedSwordDataBackgroundExecutor;
 
     public ConsumedSwordDataProcessor(){
-        consumedOrderSwordDataSet = new CopyOnWriteArraySet<>();
+        consumedSwordDataSet = new CopyOnWriteArraySet<>();
         consumedSwordDataBackgroundExecutor = new ConsumedSwordDataBackgroundExecutor();
     }
 
@@ -47,15 +48,15 @@ public class ConsumedSwordDataProcessor {
 
         //只保存两分钟的数据
         consumedSwordDataBackgroundExecutor.timedExecute(()->{
-            consumedOrderSwordDataSet.clear();
+            consumedSwordDataSet.clear();
         }, 2, TimeUnit.MINUTES);
     }
 
-    public void addOrderSwordData(OrderSwordData orderSwordData) {
-        consumedOrderSwordDataSet.add(orderSwordData);
+    public void addSwordData(SwordData swordData) {
+        consumedSwordDataSet.add(swordData);
     }
 
-    public boolean containsOrderSwordData(OrderSwordData orderSwordData) {
-        return consumedOrderSwordDataSet.contains(orderSwordData);
+    public boolean containsSwordData(SwordData swordData) {
+        return consumedSwordDataSet.contains(swordData);
     }
 }

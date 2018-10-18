@@ -1,4 +1,4 @@
-package com.zq.sword.array.data.lqueue.bitcask;
+package com.zq.sword.array.common.data;
 
 import com.zq.sword.array.common.data.Sword;
 import lombok.Data;
@@ -6,13 +6,13 @@ import lombok.ToString;
 
 /**
  * @program: sword-array
- * @description: 数据
+ * @description: 默认数据
  * @author: zhouqi1
- * @create: 2018-10-17 19:13
+ * @create: 2018-10-17 15:04
  **/
 @Data
 @ToString
-public class OrderSwordData extends Sword {
+public class SwordData extends Sword {
 
     /**
      * 数据ID

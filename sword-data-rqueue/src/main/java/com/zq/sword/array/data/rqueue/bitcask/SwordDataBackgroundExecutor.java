@@ -1,7 +1,6 @@
-package com.zq.sword.array.data.rqueue.bitcask.data;
+package com.zq.sword.array.data.rqueue.bitcask;
 
 import com.zq.sword.array.common.task.AbstractTaskExecutor;
-import com.zq.sword.array.common.task.Task;
 
 /**
  * @program: sword-array

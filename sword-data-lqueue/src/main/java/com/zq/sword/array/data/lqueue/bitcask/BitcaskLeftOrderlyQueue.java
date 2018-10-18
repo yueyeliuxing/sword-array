@@ -1,5 +1,6 @@
 package com.zq.sword.array.data.lqueue.bitcask;
 
+import com.zq.sword.array.common.data.SwordData;
 import com.zq.sword.array.data.lqueue.LeftOrderlyQueue;
 import com.zq.sword.array.data.lqueue.QueueState;
 import org.slf4j.Logger;
@@ -13,7 +14,7 @@ import java.util.List;
  * @author: zhouqi1
  * @create: 2018-10-17 19:12
  **/
-public class BitcaskLeftOrderlyQueue implements LeftOrderlyQueue<OrderSwordData> {
+public class BitcaskLeftOrderlyQueue implements LeftOrderlyQueue<SwordData> {
 
     private Logger logger = LoggerFactory.getLogger(BitcaskLeftOrderlyQueue.class);
 
@@ -42,41 +43,41 @@ public class BitcaskLeftOrderlyQueue implements LeftOrderlyQueue<OrderSwordData>
     }
 
     @Override
-    public boolean push(OrderSwordData orderSwordData) {
+    public boolean push(SwordData swordData) {
         if(state != QueueState.START){
             logger.warn("队列状态是：{}，不能添加", state.name());
             return false;
         }
-        orderSwordDataProcessor.addOrderSwordData(orderSwordData);
+        orderSwordDataProcessor.addSwordData(swordData);
         return true;
     }
 
     @Override
-    public OrderSwordData poll() {
+    public SwordData poll() {
         if(state != QueueState.START){
             logger.warn("队列状态是：{}，不能获取数据", state.name());
             return null;
         }
 
-        OrderSwordData orderSwordData = orderSwordDataProcessor.pollOrderSwordData();
-        if(orderSwordData != null){
-            consumedSwordDataProcessor.addOrderSwordData(orderSwordData);
+        SwordData swordData = orderSwordDataProcessor.pollSwordData();
+        if(swordData != null){
+            consumedSwordDataProcessor.addSwordData(swordData);
         }
-        return orderSwordData;
+        return swordData;
     }
 
     @Override
-    public boolean containsConsumed(OrderSwordData data) {
-        return consumedSwordDataProcessor.containsOrderSwordData(data);
+    public boolean containsConsumed(SwordData data) {
+        return consumedSwordDataProcessor.containsSwordData(data);
     }
 
     @Override
-    public List<OrderSwordData> pollAfterId(Long id) {
+    public List<SwordData> pollAfterId(Long id) {
         return pollAfterId(id, null);
     }
 
     @Override
-    public List<OrderSwordData> pollAfterId(Long id, Integer maxNum) {
+    public List<SwordData> pollAfterId(Long id, Integer maxNum) {
         return orderSwordDataProcessor.pollAfterId(id, maxNum);
     }
 
