@@ -4,6 +4,7 @@ import com.zq.sword.array.common.data.SwordDeserializer;
 import com.zq.sword.array.common.data.SwordSerializer;
 import com.zq.sword.array.common.utils.DateUtil;
 import com.zq.sword.array.common.utils.FileUtil;
+import com.zq.sword.array.data.lqueue.QueueState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,8 +54,11 @@ public class OrderSwordDataProcessor {
      */
     private SwordDeserializer<OrderSwordData> swordDeserializer;
 
-    public OrderSwordDataProcessor(String dataFilePath){
+    private BitcaskLeftOrderlyQueue bitcaskLeftOrderlyQueue;
+
+    public OrderSwordDataProcessor(String dataFilePath, BitcaskLeftOrderlyQueue bitcaskLeftOrderlyQueue){
         this.dataFilePath = dataFilePath;
+        this.bitcaskLeftOrderlyQueue = bitcaskLeftOrderlyQueue;
         orderSwordDataQueue = new ConcurrentLinkedQueue<>();
         swordSerializer = new OrderSwordDataSerializer();
         swordDeserializer = new OrderSwordDataDeserializer();
@@ -74,7 +78,10 @@ public class OrderSwordDataProcessor {
      */
     private void initData(){
         List<OrderSwordData> orderSwordDatas = getOrderSwordData();
-        orderSwordDatas.stream().filter(c->!DATA_ITEM_DELETE_TAG.equals(c.getValue())).forEach(c->addOrderSwordData(c));
+        orderSwordDatas.stream().filter(c->!DATA_ITEM_DELETE_TAG.equals(c.getValue())).forEach(c->{
+            orderSwordDataQueue.add(c);
+            lastDataId = c.getId();
+        });
     }
 
     private List<OrderSwordData> getOrderSwordData() {
@@ -106,9 +113,13 @@ public class OrderSwordDataProcessor {
 
         //每隔一天重新合并数据文件
         orderSwordDataBackgroundExecutor.timedExecute(()->{
+
+            bitcaskLeftOrderlyQueue.setState(QueueState.STOP);
+
             List<OrderSwordData> orderSwordDatas = getOrderSwordData();
             if(orderSwordDatas != null && !orderSwordDatas.isEmpty()){
                 Set<Long> itemIds = new HashSet<>();
+                Map<String, File> fileMap = new HashMap<>();
                 for(OrderSwordData dataItem : orderSwordDatas){
                     Long itemId = dataItem.getId();
                     if(itemIds.contains(itemId)){
@@ -116,12 +127,9 @@ public class OrderSwordDataProcessor {
                     }
                     String fileName = DateUtil.formatDate(new Date(dataItem.getTimestamp()), DateUtil.YYYY_MM_DD);
                     File dataItemFile = new File(getDataItemFilePath(fileName));
-                    File dataItemTempFile = new File(getDataItemFileTempPath(fileName));
-                    if(dataItemTempFile.exists()){
-                        dataItemTempFile.delete();
+                    if(!fileMap.containsKey(fileName) && dataItemFile.exists()){
+                        dataItemFile.delete();
                     }
-                    dataItemFile.renameTo(dataItemTempFile);
-
                     String dataLine = null;
                     try {
                         dataLine = new String(swordSerializer.serialize(dataItem), "utf-8");
@@ -130,8 +138,11 @@ public class OrderSwordDataProcessor {
                     }
                     FileUtil.appendLine(dataItemFile, dataLine);
                     itemIds.add(itemId);
+                    fileMap.put(fileName, dataItemFile);
                 }
             }
+
+            bitcaskLeftOrderlyQueue.setState(QueueState.START);
         }, 1, TimeUnit.DAYS);
     }
 
@@ -165,13 +176,14 @@ public class OrderSwordDataProcessor {
     
     public OrderSwordData pollOrderSwordData() {
         OrderSwordData orderSwordData = orderSwordDataQueue.poll();
-
-        OrderSwordData delOrderSwordData = new OrderSwordData();
-        delOrderSwordData.setId(orderSwordData.getId());
-        delOrderSwordData.setValue(DATA_ITEM_DELETE_TAG);
-        delOrderSwordData.setTimestamp(orderSwordData.getTimestamp());
-        delOrderSwordData.setCrc(orderSwordData.getCrc());
-        addOrderSwordData(delOrderSwordData);
+        if(orderSwordData != null){
+            OrderSwordData delOrderSwordData = new OrderSwordData();
+            delOrderSwordData.setId(orderSwordData.getId());
+            delOrderSwordData.setValue(DATA_ITEM_DELETE_TAG);
+            delOrderSwordData.setTimestamp(orderSwordData.getTimestamp());
+            delOrderSwordData.setCrc(orderSwordData.getCrc());
+            addOrderSwordData(delOrderSwordData);
+        }
         return orderSwordData;
     }
     

@@ -1,6 +1,9 @@
 package com.zq.sword.array.data.lqueue.bitcask;
 
 import com.zq.sword.array.data.lqueue.LeftOrderlyQueue;
+import com.zq.sword.array.data.lqueue.QueueState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -12,17 +15,25 @@ import java.util.List;
  **/
 public class BitcaskLeftOrderlyQueue implements LeftOrderlyQueue<OrderSwordData> {
 
+    private Logger logger = LoggerFactory.getLogger(BitcaskLeftOrderlyQueue.class);
+
+    private volatile QueueState state;
+
     private OrderSwordDataProcessor orderSwordDataProcessor;
 
     private ConsumedSwordDataProcessor consumedSwordDataProcessor;
 
 
     public BitcaskLeftOrderlyQueue(String dataFilePath){
-        orderSwordDataProcessor = new OrderSwordDataProcessor(dataFilePath);
+        state = QueueState.NEW;
+
+        orderSwordDataProcessor = new OrderSwordDataProcessor(dataFilePath, this);
         orderSwordDataProcessor.start();
 
         consumedSwordDataProcessor = new ConsumedSwordDataProcessor();
         consumedSwordDataProcessor.start();
+
+        state = QueueState.START;
     }
 
     @Override
@@ -31,14 +42,26 @@ public class BitcaskLeftOrderlyQueue implements LeftOrderlyQueue<OrderSwordData>
     }
 
     @Override
-    public void push(OrderSwordData orderSwordData) {
+    public boolean push(OrderSwordData orderSwordData) {
+        if(state != QueueState.START){
+            logger.warn("队列状态是：{}，不能添加", state.name());
+            return false;
+        }
         orderSwordDataProcessor.addOrderSwordData(orderSwordData);
+        return true;
     }
 
     @Override
     public OrderSwordData poll() {
+        if(state != QueueState.START){
+            logger.warn("队列状态是：{}，不能获取数据", state.name());
+            return null;
+        }
+
         OrderSwordData orderSwordData = orderSwordDataProcessor.pollOrderSwordData();
-        consumedSwordDataProcessor.addOrderSwordData(orderSwordData);
+        if(orderSwordData != null){
+            consumedSwordDataProcessor.addOrderSwordData(orderSwordData);
+        }
         return orderSwordData;
     }
 
@@ -55,5 +78,14 @@ public class BitcaskLeftOrderlyQueue implements LeftOrderlyQueue<OrderSwordData>
     @Override
     public List<OrderSwordData> pollAfterId(Long id, Integer maxNum) {
         return orderSwordDataProcessor.pollAfterId(id, maxNum);
+    }
+
+    @Override
+    public QueueState state() {
+        return state;
+    }
+
+    public void setState(QueueState state){
+        this.state = state;
     }
 }

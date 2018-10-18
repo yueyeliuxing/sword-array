@@ -23,7 +23,7 @@ public interface LeftOrderlyQueue<T extends Sword> {
      * 添加数据
      * @param data
      */
-    void push(T data);
+    boolean push(T data);
 
     /**
      * 获取数据
@@ -49,4 +49,10 @@ public interface LeftOrderlyQueue<T extends Sword> {
      * @return 数据项
      */
     List<T> pollAfterId(Long id, Integer maxNum);
+
+    /**
+     * 返回队列状态
+     * @return
+     */
+    QueueState state();
 }

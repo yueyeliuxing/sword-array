@@ -6,6 +6,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
+
 
 public class LeftOrderlyQueueTest {
 
@@ -25,16 +27,23 @@ public class LeftOrderlyQueueTest {
     }
 
     @Test
-    public void push() {
-        OrderSwordData orderSwordData = new OrderSwordData();
-        orderSwordData.setId(3L);
-        orderSwordData.setValue("11212");
-        orderSwordData.setTimestamp(System.currentTimeMillis());
-        orderSwordData.setCrc("11212");
-        leftOrderlyQueue.push(orderSwordData);
+    public void push() throws IOException {
+        for(int i = 1; i< 10; i++){
+            OrderSwordData orderSwordData = new OrderSwordData();
+            orderSwordData.setId(Long.valueOf(i));
+            orderSwordData.setValue("11212");
+            orderSwordData.setTimestamp(System.currentTimeMillis());
+            orderSwordData.setCrc("11212");
+            boolean isSucess = false;
+            while (!isSucess){
+                isSucess = leftOrderlyQueue.push(orderSwordData);
+            }
+            //orderSwordData = leftOrderlyQueue.poll();
+            System.out.println(orderSwordData);
+        }
 
-        orderSwordData = leftOrderlyQueue.poll();
-        System.out.println(orderSwordData);
+        System.in.read();
+
     }
 
     @Test
