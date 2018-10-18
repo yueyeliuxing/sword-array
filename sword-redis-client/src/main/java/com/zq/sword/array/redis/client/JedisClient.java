@@ -1,4 +1,4 @@
-package com.zq.sword.array.redis.client.helper;
+package com.zq.sword.array.redis.client;
  
 import java.util.List;
 import java.util.Map;
