@@ -10,14 +10,14 @@ import com.zq.sword.array.common.data.SwordCommand;
  * @author: zhouqi1
  * @create: 2018-10-18 20:39
  **/
-public class CommandParser {
+public class SwordCommandBuilder {
 
     /**
      * 解析redis命令
      * @param command
      * @return
      */
-    public static SwordCommand parse(Command command){
+    public static SwordCommand buildSwordCommand(Command command){
         SwordCommand swordCommand = new SwordCommand();
         if(command instanceof SetCommand){
             SetCommand setCommand = (SetCommand) command;

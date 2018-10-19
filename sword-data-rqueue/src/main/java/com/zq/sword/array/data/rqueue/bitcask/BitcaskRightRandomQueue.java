@@ -34,6 +34,7 @@ public class BitcaskRightRandomQueue implements RightRandomQueue<SwordData> {
     private List<DataEventListener<SwordData>> dataEventListeners;
 
     public BitcaskRightRandomQueue(BitcaskConfig bitcaskConfig){
+        logger.info("BitcaskRightRandomQueue init...");
         String indexFilePath = bitcaskConfig.getIndexFilePath();
         swordIndexProcessor = new SwordIndexProcessor(indexFilePath);
         swordIndexProcessor.start();

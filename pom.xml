@@ -18,6 +18,7 @@
 
 	<modules>
 		<module>sword-common</module>
+		<module>sword-id-generator</module>
 		<module>sword-netty</module>
 		<module>sword-redis</module>
 		<module>sword-metadata</module>

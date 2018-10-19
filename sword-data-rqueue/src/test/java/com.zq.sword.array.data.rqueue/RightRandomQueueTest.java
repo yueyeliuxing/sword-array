@@ -14,7 +14,7 @@ public class RightRandomQueueTest {
 
     @Before
     public void setUp() throws Exception {
-        rightRandomQueue = new BitcaskRightRandomQueue("E:\\sword\\data", "E:\\sword\\index");
+        rightRandomQueue = new BitcaskRightRandomQueue("E:\\sword\\right\\data", "E:\\sword\\right\\index");
     }
 
     @After

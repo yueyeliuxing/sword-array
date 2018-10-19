@@ -7,9 +7,15 @@ import com.moilioncircle.redis.replicator.cmd.Command;
 import com.moilioncircle.redis.replicator.event.Event;
 import com.moilioncircle.redis.replicator.event.EventListener;
 import com.zq.sword.array.common.data.SwordCommand;
+import com.zq.sword.array.common.data.SwordCommandSerializer;
+import com.zq.sword.array.common.data.SwordData;
+import com.zq.sword.array.common.data.SwordSerializer;
 import com.zq.sword.array.common.event.DataEvent;
 import com.zq.sword.array.common.event.DataEventListener;
 import com.zq.sword.array.common.event.DataEventType;
+import com.zq.sword.array.data.rqueue.RightRandomQueue;
+import com.zq.sword.array.id.IdGenerator;
+import com.zq.sword.array.id.SnowFlakeIdGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,15 +28,36 @@ import java.net.URISyntaxException;
  * @author: zhouqi1
  * @create: 2018-10-10 14:51
  **/
-public class MasterSlaveRedisReplicator implements SlaveRedisReplicator<SwordCommand> {
+public class SwordSlaveRedisReplicator implements SlaveRedisReplicator<SwordCommand> {
 
-    private Logger logger = LoggerFactory.getLogger(MasterSlaveRedisReplicator.class);
+    private Logger logger = LoggerFactory.getLogger(SwordSlaveRedisReplicator.class);
 
     private Replicator replicator;
 
-    public MasterSlaveRedisReplicator(String uri) {
+    private RightRandomQueue<SwordData> rightRandomQueue;
+
+    private IdGenerator idGenerator;
+
+    private SwordSerializer<SwordCommand> swordSerializer;
+
+    public SwordSlaveRedisReplicator(String uri, RightRandomQueue<SwordData> rightRandomQueue) {
+        logger.info("SwordSlaveRedisReplicator start...");
         try {
             replicator = new RedisReplicator(uri);
+            replicator.addEventListener(new EventListener() {
+                @Override
+                public void onEvent(Replicator replicator, Event event) {
+                    if(event instanceof Command){
+                        Command command = (Command) event;
+                        SwordData swordData = new SwordData();
+                        swordData.setId(idGenerator.nextId());
+                        swordData.setValue(new String(swordSerializer.serialize(SwordCommandBuilder.buildSwordCommand(command))));
+                        swordData.setTimestamp(System.currentTimeMillis());
+                        swordData.setCrc("1");
+                        rightRandomQueue.push(swordData);
+                    }
+                }
+            });
         } catch (URISyntaxException e) {
             logger.error("error", e);
             throw new RuntimeException(e);
@@ -38,22 +65,10 @@ public class MasterSlaveRedisReplicator implements SlaveRedisReplicator<SwordCom
             logger.error("error", e);
             throw new RuntimeException(e);
         }
-    }
 
-    @Override
-    public boolean addEventListener(DataEventListener<SwordCommand> listener) {
-        return replicator.addEventListener(new EventListener() {
-            @Override
-            public void onEvent(Replicator replicator, Event event) {
-                if(event instanceof Command){
-                    Command command = (Command) event;
-                    DataEvent<SwordCommand> dataEvent = new DataEvent<>();
-                    dataEvent.setType(DataEventType.NODE_MASTER_DATA_CHANGE);
-                    dataEvent.setData(CommandParser.parse(command));
-                    listener.listen(dataEvent);
-                }
-            }
-        });
+        this.rightRandomQueue = rightRandomQueue;
+        idGenerator = new SnowFlakeIdGenerator(0, 0);
+        swordSerializer = new SwordCommandSerializer();
     }
 
     @Override

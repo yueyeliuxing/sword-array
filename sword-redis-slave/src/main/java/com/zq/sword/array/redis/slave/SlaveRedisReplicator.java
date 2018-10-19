@@ -13,13 +13,6 @@ import com.zq.sword.array.common.event.DataEventListener;
 public interface SlaveRedisReplicator<T extends Sword> {
 
     /**
-     * 添加数据谨监听器
-     * @param listener
-     * @return
-     */
-    boolean addEventListener(DataEventListener<T> listener);
-
-    /**
      * 开启
      */
     void start();
