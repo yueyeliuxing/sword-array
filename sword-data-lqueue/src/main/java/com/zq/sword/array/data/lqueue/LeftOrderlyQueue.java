@@ -31,11 +31,6 @@ public interface LeftOrderlyQueue<T extends Sword> {
     T poll();
 
     /**
-     * 数据是否已被消费成功
-     */
-    boolean containsConsumed(T data);
-
-    /**
      * 获取指定ID之后的数据项
      * @param id 数据项ID
      * @return 数据项

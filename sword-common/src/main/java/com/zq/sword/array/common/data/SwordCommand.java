@@ -14,6 +14,8 @@ import lombok.ToString;
 @ToString
 public class SwordCommand extends Sword {
 
+    public static final SwordCommand DELETE_COMMAND = new SwordCommand();
+
     /**
      * 类型
      */

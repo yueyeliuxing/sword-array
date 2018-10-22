@@ -22,7 +22,7 @@ public class SwordData extends Sword {
     /**
      * 数据内容
      */
-    private String value;
+    private SwordCommand value;
 
     /**
      * 时间戳

@@ -1,4 +1,4 @@
-package com.zq.sword.array.data.lqueue.bitcask;
+package com.zq.sword.array.data.bridge;
 
 import com.zq.sword.array.common.task.AbstractTaskExecutor;
 
@@ -8,6 +8,6 @@ import com.zq.sword.array.common.task.AbstractTaskExecutor;
  * @author: zhouqi1
  * @create: 2018-10-17 16:17
  **/
-public class ConsumedSwordDataBackgroundExecutor extends AbstractTaskExecutor {
+public class CycleSwordCommandBackgroundExecutor extends AbstractTaskExecutor {
 
 }

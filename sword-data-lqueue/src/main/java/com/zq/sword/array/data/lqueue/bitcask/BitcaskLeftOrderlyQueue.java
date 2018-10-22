@@ -1,6 +1,8 @@
 package com.zq.sword.array.data.lqueue.bitcask;
 
+import com.zq.sword.array.common.data.SwordCommand;
 import com.zq.sword.array.common.data.SwordData;
+import com.zq.sword.array.data.bridge.DataCycleDisposeBridge;
 import com.zq.sword.array.data.lqueue.LeftOrderlyQueue;
 import com.zq.sword.array.data.lqueue.QueueState;
 import org.slf4j.Logger;
@@ -22,17 +24,16 @@ public class BitcaskLeftOrderlyQueue implements LeftOrderlyQueue<SwordData> {
 
     private OrderSwordDataProcessor orderSwordDataProcessor;
 
-    private ConsumedSwordDataProcessor consumedSwordDataProcessor;
+    private DataCycleDisposeBridge<SwordCommand> dataCycleDisposeBridge;
 
 
-    public BitcaskLeftOrderlyQueue(String dataFilePath){
+    public BitcaskLeftOrderlyQueue(String dataFilePath, DataCycleDisposeBridge<SwordCommand> dataCycleDisposeBridge){
         state = QueueState.NEW;
 
         orderSwordDataProcessor = new OrderSwordDataProcessor(dataFilePath, this);
         orderSwordDataProcessor.start();
 
-        consumedSwordDataProcessor = new ConsumedSwordDataProcessor();
-        consumedSwordDataProcessor.start();
+        this.dataCycleDisposeBridge = dataCycleDisposeBridge;
 
         state = QueueState.START;
     }
@@ -61,14 +62,9 @@ public class BitcaskLeftOrderlyQueue implements LeftOrderlyQueue<SwordData> {
 
         SwordData swordData = orderSwordDataProcessor.pollSwordData();
         if(swordData != null){
-            consumedSwordDataProcessor.addSwordData(swordData);
+            dataCycleDisposeBridge.addCycleData(swordData.getValue());
         }
         return swordData;
-    }
-
-    @Override
-    public boolean containsConsumed(SwordData data) {
-        return consumedSwordDataProcessor.containsSwordData(data);
     }
 
     @Override

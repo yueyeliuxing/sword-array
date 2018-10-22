@@ -1,5 +1,6 @@
 package com.zq.sword.array.data.rqueue;
 
+import com.zq.sword.array.common.data.SwordCommand;
 import com.zq.sword.array.data.rqueue.bitcask.BitcaskRightRandomQueue;
 import com.zq.sword.array.common.data.SwordData;
 import org.junit.After;
@@ -33,7 +34,11 @@ public class RightRandomQueueTest {
     public void push() {
         SwordData swordData = new SwordData();
         swordData.setId(2L);
-        swordData.setValue("12312321");
+        SwordCommand swordCommand = new SwordCommand();
+        swordCommand.setType((byte)1);
+        swordCommand.setKey("user");
+        swordCommand.setValue("123");
+        swordData.setValue(swordCommand);
         swordData.setTimestamp(System.currentTimeMillis());
         swordData.setCrc("112");
         rightRandomQueue.push(swordData);

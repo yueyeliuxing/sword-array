@@ -31,7 +31,7 @@ public class OrderSwordDataProcessor {
 
     private static final String DATA_ITEM_FILE_TEMP_SUFFIX = ".temp";
 
-    private static final String DATA_ITEM_DELETE_TAG = "DELETE_TAG";
+    private static final SwordCommand DELETE_COMMAND = SwordCommand.DELETE_COMMAND;
 
     /**
      * 数据文件路径
@@ -77,7 +77,7 @@ public class OrderSwordDataProcessor {
      */
     private void initData(){
         List<SwordData> orderSwordDatas = getSwordData();
-        orderSwordDatas.stream().filter(c->!DATA_ITEM_DELETE_TAG.equals(c.getValue())).forEach(c->{
+        orderSwordDatas.stream().filter(c->!DELETE_COMMAND.equals(c.getValue())).forEach(c->{
             orderSwordDataQueue.add(c);
             lastDataId = c.getId();
         });
@@ -92,8 +92,8 @@ public class OrderSwordDataProcessor {
                 List<String> dataLines = FileUtil.readLines(childFile);
                 if(dataLines != null && !dataLines.isEmpty()){
                    dataLines.stream().map(c->swordDeserializer.deserialize(c.getBytes())).forEach(c->{
-                       if(orderSwordDataMap.containsKey(c.getId()) && DATA_ITEM_DELETE_TAG.equals(c.getValue())){
-                           orderSwordDataMap.get(c.getId()).setValue(DATA_ITEM_DELETE_TAG);
+                       if(orderSwordDataMap.containsKey(c.getId()) && DELETE_COMMAND.equals(c.getValue())){
+                           orderSwordDataMap.get(c.getId()).setValue(DELETE_COMMAND);
                        }else {
                            orderSwordDataMap.put(c.getId(), c);
                            orderSwordDatas.add(c);
@@ -178,7 +178,7 @@ public class OrderSwordDataProcessor {
         if(swordData != null){
             SwordData delSwordData = new SwordData();
             delSwordData.setId(swordData.getId());
-            delSwordData.setValue(DATA_ITEM_DELETE_TAG);
+            delSwordData.setValue(DELETE_COMMAND);
             delSwordData.setTimestamp(swordData.getTimestamp());
             delSwordData.setCrc(swordData.getCrc());
             addSwordData(delSwordData);

@@ -1,8 +1,9 @@
-package com.zq.sword.array.data.lqueue;
+package com.zq.sword.array.data.bridge;
 
 import com.zq.sword.array.common.data.SwordCommand;
 import com.zq.sword.array.common.data.SwordData;
-import com.zq.sword.array.data.lqueue.bitcask.BitcaskLeftOrderlyQueue;
+import com.zq.sword.array.data.bridge.LeftOrderlyQueue;
+import com.zq.sword.array.data.bridge.bitcask.BitcaskLeftOrderlyQueue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

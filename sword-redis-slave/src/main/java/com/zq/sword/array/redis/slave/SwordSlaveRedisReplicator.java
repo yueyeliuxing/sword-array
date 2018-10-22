@@ -38,10 +38,10 @@ public class SwordSlaveRedisReplicator implements SlaveRedisReplicator<SwordComm
 
     private IdGenerator idGenerator;
 
-    private SwordSerializer<SwordCommand> swordSerializer;
-
     public SwordSlaveRedisReplicator(String uri, RightRandomQueue<SwordData> rightRandomQueue) {
         logger.info("SwordSlaveRedisReplicator start...");
+        this.rightRandomQueue = rightRandomQueue;
+        idGenerator = new SnowFlakeIdGenerator(0, 0);
         try {
             replicator = new RedisReplicator(uri);
             replicator.addEventListener(new EventListener() {
@@ -51,10 +51,10 @@ public class SwordSlaveRedisReplicator implements SlaveRedisReplicator<SwordComm
                         Command command = (Command) event;
                         SwordData swordData = new SwordData();
                         swordData.setId(idGenerator.nextId());
-                        swordData.setValue(new String(swordSerializer.serialize(SwordCommandBuilder.buildSwordCommand(command))));
+                        swordData.setValue(SwordCommandBuilder.buildSwordCommand(command));
                         swordData.setTimestamp(System.currentTimeMillis());
                         swordData.setCrc("1");
-                        rightRandomQueue.push(swordData);
+                        SwordSlaveRedisReplicator.this.rightRandomQueue.push(swordData);
                     }
                 }
             });
@@ -65,10 +65,6 @@ public class SwordSlaveRedisReplicator implements SlaveRedisReplicator<SwordComm
             logger.error("error", e);
             throw new RuntimeException(e);
         }
-
-        this.rightRandomQueue = rightRandomQueue;
-        idGenerator = new SnowFlakeIdGenerator(0, 0);
-        swordSerializer = new SwordCommandSerializer();
     }
 
     @Override
