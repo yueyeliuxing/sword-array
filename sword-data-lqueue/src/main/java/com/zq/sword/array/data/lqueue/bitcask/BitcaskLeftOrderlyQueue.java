@@ -27,15 +27,17 @@ public class BitcaskLeftOrderlyQueue implements LeftOrderlyQueue<SwordData> {
     private DataCycleDisposeBridge<SwordCommand> dataCycleDisposeBridge;
 
 
-    public BitcaskLeftOrderlyQueue(String dataFilePath, DataCycleDisposeBridge<SwordCommand> dataCycleDisposeBridge){
+    public BitcaskLeftOrderlyQueue(String dataFilePath){
         state = QueueState.NEW;
 
         orderSwordDataProcessor = new OrderSwordDataProcessor(dataFilePath, this);
         orderSwordDataProcessor.start();
 
-        this.dataCycleDisposeBridge = dataCycleDisposeBridge;
-
         state = QueueState.START;
+    }
+
+    public void setDataCycleDisposeBridge(DataCycleDisposeBridge<SwordCommand> dataCycleDisposeBridge) {
+        this.dataCycleDisposeBridge = dataCycleDisposeBridge;
     }
 
     @Override
@@ -61,7 +63,7 @@ public class BitcaskLeftOrderlyQueue implements LeftOrderlyQueue<SwordData> {
         }
 
         SwordData swordData = orderSwordDataProcessor.pollSwordData();
-        if(swordData != null){
+        if(swordData != null && dataCycleDisposeBridge != null){
             dataCycleDisposeBridge.addCycleData(swordData.getValue());
         }
         return swordData;

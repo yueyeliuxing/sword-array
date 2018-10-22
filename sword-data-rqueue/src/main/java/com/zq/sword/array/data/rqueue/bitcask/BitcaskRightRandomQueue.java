@@ -1,9 +1,11 @@
 package com.zq.sword.array.data.rqueue.bitcask;
 
+import com.zq.sword.array.common.data.SwordCommand;
 import com.zq.sword.array.common.event.DataEvent;
 import com.zq.sword.array.common.event.DataEventListener;
 import com.zq.sword.array.common.event.DataEventType;
 import com.zq.sword.array.common.data.SwordData;
+import com.zq.sword.array.data.bridge.DataCycleDisposeBridge;
 import com.zq.sword.array.data.rqueue.RightRandomQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +35,8 @@ public class BitcaskRightRandomQueue implements RightRandomQueue<SwordData> {
 
     private List<DataEventListener<SwordData>> dataEventListeners;
 
+    private DataCycleDisposeBridge<SwordCommand> dataCycleDisposeBridge;
+
     public BitcaskRightRandomQueue(BitcaskConfig bitcaskConfig){
         logger.info("BitcaskRightRandomQueue init...");
         String indexFilePath = bitcaskConfig.getIndexFilePath();
@@ -55,6 +59,10 @@ public class BitcaskRightRandomQueue implements RightRandomQueue<SwordData> {
                 .build());
     }
 
+    public void setDataCycleDisposeBridge(DataCycleDisposeBridge<SwordCommand> dataCycleDisposeBridge) {
+        this.dataCycleDisposeBridge = dataCycleDisposeBridge;
+    }
+
     @Override
     public void registerSwordDataListener(DataEventListener<SwordData> swordDataListener) {
         dataEventListeners.add(swordDataListener);
@@ -67,6 +75,12 @@ public class BitcaskRightRandomQueue implements RightRandomQueue<SwordData> {
 
     @Override
     public void push(SwordData swordData) {
+
+        //过滤掉循环数据
+        if(dataCycleDisposeBridge != null && dataCycleDisposeBridge.isCycleData(swordData.getValue())){
+            return;
+        }
+
         SwordIndex swordIndex = swordDataProcessor.addSwordData(swordData);
         swordIndexProcessor.addSwordIndex(swordIndex);
 
