@@ -29,5 +29,7 @@ public class SwordServerStarter {
         String redisUri = "redis://127.0.0.1:6379";
         SlaveRedisReplicator slaveRedisReplicator = new SwordSlaveRedisReplicator(redisUri, rightRandomQueue);
         slaveRedisReplicator.start();
+
+
     }
 }

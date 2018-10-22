@@ -1,11 +1,9 @@
 package com.zq.sword.array.transfer.server.handler;
 
+import com.zq.sword.array.common.data.SwordData;
 import com.zq.sword.array.common.event.DataEvent;
 import com.zq.sword.array.common.event.DataEventListener;
-import com.zq.sword.array.common.node.NodeServerId;
-import com.zq.sword.array.common.service.ServiceContext;
-import com.zq.sword.array.data.rqueue.domain.DataItem;
-import com.zq.sword.array.data.rqueue.service.RightQueueService;
+import com.zq.sword.array.data.rqueue.RightRandomQueue;
 import com.zq.sword.array.netty.handler.TransferHandler;
 import com.zq.sword.array.netty.message.Header;
 import com.zq.sword.array.netty.message.MessageType;
@@ -22,17 +20,14 @@ import java.util.List;
  **/
 public class PushTransferDataItemHandler extends TransferHandler {
 
-    private NodeServerId nodeServerId;
+    private RightRandomQueue<SwordData> rightRandomQueue;
 
-    private RightQueueService rightQueueService;
-
-    public PushTransferDataItemHandler(NodeServerId nodeServerId) {
-        this.nodeServerId = nodeServerId;
-        rightQueueService = ServiceContext.getInstance().findService(RightQueueService.class);
-        rightQueueService.registerDataItemListener(nodeServerId, new DataEventListener<DataItem>(){
+    public PushTransferDataItemHandler(RightRandomQueue<SwordData> rightRandomQueue) {
+        this.rightRandomQueue = rightRandomQueue;
+        rightRandomQueue.registerSwordDataListener(new DataEventListener<SwordData>(){
 
             @Override
-            public void listen(DataEvent<DataItem> dataEvent) {
+            public void listen(DataEvent<SwordData> dataEvent) {
 
             }
         });
@@ -54,14 +49,14 @@ public class PushTransferDataItemHandler extends TransferHandler {
 
         if(message.getHeader() != null && message.getHeader().getType() == MessageType.POLL_DATA_TRANSFER_REQ.value()) {
             Long dataItemId = (Long)message.getBody();
-            List<DataItem> dataItems = rightQueueService.pollAfterId(dataItemId);
+            List<SwordData> dataItems = rightRandomQueue.pollAfterId(dataItemId);
             ctx.fireChannelRead(buildPushTransferMessageResp(dataItems));
         }else {
             ctx.fireChannelRead(msg);
         }
     }
 
-    private TransferMessage buildPushTransferMessageResp(List<DataItem> dataItems) {
+    private TransferMessage buildPushTransferMessageResp(List<SwordData> dataItems) {
         TransferMessage message = new TransferMessage();
         Header header = new Header();
         header.setType(MessageType.PUSH_DATA_TRANSFER_RESP.value());
