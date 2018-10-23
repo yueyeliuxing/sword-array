@@ -1,8 +1,9 @@
-package com.zq.sword.array.metadata;
+package com.zq.sword.array.metadata.impl;
 
 import com.zq.sword.array.common.event.DataEvent;
 import com.zq.sword.array.common.event.DataEventListener;
 import com.zq.sword.array.common.event.DataEventType;
+import com.zq.sword.array.metadata.MasterSlaveServiceCoordinator;
 import com.zq.sword.array.metadata.data.*;
 import org.I0Itec.zkclient.IZkDataListener;
 import org.I0Itec.zkclient.ZkClient;
@@ -16,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author: zhouqi1
  * @create: 2018-10-23 16:17
  **/
-public class SwordMasterSlaveServiceCoordinator implements MasterSlaveServiceCoordinator{
+public class SwordMasterSlaveServiceCoordinator implements MasterSlaveServiceCoordinator {
 
     private NodeId nodeId;
 

@@ -1,8 +1,9 @@
-package com.zq.sword.array.metadata;
+package com.zq.sword.array.metadata.impl;
 
 import com.zq.sword.array.common.event.DataEvent;
 import com.zq.sword.array.common.event.DataEventListener;
 import com.zq.sword.array.common.event.DataEventType;
+import com.zq.sword.array.metadata.DataConsumerServiceCoordinator;
 import com.zq.sword.array.metadata.data.*;
 import com.zq.sword.array.metadata.helper.ZkTreePathHelper;
 import org.I0Itec.zkclient.IZkDataListener;
@@ -22,7 +23,7 @@ import static com.zq.sword.array.metadata.data.ZkTreePathBuilder.*;
  * @author: zhouqi1
  * @create: 2018-10-23 16:17
  **/
-public class SwordDataConsumerServiceCoordinator implements DataConsumerServiceCoordinator{
+public class SwordDataConsumerServiceCoordinator implements DataConsumerServiceCoordinator {
 
     private NodeId nodeId;
 

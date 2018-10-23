@@ -1,5 +1,6 @@
-package com.zq.sword.array.metadata;
+package com.zq.sword.array.metadata.impl;
 
+import com.zq.sword.array.metadata.ConfigManager;
 import com.zq.sword.array.metadata.data.NodeId;
 import com.zq.sword.array.metadata.data.SwordConfig;
 import com.zq.sword.array.metadata.data.ZkTreePathBuilder;
@@ -14,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author: zhouqi1
  * @create: 2018-10-22 20:16
  **/
-public class SwordConfigManager implements ConfigManager{
+public class SwordConfigManager implements ConfigManager {
 
     private NodeId nodeId;
 

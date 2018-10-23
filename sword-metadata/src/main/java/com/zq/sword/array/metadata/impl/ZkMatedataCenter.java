@@ -1,5 +1,9 @@
-package com.zq.sword.array.metadata;
+package com.zq.sword.array.metadata.impl;
 
+import com.zq.sword.array.metadata.ConfigManager;
+import com.zq.sword.array.metadata.DataConsumerServiceCoordinator;
+import com.zq.sword.array.metadata.MasterSlaveServiceCoordinator;
+import com.zq.sword.array.metadata.MetadataCenter;
 import com.zq.sword.array.metadata.data.*;
 import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
