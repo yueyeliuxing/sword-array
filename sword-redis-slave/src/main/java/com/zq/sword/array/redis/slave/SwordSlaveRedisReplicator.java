@@ -16,6 +16,7 @@ import com.zq.sword.array.common.event.DataEventType;
 import com.zq.sword.array.data.rqueue.RightRandomQueue;
 import com.zq.sword.array.id.IdGenerator;
 import com.zq.sword.array.id.SnowFlakeIdGenerator;
+import com.zq.sword.array.metadata.data.SwordConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,12 +39,35 @@ public class SwordSlaveRedisReplicator implements SlaveRedisReplicator<SwordComm
 
     private IdGenerator idGenerator;
 
-    public SwordSlaveRedisReplicator(String uri, RightRandomQueue<SwordData> rightRandomQueue) {
+    public SwordSlaveRedisReplicator(SwordConfig swordConfig) {
         logger.info("SwordSlaveRedisReplicator start...");
-        this.rightRandomQueue = rightRandomQueue;
-        idGenerator = new SnowFlakeIdGenerator(0, 0);
+        long workerId = swordConfig.getProperty("worker.id", Long.class);
+        long datacenterId = swordConfig.getProperty("data.center.id", Long.class);
+        idGenerator = new SnowFlakeIdGenerator(workerId, datacenterId);
         try {
+            String uri = swordConfig.getProperty("redis.master.uri");
             replicator = new RedisReplicator(uri);
+        } catch (URISyntaxException e) {
+            logger.error("error", e);
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            logger.error("error", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void bindingTargetDataSource(RightRandomQueue<SwordData> rightRandomQueue) {
+        this.rightRandomQueue = rightRandomQueue;
+    }
+
+    @Override
+    public void start() {
+        if(rightRandomQueue == null){
+            logger.error("target data source rightRandomQueue is null");
+            throw new NullPointerException("rightRandomQueue");
+        }
+        try {
             replicator.addEventListener(new EventListener() {
                 @Override
                 public void onEvent(Replicator replicator, Event event) {
@@ -58,18 +82,6 @@ public class SwordSlaveRedisReplicator implements SlaveRedisReplicator<SwordComm
                     }
                 }
             });
-        } catch (URISyntaxException e) {
-            logger.error("error", e);
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            logger.error("error", e);
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void start() {
-        try {
             replicator.open();
         } catch (IOException e) {
             logger.error("error", e);
@@ -81,17 +93,6 @@ public class SwordSlaveRedisReplicator implements SlaveRedisReplicator<SwordComm
     public void stop() {
         try {
             replicator.close();
-        } catch (IOException e) {
-            logger.error("error", e);
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void reset() {
-        try {
-            replicator.close();
-            replicator.open();
         } catch (IOException e) {
             logger.error("error", e);
             throw new RuntimeException(e);
