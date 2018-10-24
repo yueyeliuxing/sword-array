@@ -1,6 +1,5 @@
-package com.zq.sword.array.common.data;
+package com.zq.sword.array.data;
 
-import com.zq.sword.array.common.data.Sword;
 import lombok.Data;
 import lombok.ToString;
 

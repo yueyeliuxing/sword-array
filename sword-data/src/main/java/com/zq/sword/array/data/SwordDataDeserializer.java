@@ -1,8 +1,6 @@
-package com.zq.sword.array.common.data;
+package com.zq.sword.array.data;
 
-import com.zq.sword.array.common.data.SwordDeserializer;
-import com.zq.sword.array.common.utils.JsonUtil;
-import com.zq.sword.array.common.data.SwordData;
+import com.zq.sword.array.data.utils.JsonUtil;
 
 import java.io.UnsupportedEncodingException;
 

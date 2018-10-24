@@ -1,11 +1,8 @@
-package com.zq.sword.array.common.data;
+package com.zq.sword.array.data;
 
-import com.zq.sword.array.common.data.SwordData;
-import com.zq.sword.array.common.data.SwordSerializer;
-import com.zq.sword.array.common.utils.JsonUtil;
+import com.zq.sword.array.data.utils.JsonUtil;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
 
 /**
  * @program: sword-array

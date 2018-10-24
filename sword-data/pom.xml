@@ -44,9 +44,14 @@
 		<relativePath>../</relativePath>
 	</parent>
 
-	<artifactId>sword-data-bridge</artifactId>
+	<artifactId>sword-data</artifactId>
 	<packaging>jar</packaging>
-	<name>sword-data-bridge</name>
+	<name>sword-data</name>
+
+	<properties>
+		<slf4j.version>1.7.12</slf4j.version>
+		<log4j.version>2.7</log4j.version>
+	</properties>
 
 
 	<dependencies>
@@ -55,16 +60,7 @@
 			<artifactId>sword-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-        <dependency>
-            <groupId>com.zq.sword</groupId>
-            <artifactId>sword-data</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>RELEASE</version>
-        </dependency>
+
     </dependencies>
 
 </project>
