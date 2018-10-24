@@ -2,7 +2,7 @@ package com.zq.sword.array.redis.replicator;
 
 import com.moilioncircle.redis.replicator.cmd.Command;
 import com.moilioncircle.redis.replicator.cmd.impl.SetCommand;
-import com.zq.sword.array.common.data.SwordCommand;
+import com.zq.sword.array.data.SwordCommand;
 
 /**
  * @program: sword-array

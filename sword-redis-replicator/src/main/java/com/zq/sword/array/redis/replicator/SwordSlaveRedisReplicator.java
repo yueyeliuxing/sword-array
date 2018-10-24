@@ -6,10 +6,8 @@ import com.moilioncircle.redis.replicator.Replicator;
 import com.moilioncircle.redis.replicator.cmd.Command;
 import com.moilioncircle.redis.replicator.event.Event;
 import com.moilioncircle.redis.replicator.event.EventListener;
-import com.zq.sword.array.common.data.SwordCommand;
-import com.zq.sword.array.common.data.SwordCommandSerializer;
-import com.zq.sword.array.common.data.SwordData;
-import com.zq.sword.array.common.data.SwordSerializer;
+import com.zq.sword.array.data.SwordCommand;
+import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.rqueue.RightRandomQueue;
 import com.zq.sword.array.id.IdGenerator;
 import com.zq.sword.array.id.SnowFlakeIdGenerator;
@@ -36,13 +34,10 @@ public class SwordSlaveRedisReplicator implements SlaveRedisReplicator<SwordComm
 
     private IdGenerator idGenerator;
 
-    public SwordSlaveRedisReplicator(SwordConfig swordConfig) {
+    private SwordSlaveRedisReplicator(long workerId, long datacenterId, String uri) {
         logger.info("SwordSlaveRedisReplicator start...");
-        long workerId = swordConfig.getProperty("worker.id", Long.class);
-        long datacenterId = swordConfig.getProperty("data.center.id", Long.class);
         idGenerator = new SnowFlakeIdGenerator(workerId, datacenterId);
         try {
-            String uri = swordConfig.getProperty("redis.master.uri");
             replicator = new RedisReplicator(uri);
         } catch (URISyntaxException e) {
             logger.error("error", e);
@@ -50,6 +45,31 @@ public class SwordSlaveRedisReplicator implements SlaveRedisReplicator<SwordComm
         } catch (IOException e) {
             logger.error("error", e);
             throw new RuntimeException(e);
+        }
+    }
+
+    public static class SwordSlaveRedisReplicatorBuilder {
+        private long workerId;
+        private long datacenterId;
+        private String uri;
+
+        public static SwordSlaveRedisReplicatorBuilder create(){
+            return new SwordSlaveRedisReplicatorBuilder();
+        }
+
+        public SwordSlaveRedisReplicatorBuilder idGenerat(long workerId, long datacenterId){
+            this.workerId = workerId;
+            this.datacenterId = datacenterId;
+            return this;
+        }
+
+        public SwordSlaveRedisReplicatorBuilder listen(String uri){
+            this.uri = uri;
+            return this;
+        }
+
+        public SwordSlaveRedisReplicator build(){
+            return new SwordSlaveRedisReplicator(workerId, datacenterId, uri);
         }
     }
 

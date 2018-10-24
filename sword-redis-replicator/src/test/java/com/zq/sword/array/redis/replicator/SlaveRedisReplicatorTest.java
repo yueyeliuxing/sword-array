@@ -18,7 +18,8 @@ public class SlaveRedisReplicatorTest {
 
         //初始化redis slave replicator
         String redisUri = "redis://127.0.0.1:6379";
-        slaveRedisReplicator = new SwordSlaveRedisReplicator(redisUri, rightRandomQueue);
+        slaveRedisReplicator = SwordSlaveRedisReplicator.SwordSlaveRedisReplicatorBuilder.create()
+                .idGenerat(0, 0).listen(redisUri).build();
         slaveRedisReplicator.start();
     }
 }
