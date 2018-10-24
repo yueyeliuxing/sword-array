@@ -44,9 +44,9 @@
 		<relativePath>../</relativePath>
 	</parent>
 
-	<artifactId>sword-backup-master</artifactId>
+	<artifactId>sword-transfer-backup-gather</artifactId>
 	<packaging>jar</packaging>
-	<name>sword-backup-master</name>
+	<name>sword-transfer-backup-gather</name>
 
 
 	<dependencies>

@@ -1,9 +1,8 @@
-package com.zq.sword.array.backup.master.handler;
+package com.zq.sword.array.backup.master;
 
-import com.zq.sword.array.common.service.ServiceContext;
-import com.zq.sword.array.data.lqueue.service.LeftQueueService;
-import com.zq.sword.array.data.rqueue.domain.DataItem;
-import com.zq.sword.array.data.rqueue.service.RightQueueService;
+import com.zq.sword.array.data.SwordData;
+import com.zq.sword.array.data.lqueue.LeftOrderlyQueue;
+import com.zq.sword.array.data.rqueue.RightRandomQueue;
 import com.zq.sword.array.netty.handler.TransferHandler;
 import com.zq.sword.array.netty.message.Header;
 import com.zq.sword.array.netty.message.MessageType;
@@ -18,14 +17,14 @@ import java.util.List;
  * @author: zhouqi1
  * @create: 2018-08-01 20:44
  **/
-public class PushBackupDataHandler extends TransferHandler {
+public class ProvideSwordDataTransferBackupHandler extends TransferHandler {
 
-    private LeftQueueService getLeftQueueService(){
-        return ServiceContext.getInstance().findService(LeftQueueService.class);
-    }
+    private RightRandomQueue<SwordData> rightRandomQueue;
+    private LeftOrderlyQueue<SwordData> leftOrderlyQueue;
 
-    private RightQueueService getRightQueueService(){
-        return ServiceContext.getInstance().findService(RightQueueService.class);
+    public ProvideSwordDataTransferBackupHandler(RightRandomQueue<SwordData> rightRandomQueue, LeftOrderlyQueue<SwordData> leftOrderlyQueue) {
+        this.rightRandomQueue = rightRandomQueue;
+        this.leftOrderlyQueue = leftOrderlyQueue;
     }
 
     @Override
@@ -41,22 +40,20 @@ public class PushBackupDataHandler extends TransferHandler {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         TransferMessage message = (TransferMessage)msg;
-        RightQueueService rightQueueService = getRightQueueService();
-        LeftQueueService leftQueueService = getLeftQueueService();
         if(message.getHeader() != null && message.getHeader().getType() == MessageType.POLL_T_RIGHT_DATA_BACKUP_REQ.value()) {
             Long dataItemId = (Long)message.getBody();
-            List<DataItem> dataItems = rightQueueService.pollAfterId(dataItemId);
+            List<SwordData> dataItems = rightRandomQueue.pollAfterId(dataItemId);
             ctx.fireChannelRead(buildPushTRightBackupDataResp(dataItems));
         }else if(message.getHeader() != null && message.getHeader().getType() == MessageType.POLL_T_LEFT_DATA_BACKUP_REQ.value()) {
             Long dataItemId = (Long)message.getBody();
-            List<com.zq.sword.array.data.lqueue.domain.DataItem> dataItems = leftQueueService.pollAfterId(dataItemId);
+            List<SwordData> dataItems = leftOrderlyQueue.pollAfterId(dataItemId);
             ctx.fireChannelRead(buildPushTLeftBackupDataResp(dataItems));
         }else {
             ctx.fireChannelRead(msg);
         }
     }
 
-    private TransferMessage buildPushTLeftBackupDataResp(List<com.zq.sword.array.data.lqueue.domain.DataItem> dataItems) {
+    private TransferMessage buildPushTLeftBackupDataResp(List<SwordData> dataItems) {
         TransferMessage message = new TransferMessage();
         Header header = new Header();
         header.setType(MessageType.POLL_T_LEFT_DATA_BACKUP_RESP.value());
@@ -65,7 +62,7 @@ public class PushBackupDataHandler extends TransferHandler {
         return message;
     }
 
-    private TransferMessage buildPushTRightBackupDataResp(List<DataItem> dataItems) {
+    private TransferMessage buildPushTRightBackupDataResp(List<SwordData> dataItems) {
         TransferMessage message = new TransferMessage();
         Header header = new Header();
         header.setType(MessageType.POLL_T_RIGHT_DATA_BACKUP_RESP.value());

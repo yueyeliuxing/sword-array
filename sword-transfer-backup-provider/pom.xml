@@ -44,9 +44,9 @@
 		<relativePath>../</relativePath>
 	</parent>
 
-	<artifactId>sword-backup-slave</artifactId>
+	<artifactId>sword-transfer-backup-provider</artifactId>
 	<packaging>jar</packaging>
-	<name>sword-backup-slave</name>
+	<name>sword-transfer-backup-provider</name>
 
 
 	<dependencies>
@@ -54,35 +54,24 @@
 			<groupId>com.zq.sword</groupId>
 			<artifactId>sword-common</artifactId>
 			<version>${project.version}</version>
-			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>com.zq.sword</groupId>
 			<artifactId>sword-data-lqueue</artifactId>
 			<version>${project.version}</version>
-			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>com.zq.sword</groupId>
 			<artifactId>sword-data-rqueue</artifactId>
 			<version>${project.version}</version>
-			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>com.zq.sword</groupId>
-			<artifactId>sword-metadata</artifactId>
+			<artifactId>sword-transfer</artifactId>
 			<version>${project.version}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>com.zq.sword</groupId>
-			<artifactId>sword-netty</artifactId>
-			<version>${project.version}</version>
-			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
