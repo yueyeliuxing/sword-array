@@ -78,7 +78,7 @@ public class SwordSlaveRedisReplicator implements SlaveRedisReplicator<SwordComm
                         swordData.setValue(SwordCommandBuilder.buildSwordCommand(command));
                         swordData.setTimestamp(System.currentTimeMillis());
                         swordData.setCrc("1");
-                        SwordSlaveRedisReplicator.this.rightRandomQueue.push(swordData);
+                        rightRandomQueue.push(swordData);
                     }
                 }
             });
