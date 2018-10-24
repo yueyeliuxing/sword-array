@@ -78,12 +78,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.zq.sword</groupId>
-			<artifactId>sword-metadata</artifactId>
-			<version>${project.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>RELEASE</version>
