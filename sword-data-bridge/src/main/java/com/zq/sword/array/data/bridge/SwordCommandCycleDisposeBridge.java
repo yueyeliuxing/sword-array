@@ -1,6 +1,7 @@
 package com.zq.sword.array.data.bridge;
 
-import com.zq.sword.array.common.data.SwordCommand;
+
+import com.zq.sword.array.data.SwordCommand;
 
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;

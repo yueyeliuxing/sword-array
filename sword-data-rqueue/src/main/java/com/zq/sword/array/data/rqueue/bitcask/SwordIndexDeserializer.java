@@ -1,7 +1,7 @@
 package com.zq.sword.array.data.rqueue.bitcask;
 
-import com.zq.sword.array.common.data.SwordDeserializer;
 import com.zq.sword.array.common.utils.JsonUtil;
+import com.zq.sword.array.data.SwordDeserializer;
 
 import java.io.UnsupportedEncodingException;
 

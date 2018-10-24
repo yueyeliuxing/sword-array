@@ -1,9 +1,9 @@
 package com.zq.sword.array.data.rqueue.bitcask;
 
-import com.zq.sword.array.common.data.SwordDataDeserializer;
-import com.zq.sword.array.common.data.SwordDataSerializer;
-import com.zq.sword.array.common.data.SwordDeserializer;
-import com.zq.sword.array.common.data.SwordSerializer;
+import com.zq.sword.array.data.SwordDataDeserializer;
+import com.zq.sword.array.data.SwordDataSerializer;
+import com.zq.sword.array.data.SwordDeserializer;
+import com.zq.sword.array.data.SwordSerializer;
 import lombok.Data;
 import lombok.ToString;
 

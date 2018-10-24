@@ -1,10 +1,10 @@
 package com.zq.sword.array.data.rqueue.bitcask;
 
-import com.zq.sword.array.common.data.SwordCommand;
 import com.zq.sword.array.common.event.DataEvent;
 import com.zq.sword.array.common.event.DataEventListener;
 import com.zq.sword.array.common.event.DataEventType;
-import com.zq.sword.array.common.data.SwordData;
+import com.zq.sword.array.data.SwordCommand;
+import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.bridge.DataCycleDisposeBridge;
 import com.zq.sword.array.data.rqueue.RightRandomQueue;
 import org.slf4j.Logger;

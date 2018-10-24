@@ -1,7 +1,7 @@
 package com.zq.sword.array.data.rqueue;
 
 import com.zq.sword.array.common.event.DataEventListener;
-import com.zq.sword.array.common.data.Sword;
+import com.zq.sword.array.data.Sword;
 
 import java.util.List;
 

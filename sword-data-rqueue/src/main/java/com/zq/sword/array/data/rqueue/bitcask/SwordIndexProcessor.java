@@ -2,8 +2,8 @@ package com.zq.sword.array.data.rqueue.bitcask;
 
 import com.zq.sword.array.common.utils.DateUtil;
 import com.zq.sword.array.common.utils.FileUtil;
-import com.zq.sword.array.common.data.SwordDeserializer;
-import com.zq.sword.array.common.data.SwordSerializer;
+import com.zq.sword.array.data.SwordDeserializer;
+import com.zq.sword.array.data.SwordSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

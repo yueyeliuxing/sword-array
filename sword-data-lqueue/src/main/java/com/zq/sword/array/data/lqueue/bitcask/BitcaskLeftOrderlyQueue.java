@@ -1,7 +1,7 @@
 package com.zq.sword.array.data.lqueue.bitcask;
 
-import com.zq.sword.array.common.data.SwordCommand;
-import com.zq.sword.array.common.data.SwordData;
+import com.zq.sword.array.data.SwordCommand;
+import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.bridge.DataCycleDisposeBridge;
 import com.zq.sword.array.data.lqueue.LeftOrderlyQueue;
 import com.zq.sword.array.data.lqueue.QueueState;

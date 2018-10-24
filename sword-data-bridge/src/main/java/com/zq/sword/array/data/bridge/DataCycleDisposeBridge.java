@@ -1,6 +1,7 @@
 package com.zq.sword.array.data.bridge;
 
-import com.zq.sword.array.common.data.Sword;
+
+import com.zq.sword.array.data.Sword;
 
 /**
  * @program: sword-array
