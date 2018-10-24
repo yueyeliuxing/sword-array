@@ -78,7 +78,7 @@ public class SwordDataTransferGather implements DataTransferGather {
                                              LeftOrderlyQueue<SwordData> leftQueueService,
                                              DataConsumerServiceCoordinator dataConsumerServiceCoordinator){
         TransferClient transferClient = new DefaultTransferClient(nodeNamingInfo.getHost(), nodeNamingInfo.getPort());
-        transferClient.registerTransferHandler(new GatherSwordDataHandler(clientNodeId, leftQueueService, dataConsumerServiceCoordinator));
+        transferClient.registerTransferHandler(new GatherSwordDataTransferHandler(clientNodeId, leftQueueService, dataConsumerServiceCoordinator));
         return transferClient;
     }
 

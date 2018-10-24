@@ -44,9 +44,9 @@
 		<relativePath>../</relativePath>
 	</parent>
 
-	<artifactId>sword-transfer-server</artifactId>
+	<artifactId>sword-transfer-provider</artifactId>
 	<packaging>jar</packaging>
-	<name>sword-transfer-server</name>
+	<name>sword-transfer-provider</name>
 
 
 	<dependencies>

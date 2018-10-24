@@ -20,7 +20,7 @@ import java.util.Map;
  * @author: zhouqi1
  * @create: 2018-08-01 20:44
  **/
-public class GatherSwordDataHandler extends TransferHandler {
+public class GatherSwordDataTransferHandler extends TransferHandler {
 
     private NodeId clientNodeServerId;
 
@@ -28,8 +28,8 @@ public class GatherSwordDataHandler extends TransferHandler {
 
     private DataConsumerServiceCoordinator dataConsumerServiceCoordinator;
 
-    public GatherSwordDataHandler(NodeId clientNodeServerId, LeftOrderlyQueue<SwordData> leftQueueService,
-                                  DataConsumerServiceCoordinator dataConsumerServiceCoordinator) {
+    public GatherSwordDataTransferHandler(NodeId clientNodeServerId, LeftOrderlyQueue<SwordData> leftQueueService,
+                                          DataConsumerServiceCoordinator dataConsumerServiceCoordinator) {
         this.clientNodeServerId = clientNodeServerId;
         this.leftQueueService = leftQueueService;
         this.dataConsumerServiceCoordinator = dataConsumerServiceCoordinator;

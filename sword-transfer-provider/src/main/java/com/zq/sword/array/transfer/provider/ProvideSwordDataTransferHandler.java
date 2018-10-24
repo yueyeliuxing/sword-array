@@ -1,8 +1,8 @@
-package com.zq.sword.array.transfer.server.handler;
+package com.zq.sword.array.transfer.provider;
 
-import com.zq.sword.array.common.data.SwordData;
 import com.zq.sword.array.common.event.DataEvent;
 import com.zq.sword.array.common.event.DataEventListener;
+import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.rqueue.RightRandomQueue;
 import com.zq.sword.array.netty.handler.TransferHandler;
 import com.zq.sword.array.netty.message.Header;
@@ -18,11 +18,11 @@ import java.util.List;
  * @author: zhouqi1
  * @create: 2018-08-01 20:44
  **/
-public class PushTransferDataItemHandler extends TransferHandler {
+public class ProvideSwordDataTransferHandler extends TransferHandler {
 
     private RightRandomQueue<SwordData> rightRandomQueue;
 
-    public PushTransferDataItemHandler(RightRandomQueue<SwordData> rightRandomQueue) {
+    public ProvideSwordDataTransferHandler(RightRandomQueue<SwordData> rightRandomQueue) {
         this.rightRandomQueue = rightRandomQueue;
         rightRandomQueue.registerSwordDataListener(new DataEventListener<SwordData>(){
 
@@ -48,8 +48,8 @@ public class PushTransferDataItemHandler extends TransferHandler {
         TransferMessage message = (TransferMessage)msg;
 
         if(message.getHeader() != null && message.getHeader().getType() == MessageType.POLL_DATA_TRANSFER_REQ.value()) {
-            Long dataItemId = (Long)message.getBody();
-            List<SwordData> dataItems = rightRandomQueue.pollAfterId(dataItemId);
+            Long dataId = (Long)message.getBody();
+            List<SwordData> dataItems = rightRandomQueue.pollAfterId(dataId);
             ctx.fireChannelRead(buildPushTransferMessageResp(dataItems));
         }else {
             ctx.fireChannelRead(msg);

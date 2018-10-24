@@ -30,7 +30,7 @@
 		<module>sword-redis-client</module>
 		<module>sword-redis-slave</module>
         <module>sword-transfer</module>
-		<module>sword-transfer-server</module>
+		<module>sword-transfer-provider</module>
 		<module>sword-transfer-gather</module>
 		<module>sword-node-server</module>
 	</modules>

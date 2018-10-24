@@ -31,20 +31,19 @@ public class DefaultTransferServer implements TransferServer {
 
     private Logger logger = LoggerFactory.getLogger(DefaultTransferServer.class);
 
-    private String host;
-
     private int port;
 
     private List<TransferHandler> transferHandlers;
 
-    public DefaultTransferServer(String host, int port) {
-        this.host = host;
+    private ServerBootstrap bootstrap;
+
+    public DefaultTransferServer(int port) {
         this.port = port;
         transferHandlers = new CopyOnWriteArrayList<>();
     }
 
     public static void main(String[] args) throws Exception{
-        new DefaultTransferServer("127.0.0.1", 6440).start();
+        new DefaultTransferServer(6440).start();
     }
 
     @Override
@@ -57,8 +56,8 @@ public class DefaultTransferServer implements TransferServer {
         try{
             EventLoopGroup bossGroup = new NioEventLoopGroup(1);
             EventLoopGroup workerGroup = new NioEventLoopGroup(10);
-            ServerBootstrap b = new ServerBootstrap();
-            b.group(bossGroup, workerGroup)
+            bootstrap = new ServerBootstrap();
+            bootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .option(ChannelOption.SO_BACKLOG, 100)
                     .handler(new LoggingHandler(LogLevel.INFO))
@@ -72,8 +71,8 @@ public class DefaultTransferServer implements TransferServer {
                                     .addLast("HeartBeatHandler", new HeartBeatRespHandler());
                         }
                     });
-            b.bind(host, port).sync();
-            System.out.println("Netty server start ok :" + host + ":" + port);
+            bootstrap.bind(port).sync();
+            System.out.println("Netty server start ok :" + port);
         }catch (Exception e){
             logger.error("start error", e);
         }
@@ -82,7 +81,6 @@ public class DefaultTransferServer implements TransferServer {
 
     @Override
     public void shutdown() {
-
     }
 
     @Override
