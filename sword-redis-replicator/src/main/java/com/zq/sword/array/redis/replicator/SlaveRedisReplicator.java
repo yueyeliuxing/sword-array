@@ -14,12 +14,6 @@ import com.zq.sword.array.data.rqueue.RightRandomQueue;
 public interface SlaveRedisReplicator<T extends Sword> {
 
     /**
-     * 绑定目的数据源
-     * @param rightRandomQueue
-     */
-    void bindingTargetDataSource(RightRandomQueue<SwordData> rightRandomQueue);
-
-    /**
      * 开启
      */
     void start();

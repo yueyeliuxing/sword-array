@@ -34,7 +34,7 @@ public class SwordSlaveRedisReplicator implements SlaveRedisReplicator<SwordComm
 
     private IdGenerator idGenerator;
 
-    private SwordSlaveRedisReplicator(long workerId, long datacenterId, String uri) {
+    private SwordSlaveRedisReplicator(long workerId, long datacenterId, String uri, RightRandomQueue<SwordData> rightRandomQueue) {
         logger.info("SwordSlaveRedisReplicator start...");
         idGenerator = new SnowFlakeIdGenerator(workerId, datacenterId);
         try {
@@ -52,6 +52,7 @@ public class SwordSlaveRedisReplicator implements SlaveRedisReplicator<SwordComm
         private long workerId;
         private long datacenterId;
         private String uri;
+        private RightRandomQueue<SwordData> rightRandomQueue;
 
         public static SwordSlaveRedisReplicatorBuilder create(){
             return new SwordSlaveRedisReplicatorBuilder();
@@ -68,14 +69,14 @@ public class SwordSlaveRedisReplicator implements SlaveRedisReplicator<SwordComm
             return this;
         }
 
-        public SwordSlaveRedisReplicator build(){
-            return new SwordSlaveRedisReplicator(workerId, datacenterId, uri);
+        public SwordSlaveRedisReplicatorBuilder bindingDataSource(RightRandomQueue<SwordData> rightRandomQueue){
+            this.rightRandomQueue = rightRandomQueue;
+            return this;
         }
-    }
 
-    @Override
-    public void bindingTargetDataSource(RightRandomQueue<SwordData> rightRandomQueue) {
-        this.rightRandomQueue = rightRandomQueue;
+        public SwordSlaveRedisReplicator build(){
+            return new SwordSlaveRedisReplicator(workerId, datacenterId, uri, rightRandomQueue);
+        }
     }
 
     @Override
