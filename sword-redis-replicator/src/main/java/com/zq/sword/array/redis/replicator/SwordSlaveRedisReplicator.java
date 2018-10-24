@@ -1,4 +1,4 @@
-package com.zq.sword.array.redis.slave;
+package com.zq.sword.array.redis.replicator;
 
 
 import com.moilioncircle.redis.replicator.RedisReplicator;
@@ -10,9 +10,6 @@ import com.zq.sword.array.common.data.SwordCommand;
 import com.zq.sword.array.common.data.SwordCommandSerializer;
 import com.zq.sword.array.common.data.SwordData;
 import com.zq.sword.array.common.data.SwordSerializer;
-import com.zq.sword.array.common.event.DataEvent;
-import com.zq.sword.array.common.event.DataEventListener;
-import com.zq.sword.array.common.event.DataEventType;
 import com.zq.sword.array.data.rqueue.RightRandomQueue;
 import com.zq.sword.array.id.IdGenerator;
 import com.zq.sword.array.id.SnowFlakeIdGenerator;

@@ -1,13 +1,10 @@
 package com.zq.sword.array.node.server;
 
 import com.zq.sword.array.common.data.SwordCommand;
-import com.zq.sword.array.common.event.DataEvent;
-import com.zq.sword.array.common.event.DataEventListener;
-import com.zq.sword.array.common.event.DataEventType;
 import com.zq.sword.array.data.rqueue.RightRandomQueue;
 import com.zq.sword.array.data.rqueue.bitcask.BitcaskRightRandomQueue;
-import com.zq.sword.array.redis.slave.SwordSlaveRedisReplicator;
-import com.zq.sword.array.redis.slave.SlaveRedisReplicator;
+import com.zq.sword.array.redis.replicator.SwordSlaveRedisReplicator;
+import com.zq.sword.array.redis.replicator.SlaveRedisReplicator;
 
 /**
  * @program: sword-array

@@ -44,9 +44,9 @@
 		<relativePath>../</relativePath>
 	</parent>
 
-	<artifactId>sword-redis-slave</artifactId>
+	<artifactId>sword-redis-replicator</artifactId>
 	<packaging>jar</packaging>
-	<name>sword-redis-slave</name>
+	<name>sword-redis-replicator</name>
 
 
 	<dependencies>

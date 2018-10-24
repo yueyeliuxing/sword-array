@@ -1,4 +1,4 @@
-package com.zq.sword.array.redis.slave;
+package com.zq.sword.array.redis.replicator;
 
 import com.moilioncircle.redis.replicator.cmd.Command;
 import com.moilioncircle.redis.replicator.cmd.impl.SetCommand;

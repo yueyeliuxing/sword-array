@@ -1,9 +1,8 @@
-package com.zq.sword.array.redis.slave;
+package com.zq.sword.array.redis.replicator;
 
 
 import com.zq.sword.array.data.rqueue.RightRandomQueue;
 import com.zq.sword.array.data.rqueue.bitcask.BitcaskRightRandomQueue;
-import org.junit.Before;
 import org.junit.Test;
 
 public class SlaveRedisReplicatorTest {
