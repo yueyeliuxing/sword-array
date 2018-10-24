@@ -1,9 +1,8 @@
-package com.zq.sword.array.redis.client;
+package com.zq.sword.array.redis.writer;
 
-import com.zq.sword.array.common.data.SwordCommand;
-import com.zq.sword.array.common.data.SwordData;
+import com.zq.sword.array.data.SwordCommand;
+import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.lqueue.LeftOrderlyQueue;
-import com.zq.sword.array.metadata.data.SwordConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,12 +24,36 @@ public class SwordRedisCommandWriter implements RedisCommandWriter {
 
     private volatile boolean SUCCESS_TAG = true;
 
-    public SwordRedisCommandWriter(SwordConfig swordConfig) {
-        redisClient = new SwordRedisClient(getRedisConfig(swordConfig));
+    private SwordRedisCommandWriter(RedisConfig redisConfig, LeftOrderlyQueue<SwordData> leftOrderlyQueue) {
+        redisClient = new SwordRedisClient(redisConfig);
         swordRedisCommandBackgroundExecutor = new SwordRedisCommandBackgroundExecutor();
+        this.leftOrderlyQueue = leftOrderlyQueue;
     }
 
-    private RedisConfig getRedisConfig(SwordConfig swordConfig) {
+    public static class SwordRedisCommandWriterBuilder{
+        private RedisConfig redisConfig;
+        private LeftOrderlyQueue<SwordData> leftOrderlyQueue;
+
+        public static SwordRedisCommandWriterBuilder create(){
+            return new SwordRedisCommandWriterBuilder();
+        }
+
+        public SwordRedisCommandWriterBuilder config(RedisConfig redisConfig){
+            this.redisConfig = redisConfig;
+            return this;
+        }
+
+        public SwordRedisCommandWriterBuilder bindingDataSource(LeftOrderlyQueue<SwordData> leftOrderlyQueue){
+            this.leftOrderlyQueue = leftOrderlyQueue;
+            return this;
+        }
+
+        public SwordRedisCommandWriter build(){
+            return new SwordRedisCommandWriter(redisConfig, leftOrderlyQueue);
+        }
+    }
+
+   /* private RedisConfig getRedisConfig(SwordConfig swordConfig) {
         String host = swordConfig.getProperty("redis.host");
         String port = swordConfig.getProperty("redis.port");
         String pass = swordConfig.getProperty("redis.pass");
@@ -40,12 +63,7 @@ public class SwordRedisCommandWriter implements RedisCommandWriter {
         String maxWaitMillis = swordConfig.getProperty("redis.maxWaitMillis");
         String testOnBorrow = swordConfig.getProperty("redis.testOnBorrow");
         return new RedisConfig(host, port, pass, timeout, maxIdle, maxTotal, maxWaitMillis, testOnBorrow);
-    }
-
-    @Override
-    public void bindingDataSource(LeftOrderlyQueue<SwordData> leftOrderlyQueue){
-        this.leftOrderlyQueue = leftOrderlyQueue;
-    }
+    }*/
 
     @Override
     public void start() {

@@ -44,9 +44,9 @@
 		<relativePath>../</relativePath>
 	</parent>
 
-	<artifactId>sword-redis-client</artifactId>
+	<artifactId>sword-redis-writer</artifactId>
 	<packaging>jar</packaging>
-	<name>sword-redis-client</name>
+	<name>sword-redis-writer</name>
 
 
 	<dependencies>
@@ -59,12 +59,6 @@
 		<dependency>
 			<groupId>com.zq.sword</groupId>
 			<artifactId>sword-data-lqueue</artifactId>
-			<version>${project.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.zq.sword</groupId>
-			<artifactId>sword-metadata</artifactId>
 			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>

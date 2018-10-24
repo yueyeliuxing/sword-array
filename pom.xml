@@ -27,7 +27,7 @@
 		<module>sword-data-rqueue</module>
 		<module>sword-backup-master</module>
 		<module>sword-backup-slave</module>
-		<module>sword-redis-client</module>
+		<module>sword-redis-writer</module>
 		<module>sword-redis-replicator</module>
         <module>sword-transfer</module>
 		<module>sword-transfer-provider</module>

@@ -1,6 +1,7 @@
-package com.zq.sword.array.redis.client;
+package com.zq.sword.array.redis.writer;
 
-import com.zq.sword.array.common.data.SwordData;
+
+import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.lqueue.LeftOrderlyQueue;
 
 /**
@@ -15,12 +16,6 @@ public interface RedisCommandWriter {
      * 开启写入器
      */
     void start();
-
-    /**
-     * 绑定数据源
-     * @param leftOrderlyQueue
-     */
-    void bindingDataSource(LeftOrderlyQueue<SwordData> leftOrderlyQueue);
 
     /**
      *  关闭写入器

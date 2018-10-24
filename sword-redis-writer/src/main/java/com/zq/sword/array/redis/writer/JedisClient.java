@@ -1,8 +1,7 @@
-package com.zq.sword.array.redis.client;
+package com.zq.sword.array.redis.writer;
  
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
  
 import redis.clients.jedis.Jedis;

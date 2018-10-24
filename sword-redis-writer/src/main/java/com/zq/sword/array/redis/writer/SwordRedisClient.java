@@ -1,10 +1,8 @@
-package com.zq.sword.array.redis.client;
+package com.zq.sword.array.redis.writer;
 
-import com.zq.sword.array.common.data.SwordCommand;
+import com.zq.sword.array.data.SwordCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Properties;
 
 /**
  * @program: sword-array

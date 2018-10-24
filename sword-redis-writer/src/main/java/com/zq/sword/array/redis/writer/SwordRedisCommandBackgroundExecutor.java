@@ -1,4 +1,4 @@
-package com.zq.sword.array.redis.client;
+package com.zq.sword.array.redis.writer;
 
 import com.zq.sword.array.common.task.AbstractTaskExecutor;
 

@@ -1,6 +1,6 @@
-package com.zq.sword.array.redis.client;
+package com.zq.sword.array.redis.writer;
 
-import com.zq.sword.array.common.data.Sword;
+import com.zq.sword.array.data.Sword;
 
 /**
  * @program: sword-array
