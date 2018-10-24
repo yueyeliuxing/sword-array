@@ -36,7 +36,8 @@ public class BitcaskLeftOrderlyQueue implements LeftOrderlyQueue<SwordData> {
         state = QueueState.START;
     }
 
-    public void setDataCycleDisposeBridge(DataCycleDisposeBridge<SwordCommand> dataCycleDisposeBridge) {
+    @Override
+    public void bindingDataCycleDisposeBridge(DataCycleDisposeBridge<SwordCommand> dataCycleDisposeBridge) {
         this.dataCycleDisposeBridge = dataCycleDisposeBridge;
     }
 

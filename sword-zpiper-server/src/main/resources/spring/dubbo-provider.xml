@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+
+    <dubbo:service interface="com.dianwoba.redcliff.user.provider.UserVisitRecordProvider"
+                   ref="userVisitRecordProviderImpl" version="1.0.0"/>
+    <dubbo:service interface="com.dianwoba.redcliff.user.provider.VisitPurposeTemplateProvider"
+                   ref="visitPurposeTemplateProviderImpl" version="1.0.0"/>
+    <dubbo:service interface="com.dianwoba.redcliff.user.provider.VisitPurposeTemplateQueryProvider"
+                   ref="visitPurposeTemplateQueryProviderImpl" version="1.0.0"/>
+    <dubbo:service interface="com.dianwoba.redcliff.user.provider.VisitRuleJournalQueryProvider"
+                   ref="visitRuleJournalQueryProviderImpl" version="1.0.0"/>
+    <dubbo:service interface="com.dianwoba.redcliff.user.provider.VisitRuleTemplateProvider"
+                   ref="visitRuleTemplateProviderImpl" version="1.0.0"/>
+    <dubbo:service interface="com.dianwoba.redcliff.user.provider.VisitRuleTemplateQueryProvider"
+                   ref="visitRuleTemplateQueryProviderImpl" version="1.0.0"/>
+    <dubbo:service interface="com.dianwoba.redcliff.user.provider.VisitUserJournalQueryProvider"
+                   ref="visitUserJournalQueryProviderImpl" version="1.0.0"/>
+    <dubbo:service interface="com.dianwoba.redcliff.user.provider.VisitUserRecordProvider"
+                   ref="visitUserRecordProviderImpl" version="1.0.0"/>
+    <dubbo:service interface="com.dianwoba.redcliff.user.provider.VisitUserRecordQueryProvider"
+                   ref="visitUserRecordQueryProviderImpl" version="1.0.0"/>
+
+
+
+
+    <bean id="failHandle" class="com.dianwoba.pt.goodjob.node.file.FailHandle" />
+    <!-- ============== 引用调度回调服务，必须项，超时设置为40秒 =========================== -->
+
+    <dubbo:reference id="jobExecuteRespService" timeout="40000"
+                     interface="com.dianwoba.pt.goodjob.remote.service.JobExecuteRespService" />
+    <!-- ============== 服务实现，请务必按照此配置. group命名规则为【项目code + 业务】，用于区分调度任务 ======= -->
+    <!-- ============== 此处服务超时时间请务必按照自身任务执行时间来设置，在调度中心默认引用超时时间设置为5分钟================ -->
+    <!-- ============== 定时任务不推荐使用dubbo重试的配置，防止重试状态下的数据混乱 =============== -->
+
+    <!-- 定时任务 生成规则流水数据 -->
+    <dubbo:service
+            interface="com.dianwoba.pt.goodjob.remote.service.JobExecuteService"
+            group="user-visit-gw-service_generateRuleUserJournalJob" ref="generateRuleUserJournalJob"
+            timeout="30000" />
+
+    <!-- 定时任务 推送 回访提醒 -->
+    <dubbo:service
+            interface="com.dianwoba.pt.goodjob.remote.service.JobExecuteService"
+            group="user-visit-gw-service_pushAppAlertJob" ref="pushAppAlertJob"
+            timeout="30000" />
+
+    <!-- 定时任务 商家数据同步 -->
+    <dubbo:service
+            interface="com.dianwoba.pt.goodjob.remote.service.JobExecuteService"
+            group="user-visit-gw-service_syncUserDataJob" ref="syncUserDataJob"
+            timeout="30000" />
+</beans>

@@ -28,7 +28,7 @@ public class SwordDataTransferBackupGather implements DataTransferBackupGather {
         return transferClient;
     }
 
-    public static class SwordDataTransferGatherBuilder {
+    public static class SwordDataTransferBackupGatherBuilder {
 
         private String host;
 
@@ -38,16 +38,16 @@ public class SwordDataTransferBackupGather implements DataTransferBackupGather {
 
         private RightRandomQueue<SwordData> rightRandomQueue;
 
-        public static SwordDataTransferGatherBuilder create(){
-            return new SwordDataTransferGatherBuilder();
+        public static SwordDataTransferBackupGatherBuilder create(){
+            return new SwordDataTransferBackupGatherBuilder();
         }
 
-        public SwordDataTransferGatherBuilder connect(String host, int port){
+        public SwordDataTransferBackupGatherBuilder connect(String host, int port){
             this.host = host;
             this.port = port;
             return this;
         }
-        public SwordDataTransferGatherBuilder bindingTargetDataSource(LeftOrderlyQueue<SwordData> leftOrderlyQueue, RightRandomQueue<SwordData> rightRandomQueue){
+        public SwordDataTransferBackupGatherBuilder bindingTargetDataSource(LeftOrderlyQueue<SwordData> leftOrderlyQueue, RightRandomQueue<SwordData> rightRandomQueue){
             this.leftOrderlyQueue = leftOrderlyQueue;
             this.rightRandomQueue = rightRandomQueue;
             return this;

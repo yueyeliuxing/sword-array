@@ -21,21 +21,21 @@ public class SwordDataTransferBackupProvider implements DataTransferBackupProvid
         transferServer.registerTransferHandler(new ProvideSwordDataTransferBackupHandler(rightRandomQueue, leftOrderlyQueue));
     }
 
-    public static class SwordDataTransferProviderBuilder {
+    public static class SwordDataTransferBackupProviderBuilder {
         private int port;
         private RightRandomQueue<SwordData> rightRandomQueue;
         private LeftOrderlyQueue<SwordData> leftOrderlyQueue;
 
-        public static SwordDataTransferProviderBuilder create(){
-            return new SwordDataTransferProviderBuilder();
+        public static SwordDataTransferBackupProviderBuilder create(){
+            return new SwordDataTransferBackupProviderBuilder();
         }
 
-        public SwordDataTransferProviderBuilder bind(int port){
+        public SwordDataTransferBackupProviderBuilder bind(int port){
             this.port = port;
             return this;
         }
 
-        public SwordDataTransferProviderBuilder bindingDataSource(RightRandomQueue<SwordData> rightRandomQueue, LeftOrderlyQueue<SwordData> leftOrderlyQueue){
+        public SwordDataTransferBackupProviderBuilder bindingDataSource(RightRandomQueue<SwordData> rightRandomQueue, LeftOrderlyQueue<SwordData> leftOrderlyQueue){
             this.rightRandomQueue = rightRandomQueue;
             this.leftOrderlyQueue = leftOrderlyQueue;
             return this;

@@ -11,7 +11,6 @@ import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.rqueue.RightRandomQueue;
 import com.zq.sword.array.id.IdGenerator;
 import com.zq.sword.array.id.SnowFlakeIdGenerator;
-import com.zq.sword.array.metadata.data.SwordConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

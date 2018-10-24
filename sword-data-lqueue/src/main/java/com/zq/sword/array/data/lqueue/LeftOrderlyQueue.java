@@ -2,6 +2,8 @@ package com.zq.sword.array.data.lqueue;
 
 
 import com.zq.sword.array.data.Sword;
+import com.zq.sword.array.data.SwordCommand;
+import com.zq.sword.array.data.bridge.DataCycleDisposeBridge;
 
 import java.util.List;
 
@@ -12,6 +14,12 @@ import java.util.List;
  * @create: 2018-08-01 11:47
  **/
 public interface LeftOrderlyQueue<T extends Sword> {
+
+    /**
+     * 绑定桥梁
+     * @param dataCycleDisposeBridge
+     */
+    void bindingDataCycleDisposeBridge(DataCycleDisposeBridge<SwordCommand> dataCycleDisposeBridge);
 
     /**
      * 获取最新的id

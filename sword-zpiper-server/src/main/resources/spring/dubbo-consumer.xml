@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://code.alibabatech.com/schema/dubbo
+        http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+    <!-- 商家信息-->
+    <dubbo:reference id="shopInfoProvider"  registry="dianwodaBaseDubboRegistry"
+                     interface="com.dianwoba.redcliff.shopinfo.provider.ShopInfoProvider"/>
+
+    <!-- 用户画像-->
+    <dubbo:reference id="userPortraitProvider" registry="dianwodaBaseDubboRegistry"
+                     interface="com.dianwoba.redcliff.shopinfo.provider.UserPortraitProvider"
+                        version="1.0.0"/>
+
+    <!-- 渠道服务-->
+    <dubbo:reference id="expressPlatformSearchProvider" registry="dianwodaBaseDubboRegistry"
+                     interface="com.dinawoba.platform.provider.ExpressPlatformSearchProvider"
+                     version="1.0.0"/>
+    <!-- 商家查询服务-->
+    <dubbo:reference id="shopInfoQueryProvider" registry="unit"
+                     interface="com.dianwoba.redcliff.user.provider.ShopInfoQueryProvider"
+                     timeout="1000" />
+    <!-- 员工服务 -->
+    <dubbo:reference id="staffProvider" registry="commonDubboRegistry"
+                     interface="com.dianwoba.genius.provider.StaffProvider"
+                     check="false" />
+
+    <!-- APP 提醒服务 -->
+    <dubbo:reference id="hawkeyeTodolistProvider"
+                     interface="com.dianwoba.hawkeye.provider.HawkeyeTodolistProvider"
+                     version="1.0.0" />
+</beans>

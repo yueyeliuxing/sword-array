@@ -59,7 +59,8 @@ public class BitcaskRightRandomQueue implements RightRandomQueue<SwordData> {
                 .build());
     }
 
-    public void setDataCycleDisposeBridge(DataCycleDisposeBridge<SwordCommand> dataCycleDisposeBridge) {
+    @Override
+    public void bindingDataCycleDisposeBridge(DataCycleDisposeBridge<SwordCommand> dataCycleDisposeBridge) {
         this.dataCycleDisposeBridge = dataCycleDisposeBridge;
     }
 
