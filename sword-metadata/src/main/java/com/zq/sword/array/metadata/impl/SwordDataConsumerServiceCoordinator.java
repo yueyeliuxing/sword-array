@@ -5,7 +5,6 @@ import com.zq.sword.array.common.event.DataEventListener;
 import com.zq.sword.array.common.event.DataEventType;
 import com.zq.sword.array.metadata.DataConsumerServiceCoordinator;
 import com.zq.sword.array.metadata.data.*;
-import com.zq.sword.array.metadata.helper.ZkTreePathHelper;
 import org.I0Itec.zkclient.IZkDataListener;
 import org.I0Itec.zkclient.ZkClient;
 
@@ -53,7 +52,7 @@ public class SwordDataConsumerServiceCoordinator implements DataConsumerServiceC
     @Override
     public Map<NodeId, NodeNamingInfo> getNeedToConsumeNodeNamingInfo(DataEventListener<Map<NodeId, NodeNamingInfo>> nodeNamingInfoDataEventListener) {
         Map<NodeId, NodeNamingInfo> nodeNamingInfoOfNodeIds = new HashMap<>();
-        List<String> dcPaths = zkClient.getChildren(ZkTreePathHelper.ZK_ROOT);
+        List<String> dcPaths = zkClient.getChildren(ZkTreePathBuilder.ZK_ROOT);
         if(dcPaths != null && !dcPaths.isEmpty()){
             for(String dcPath : dcPaths){
                 String dcName = dcPath.substring(dcPath.lastIndexOf("/")+1);
@@ -118,6 +117,9 @@ public class SwordDataConsumerServiceCoordinator implements DataConsumerServiceC
                                                                                 public void handleDataDeleted(String dataPath) throws Exception {
                                                                                     DataEvent<Map<NodeId, NodeNamingInfo>> dataEvent = new DataEvent();
                                                                                     dataEvent.setType(DataEventType.NODE_CONFIG_DATA_DELETE);
+                                                                                    Map<NodeId, NodeNamingInfo> nodeNamingInfosOfNodeId = new HashMap<>();
+                                                                                    nodeNamingInfosOfNodeId.put(consumedNodeId, nodeNamingInfo);
+                                                                                    dataEvent.setData(nodeNamingInfosOfNodeId);
                                                                                     nodeNamingInfoDataEventListener.listen(dataEvent);
                                                                                 }
                                                                             });

@@ -44,10 +44,11 @@
 		<relativePath>../</relativePath>
 	</parent>
 
-	<artifactId>sword-netty</artifactId>
+	<artifactId>sword-transfer-gather</artifactId>
 	<packaging>jar</packaging>
-	<name>sword-netty</name>
-	
+	<name>sword-transfer-gather</name>
+
+
 	<dependencies>
 		<dependency>
 			<groupId>com.zq.sword</groupId>
@@ -57,23 +58,23 @@
 		</dependency>
 
 		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-all</artifactId>
-			<version>5.0.0.Alpha2</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.jboss.marshalling</groupId>
-			<artifactId>jboss-marshalling-serial</artifactId>
-			<version>2.0.5.Final</version>
+			<groupId>com.zq.sword</groupId>
+			<artifactId>sword-data-lqueue</artifactId>
+			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
-			<groupId>org.jboss.marshalling</groupId>
-			<artifactId>jboss-marshalling</artifactId>
-			<version>2.0.5.Final</version>
+			<groupId>com.zq.sword</groupId>
+			<artifactId>sword-metadata</artifactId>
+			<version>${project.version}</version>
 			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.zq.sword</groupId>
+			<artifactId>sword-transfer</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 

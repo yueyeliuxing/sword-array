@@ -19,7 +19,6 @@
 	<modules>
 		<module>sword-common</module>
 		<module>sword-id-generator</module>
-		<module>sword-netty</module>
 		<module>sword-redis</module>
 		<module>sword-metadata</module>
 		<module>sword-data</module>
@@ -30,8 +29,9 @@
 		<module>sword-backup-slave</module>
 		<module>sword-redis-client</module>
 		<module>sword-redis-slave</module>
+        <module>sword-transfer</module>
 		<module>sword-transfer-server</module>
-		<module>sword-transfer-client</module>
+		<module>sword-transfer-gather</module>
 		<module>sword-node-server</module>
 	</modules>
 
