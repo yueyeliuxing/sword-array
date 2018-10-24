@@ -16,18 +16,19 @@ import redis.clients.jedis.JedisPoolConfig;
 public class JedisClient {
     private JedisPool jedisPool = null;
 
-    public void initJedis(Properties properties){
+    public void initJedis(RedisConfig redisConfig){
         if(jedisPool != null){
             jedisPool.close();
         }
-        String host = properties.getProperty("redis.host");
-        String port = properties.getProperty("redis.port");
-        String pass = properties.getProperty("redis.pass");
-        String timeout = properties.getProperty("redis.timeout");
-        String maxIdle = properties.getProperty("redis.maxIdle");
-        String maxTotal = properties.getProperty("redis.maxTotal");
-        String maxWaitMillis = properties.getProperty("redis.maxWaitMillis");
-        String testOnBorrow = properties.getProperty("redis.testOnBorrow");
+
+        String host = redisConfig.getHost();
+        String port = redisConfig.getPort();
+        String pass = redisConfig.getPass();
+        String timeout = redisConfig.getTimeout();
+        String maxIdle = redisConfig.getMaxIdle();
+        String maxTotal = redisConfig.getMaxTotal();
+        String maxWaitMillis = redisConfig.getMaxWaitMillis();
+        String testOnBorrow = redisConfig.getTestOnBorrow();
 
         JedisPoolConfig config = new JedisPoolConfig();
         //控制一个pool可分配多少个jedis实例，通过pool.getResource()来获取；
@@ -341,5 +342,9 @@ public class JedisClient {
     	}
         returnJedis(jedis);
         return l;
+    }
+
+    public void close(){
+        jedisPool.close();
     }
 }

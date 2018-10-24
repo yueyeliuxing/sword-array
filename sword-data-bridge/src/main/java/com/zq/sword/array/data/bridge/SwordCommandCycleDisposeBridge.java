@@ -21,7 +21,9 @@ public class SwordCommandCycleDisposeBridge implements DataCycleDisposeBridge<Sw
     public SwordCommandCycleDisposeBridge() {
         consumedSwordDataSet = new CopyOnWriteArraySet<>();
         cycleSwordCommandBackgroundExecutor = new CycleSwordCommandBackgroundExecutor();
+    }
 
+    public void start(){
         startTasks();
     }
 

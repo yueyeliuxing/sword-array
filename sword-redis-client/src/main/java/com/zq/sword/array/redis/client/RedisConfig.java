@@ -1,6 +1,7 @@
 package com.zq.sword.array.redis.client;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
@@ -11,6 +12,7 @@ import lombok.ToString;
  **/
 @Data
 @ToString
+@NoArgsConstructor
 public class RedisConfig {
 
     private String host;
@@ -28,4 +30,15 @@ public class RedisConfig {
     private String maxWaitMillis;
 
     private String testOnBorrow;
+
+    public RedisConfig(String host, String port, String pass, String timeout, String maxIdle, String maxTotal, String maxWaitMillis, String testOnBorrow) {
+        this.host = host;
+        this.port = port;
+        this.pass = pass;
+        this.timeout = timeout;
+        this.maxIdle = maxIdle;
+        this.maxTotal = maxTotal;
+        this.maxWaitMillis = maxWaitMillis;
+        this.testOnBorrow = testOnBorrow;
+    }
 }

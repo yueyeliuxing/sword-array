@@ -16,4 +16,9 @@ public interface RedisClient<T extends Sword> {
      * @return
      */
     boolean write(T data);
+
+    /**
+     * 关闭
+     */
+    void close();
 }
