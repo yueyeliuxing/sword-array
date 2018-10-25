@@ -133,6 +133,8 @@ public class SwordServerStarter implements CommandLineRunner, EnvironmentAware {
                     case NODE_MASTER_DATA_DELETE:
 
                         break;
+                    default:
+                        break;
                 }
             });
             String masterHost = masterNodeNamingInfo.getHost();
