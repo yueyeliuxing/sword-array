@@ -26,7 +26,7 @@ public class CharacterDataSeparator implements DataSeparator {
     @Override
     public int isBoundary(byte[] data) {
         int index = 0;
-        if((index =new String(data).lastIndexOf(character)) > -1){
+        if((index =new String(data).indexOf(character)) > -1){
             return index;
         }
         return index;

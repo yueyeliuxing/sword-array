@@ -6,6 +6,8 @@ import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @program: sword-array
@@ -23,6 +25,10 @@ public class BitcaskRandomAccessFile<T extends Sword> implements Closeable {
 
     private RandomAccessFile randomAccessFile;
 
+    public BitcaskRandomAccessFile(String name, String mode, SwordSerializer<T> swordSerializer, SwordDeserializer<T> swordDeserializer)  throws FileNotFoundException {
+        this(name, mode, new CharacterDataSeparator(), swordSerializer, swordDeserializer);
+    }
+
     public BitcaskRandomAccessFile(String name, String mode, DataSeparator dataSeparator, SwordSerializer<T> swordSerializer, SwordDeserializer<T> swordDeserializer)  throws FileNotFoundException {
         this.randomAccessFile = new RandomAccessFile(name, mode);
         this.dataSeparator = dataSeparator;
@@ -35,33 +41,59 @@ public class BitcaskRandomAccessFile<T extends Sword> implements Closeable {
     }
 
     public T read(long pos) throws IOException{
-        randomAccessFile.seek(pos);
-        //分隔符为空 默认是长度分隔
-        if(dataSeparator == null){
-            int itemLen = randomAccessFile.readInt();
-            byte[] itemArray = new byte[itemLen];
-            int l = randomAccessFile.read(itemArray);
-            if(l != -1){
-                return swordDeserializer.deserialize(itemArray);
-            }
-            return null;
-        }
-
-        byte[] temp = new byte[1024];
-        int line = 0;
-        StringBuilder sb = new StringBuilder();
-        while ((line = randomAccessFile.read(temp)) != -1) {
-            sb.append(new String(temp,0,line));
-            byte[] data = sb.toString().getBytes();
-            int index = dataSeparator.isBoundary(data);
-            if(index > -1){
-                byte[] item = dataSeparator.toDataArray(data);
-                //文件指针回退
-                randomAccessFile.seek(Long.valueOf(index+dataSeparator.character().length()));
-                return swordDeserializer.deserialize(item);
-            }
+        List<T> datas = read(pos, 1);
+        if(datas != null && !datas.isEmpty()){
+            return datas.get(0);
         }
         return null;
+    }
+
+    public List<T> read(long pos, Integer num) throws IOException{
+        int n = 1;
+        randomAccessFile.seek(pos);
+        List<T> datas = new ArrayList<T>();
+        while (num == null || n <= num){
+            //分隔符为空 默认是长度分隔
+            if(dataSeparator == null){
+                int itemLen = randomAccessFile.readInt();
+                byte[] itemArray = new byte[itemLen];
+                int l = randomAccessFile.read(itemArray);
+                if(l > -1){
+                    datas.add(swordDeserializer.deserialize(itemArray));
+                    n++;
+                }else {
+                    break;
+                }
+            }else {
+                byte[] temp = new byte[1024];
+                int line = 0;
+                StringBuilder sb = new StringBuilder();
+                int p = 0;
+                while ((line = randomAccessFile.read(temp)) != -1) {
+                    sb.append(new String(temp,0,line));
+                    byte[] data = sb.toString().getBytes();
+                    int index = dataSeparator.isBoundary(data);
+                    if(index > -1){
+                        byte[] item = dataSeparator.toDataArray(data);
+                        int len = index+dataSeparator.character().length();
+                        if(len < data.length){
+                            sb = new StringBuilder();
+                            for(int i = len; i < data.length; i++){
+                                sb.append(data[i]);
+                            }
+                        }
+                        datas.add(swordDeserializer.deserialize(item));
+                        n++;
+                    }else {
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+        return datas;
+
+
     }
 
     /**
@@ -87,13 +119,12 @@ public class BitcaskRandomAccessFile<T extends Sword> implements Closeable {
         if(dataSeparator == null){
             randomAccessFile.writeInt(dataArray.length);
             randomAccessFile.write(dataArray);
-            return pos;
+        }else {
+            //获取分隔符
+            String character  = dataSeparator.character();
+            randomAccessFile.write(dataArray);
+            randomAccessFile.writeBytes(character);
         }
-
-        //获取分隔符
-        String character  = dataSeparator.character();
-        randomAccessFile.write(dataArray);
-        randomAccessFile.writeBytes(character);
         return pos;
     }
 
