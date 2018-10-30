@@ -55,8 +55,7 @@ public class FileUtil{
      */
     public static List<String> readLines(String filePath, long pos, Integer num){
         List<String> dataLines = new ArrayList<>();
-        try{
-            RandomAccessFile file = new RandomAccessFile(filePath, "rw");
+        try(RandomAccessFile file = new RandomAccessFile(filePath, "rw")){
             file.seek(pos);
             StringBuilder sb = new StringBuilder();
             byte[] temp = new byte[1024];
