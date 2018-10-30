@@ -3,10 +3,13 @@ package com.zq.sword.array.data.rqueue.bitcask;
 import com.zq.sword.array.common.utils.DateUtil;
 import com.zq.sword.array.common.utils.FileUtil;
 import com.zq.sword.array.data.*;
+import com.zq.sword.array.data.stream.BitcaskRandomAccessFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -98,27 +101,23 @@ public class SwordDataProcessor {
      * @return
      */
     public SwordIndex addSwordData(SwordData swordData){
-        SwordIndex swordIndex = new SwordIndex();
         String fileName = DateUtil.formatDate(new Date(swordData.getTimestamp()), DateUtil.YYYY_MM_DD);
         String swordDataFilePath = getSwordDataFilePath(fileName);
-        File swordDataFile = new File(swordDataFilePath);
-
-        long pos = swordDataFile.length();
-        swordIndex.setValuePosition(pos);
-
-        String dataLine = null;
-        try {
-            dataLine = new String(swordSerializer.serialize(swordData), "utf-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+        long pos = 0;
+        try{
+            BitcaskRandomAccessFile<SwordData> bitcaskRandomAccessFile = new BitcaskRandomAccessFile(swordDataFilePath, "rw", swordSerializer, swordDeserializer);
+            pos = bitcaskRandomAccessFile.write(swordData);
+        }catch (FileNotFoundException e){
+            logger.error("数据文件不存在", e);
+        }catch (IOException e){
+            logger.error("写文件错误", e);
         }
-        FileUtil.appendLine(swordDataFile, dataLine);
 
+        SwordIndex swordIndex = new SwordIndex();
         swordIndex.setDataId(swordData.getId());
         swordIndex.setFileId(fileName);
         swordIndex.setTimestamp(swordData.getTimestamp());
-        swordIndex.setValueLength(Long.valueOf(dataLine.length()));
-
+        swordIndex.setValuePosition(pos);
 
         //保存iD
         File lastSwordDataIdFile = new File(getLastSwordDataIdFilePath());
@@ -140,9 +139,13 @@ public class SwordDataProcessor {
         long valuePos = swordIndex.getValuePosition();
         String startDateValue = DateUtil.formatDate(new Date(swordIndex.getTimestamp()), DateUtil.YYYY_MM_DD);
         String swordDataFilePath = getSwordDataFilePath(startDateValue);
-        List<String> dataLines = FileUtil.readLines(swordDataFilePath, valuePos, num);
-        if(dataLines != null && !dataLines.isEmpty()){
-            dataIndices.addAll(dataLines.stream().map(c->swordDeserializer.deserialize(c.getBytes())).collect(Collectors.toList()));
+        try{
+            BitcaskRandomAccessFile<SwordData> bitcaskRandomAccessFile = new BitcaskRandomAccessFile(swordDataFilePath, "rw", swordSerializer, swordDeserializer);
+            dataIndices = bitcaskRandomAccessFile.read(valuePos, num);
+        }catch (FileNotFoundException e){
+            logger.error("数据文件不存在", e);
+        }catch (IOException e){
+            logger.error("读文件错误", e);
         }
         return dataIndices;
     }

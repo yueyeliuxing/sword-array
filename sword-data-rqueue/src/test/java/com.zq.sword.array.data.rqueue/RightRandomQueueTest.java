@@ -1,8 +1,8 @@
 package com.zq.sword.array.data.rqueue;
 
-import com.zq.sword.array.common.data.SwordCommand;
+import com.zq.sword.array.data.SwordCommand;
+import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.rqueue.bitcask.BitcaskRightRandomQueue;
-import com.zq.sword.array.common.data.SwordData;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +33,7 @@ public class RightRandomQueueTest {
     @Test
     public void push() {
         SwordData swordData = new SwordData();
-        swordData.setId(2L);
+        swordData.setId(4L);
         SwordCommand swordCommand = new SwordCommand();
         swordCommand.setType((byte)1);
         swordCommand.setKey("user");
@@ -43,7 +43,7 @@ public class RightRandomQueueTest {
         swordData.setCrc("112");
         rightRandomQueue.push(swordData);
 
-        List<SwordData> swordDatas = rightRandomQueue.pollAfterId(2L);
+        List<SwordData> swordDatas = rightRandomQueue.pollAfterId(4L);
         System.out.println(swordDatas);
     }
 

@@ -2,12 +2,16 @@ package com.zq.sword.array.data.rqueue.bitcask;
 
 import com.zq.sword.array.common.utils.DateUtil;
 import com.zq.sword.array.common.utils.FileUtil;
+import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.SwordDeserializer;
 import com.zq.sword.array.data.SwordSerializer;
+import com.zq.sword.array.data.stream.BitcaskRandomAccessFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -107,10 +111,22 @@ public class SwordIndexProcessor {
         File[] childFiles = FileUtil.listChildFile(indexFilePath, DATA_INDEX_FILE_SUFFIX);
         if(childFiles != null && childFiles.length > 0){
             for (File childFile : childFiles){
-                List<String> dataLines = FileUtil.readLines(childFile);
+                try{
+
+                    BitcaskRandomAccessFile<SwordIndex> bitcaskRandomAccessFile = new BitcaskRandomAccessFile(childFile.getAbsolutePath(), "rw", swordSerializer, swordDeserializer);
+                    List<SwordIndex> dataLines = bitcaskRandomAccessFile.read(0, null);
+                    if(dataLines != null && !dataLines.isEmpty()){
+                        dataLines.stream().forEach(c->addSwordIndex(c));
+                    }
+                }catch (FileNotFoundException e){
+                    logger.error("数据文件不存在", e);
+                }catch (IOException e){
+                    logger.error("写文件错误", e);
+                }
+               /* List<String> dataLines = FileUtil.readLines(childFile);
                 if(dataLines != null && !dataLines.isEmpty()){
                     dataLines.stream().map(c->swordDeserializer.deserialize(c.getBytes())).forEach(c->addSwordIndex(c));
-                }
+                }*/
             }
         }
     }
@@ -212,7 +228,14 @@ public class SwordIndexProcessor {
                     swordIndexFile.renameTo(swordIndexBackupFile);
                     swordIndexFile.delete();
                 }
-                FileUtil.appendLine(swordIndexFile, new String(swordSerializer.serialize(swordIndex)));
+                try{
+                    BitcaskRandomAccessFile<SwordIndex> bitcaskRandomAccessFile = new BitcaskRandomAccessFile(swordIndexFilePath, "rw", swordSerializer, swordDeserializer);
+                    bitcaskRandomAccessFile.write(swordIndex);
+                }catch (FileNotFoundException e){
+                    logger.error("数据文件不存在", e);
+                }catch (IOException e){
+                    logger.error("写文件错误", e);
+                }
             }
         }
     }
