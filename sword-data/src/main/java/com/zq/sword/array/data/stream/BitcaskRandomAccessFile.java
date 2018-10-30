@@ -2,10 +2,7 @@ package com.zq.sword.array.data.stream;
 
 import com.zq.sword.array.data.*;
 
-import java.io.Closeable;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +23,7 @@ public class BitcaskRandomAccessFile<T extends Sword> implements Closeable {
     private RandomAccessFile randomAccessFile;
 
     public BitcaskRandomAccessFile(String name, String mode, SwordSerializer<T> swordSerializer, SwordDeserializer<T> swordDeserializer)  throws FileNotFoundException {
-        this(name, mode, new CharacterDataSeparator(), swordSerializer, swordDeserializer);
+        this(name, mode, null, swordSerializer, swordDeserializer);
     }
 
     public BitcaskRandomAccessFile(String name, String mode, DataSeparator dataSeparator, SwordSerializer<T> swordSerializer, SwordDeserializer<T> swordDeserializer)  throws FileNotFoundException {
@@ -55,15 +52,20 @@ public class BitcaskRandomAccessFile<T extends Sword> implements Closeable {
         while (num == null || n <= num){
             //分隔符为空 默认是长度分隔
             if(dataSeparator == null){
-                int itemLen = randomAccessFile.readInt();
-                byte[] itemArray = new byte[itemLen];
-                int l = randomAccessFile.read(itemArray);
-                if(l > -1){
-                    datas.add(swordDeserializer.deserialize(itemArray));
-                    n++;
-                }else {
+                try{
+                    int itemLen = randomAccessFile.readInt();
+                    byte[] itemArray = new byte[itemLen];
+                    int l = randomAccessFile.read(itemArray);
+                    if(l > -1){
+                        datas.add(swordDeserializer.deserialize(itemArray));
+                        n++;
+                    }else {
+                        break;
+                    }
+                }catch (EOFException e){
                     break;
                 }
+
             }else {
                 byte[] temp = new byte[1024];
                 int line = 0;
