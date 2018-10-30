@@ -36,6 +36,7 @@ public class SwordSlaveRedisReplicator implements SlaveRedisReplicator<SwordComm
     private SwordSlaveRedisReplicator(long workerId, long datacenterId, String uri, RightRandomQueue<SwordData> rightRandomQueue) {
         logger.info("SwordSlaveRedisReplicator start...");
         idGenerator = new SnowFlakeIdGenerator(workerId, datacenterId);
+        this.rightRandomQueue = rightRandomQueue;
         try {
             replicator = new RedisReplicator(uri);
         } catch (URISyntaxException e) {

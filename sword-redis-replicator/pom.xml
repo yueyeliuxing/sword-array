@@ -67,14 +67,12 @@
 			<groupId>com.zq.sword</groupId>
 			<artifactId>sword-data-rqueue</artifactId>
 			<version>${project.version}</version>
-			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>com.zq.sword</groupId>
 			<artifactId>sword-id-generator</artifactId>
 			<version>${project.version}</version>
-			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
