@@ -1,7 +1,7 @@
 package com.zq.sword.array.data.lqueue;
 
-import com.zq.sword.array.common.data.SwordCommand;
-import com.zq.sword.array.common.data.SwordData;
+import com.zq.sword.array.data.SwordCommand;
+import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.lqueue.bitcask.BitcaskLeftOrderlyQueue;
 import org.junit.After;
 import org.junit.Before;
@@ -43,7 +43,7 @@ public class LeftOrderlyQueueTest {
             while (!isSucess){
                 isSucess = leftOrderlyQueue.push(orderSwordData);
             }
-            //orderSwordData = leftOrderlyQueue.poll();
+            orderSwordData = leftOrderlyQueue.poll();
             System.out.println(orderSwordData);
         }
 

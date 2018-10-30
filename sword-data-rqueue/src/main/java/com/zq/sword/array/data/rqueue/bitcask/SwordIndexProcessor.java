@@ -123,10 +123,6 @@ public class SwordIndexProcessor {
                 }catch (IOException e){
                     logger.error("写文件错误", e);
                 }
-               /* List<String> dataLines = FileUtil.readLines(childFile);
-                if(dataLines != null && !dataLines.isEmpty()){
-                    dataLines.stream().map(c->swordDeserializer.deserialize(c.getBytes())).forEach(c->addSwordIndex(c));
-                }*/
             }
         }
     }
