@@ -3,6 +3,7 @@ package com.zq.sword.array.data;
 import com.zq.sword.array.common.utils.JsonUtil;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 
 /**
  * @program: sword-array
@@ -14,23 +15,29 @@ public class SwordDataSerializer implements SwordSerializer<SwordData> {
 
     @Override
     public byte[] serialize(SwordData defaultSwordData) {
-       /* ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
-        byteBuffer.putLong(defaultSwordData.getId());
-        String value = defaultSwordData.getValue();
-        byte[] bytes = value.getBytes();
-        byteBuffer.putInt(bytes.length);
-        byteBuffer.put(bytes);
-        byteBuffer.putLong(defaultSwordData.getTimestamp());
+
+        Long id = defaultSwordData.getId();
+
+        SwordSerializer<SwordCommand> swordCommandSwordSerializer = new  SwordCommandSerializer();
+        SwordCommand value = defaultSwordData.getValue();
+        byte[] bytes = swordCommandSwordSerializer.serialize(value);
+        int valueLen = bytes.length;
+
+        long timestamp  = defaultSwordData.getTimestamp();
+
         String crc = defaultSwordData.getCrc();
         byte[] crcBytes = crc.getBytes();
-        byteBuffer.putInt(crcBytes.length);
+        int crcLen = crcBytes.length;
+
+        int capacity = 16 + 8 + valueLen + 16 + 8 + crcLen;
+
+        ByteBuffer byteBuffer = ByteBuffer.allocate(capacity);
+        byteBuffer.putLong(id);
+        byteBuffer.putInt(valueLen);
+        byteBuffer.put(bytes);
+        byteBuffer.putLong(timestamp);
+        byteBuffer.putInt(crcLen);
         byteBuffer.put(crcBytes);
-        return byteBuffer.array();*/
-        try {
-            return JsonUtil.toJSONString(defaultSwordData).getBytes("utf-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return byteBuffer.array();
     }
 }

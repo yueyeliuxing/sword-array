@@ -4,6 +4,7 @@ package com.zq.sword.array.data;
 import com.zq.sword.array.common.utils.JsonUtil;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 
 /**
  * @program: sword-array
@@ -15,11 +16,26 @@ public class SwordCommandDeserializer implements SwordDeserializer<SwordCommand>
 
     @Override
     public SwordCommand deserialize(byte[] data) {
-        try {
-            return JsonUtil.parse(new String(data, "utf-8"), SwordCommand.class);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return null;
-        }
+
+        SwordCommand swordCommand = new SwordCommand();
+        ByteBuffer byteBuffer = ByteBuffer.wrap(data);
+
+        swordCommand.setType(byteBuffer.get());
+
+        int keyLen = byteBuffer.getInt();
+        byte[] keyBytes = new byte[keyLen];
+        byteBuffer.get(keyBytes);
+        swordCommand.setKey(new String(keyBytes));
+
+        int valueLen = byteBuffer.getInt();
+        byte[] valueBytes = new byte[valueLen];
+        byteBuffer.get(valueBytes);
+        swordCommand.setValue(new String(valueBytes));
+
+        //swordCommand.setEx(byteBuffer.getInt());
+
+        //swordCommand.setPx(byteBuffer.getLong());
+
+        return swordCommand;
     }
 }
