@@ -10,12 +10,10 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * @program: sword-array
@@ -46,20 +44,11 @@ public class SwordDataProcessor {
      */
     private SwordDataBackgroundExecutor swordDataBackgroundExecutor;
 
-    /**
-     * 数据序列化器
-     */
-    private SwordSerializer<SwordData> swordSerializer;
-
-    /**
-     * 数据反序列化器
-     */
-    private SwordDeserializer<SwordData> swordDeserializer;
+    private BitcaskFileSystem<SwordData> fileSystem;
 
     public SwordDataProcessor(String dataFilePath){
         this.dataFilePath = dataFilePath;
-        swordSerializer = new SwordDataSerializer();
-        swordDeserializer = new SwordDataDeserializer();
+        fileSystem = new BitcaskSequentialFileSystem(dataFilePath, new SwordDataSerializer(), new SwordDataDeserializer());
         swordDataBackgroundExecutor = new SwordDataBackgroundExecutor();
     }
 
@@ -101,11 +90,10 @@ public class SwordDataProcessor {
      * @return
      */
     public SwordIndex addSwordData(SwordData swordData){
-        String fileName = DateUtil.formatDate(new Date(swordData.getTimestamp()), DateUtil.YYYY_MM_DD);
-        String swordDataFilePath = getSwordDataFilePath(fileName);
+        FileIdGenerater.FileId fileId = FileIdGenerater.getFileId(new Date(), swordData.getId());
         long pos = 0;
         try{
-            BitcaskRandomAccessFile<SwordData> bitcaskRandomAccessFile = new BitcaskRandomAccessFile(swordDataFilePath, "rw", swordSerializer, swordDeserializer);
+            BitcaskRandomAccessFile<SwordData> bitcaskRandomAccessFile = fileSystem.getDataFile(fileId);
             pos = bitcaskRandomAccessFile.write(swordData);
         }catch (FileNotFoundException e){
             logger.error("数据文件不存在", e);
@@ -115,7 +103,7 @@ public class SwordDataProcessor {
 
         SwordIndex swordIndex = new SwordIndex();
         swordIndex.setDataId(swordData.getId());
-        swordIndex.setFileId(fileName);
+        swordIndex.setFileId(fileId.toFileId());
         swordIndex.setTimestamp(swordData.getTimestamp());
         swordIndex.setValuePosition(pos);
 
@@ -137,10 +125,9 @@ public class SwordDataProcessor {
     public List<SwordData> listSwordDataAfterIndex(SwordIndex swordIndex, Integer num){
         List<SwordData> dataIndices = new ArrayList<>();
         long valuePos = swordIndex.getValuePosition();
-        String startDateValue = DateUtil.formatDate(new Date(swordIndex.getTimestamp()), DateUtil.YYYY_MM_DD);
-        String swordDataFilePath = getSwordDataFilePath(startDateValue);
+        FileIdGenerater.FileId fileId = FileIdGenerater.toFileId(swordIndex.getFileId());
         try{
-            BitcaskRandomAccessFile<SwordData> bitcaskRandomAccessFile = new BitcaskRandomAccessFile(swordDataFilePath, "rw", swordSerializer, swordDeserializer);
+            BitcaskRandomAccessFile<SwordData> bitcaskRandomAccessFile = fileSystem.getDataFile(fileId);
             dataIndices = bitcaskRandomAccessFile.read(valuePos, num);
         }catch (FileNotFoundException e){
             logger.error("数据文件不存在", e);

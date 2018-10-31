@@ -33,7 +33,7 @@ public class RightRandomQueueTest {
     @Test
     public void push() {
         SwordData swordData = new SwordData();
-        swordData.setId(4L);
+        swordData.setId(5L);
         SwordCommand swordCommand = new SwordCommand();
         swordCommand.setType((byte)1);
         swordCommand.setKey("user");
@@ -43,7 +43,7 @@ public class RightRandomQueueTest {
         swordData.setCrc("112");
         rightRandomQueue.push(swordData);
 
-        List<SwordData> swordDatas = rightRandomQueue.pollAfterId(4L);
+        List<SwordData> swordDatas = rightRandomQueue.pollAfterId(5L);
         System.out.println(swordDatas);
     }
 
