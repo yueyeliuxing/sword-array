@@ -18,20 +18,24 @@ public class SwordDataDeserializer implements SwordDeserializer<SwordData> {
     public SwordData deserialize(byte[] data) {
         SwordData swordData = new SwordData();
         ByteBuffer byteBuffer = ByteBuffer.wrap(data);
-        swordData.setId(byteBuffer.getLong());
+        Long id = byteBuffer.getLong();
+        swordData.setId(id == 0 ? null : id);
 
-        SwordDeserializer<SwordCommand> swordCommandSwordDeserializer = new SwordCommandDeserializer();
         int len = byteBuffer.getInt();
-        byte[] valueBytes = new byte[len];
-        byteBuffer.get(valueBytes);
-        swordData.setValue(swordCommandSwordDeserializer.deserialize(valueBytes));
-
+        if(len > 0){
+            byte[] valueBytes = new byte[len];
+            byteBuffer.get(valueBytes);
+            SwordDeserializer<SwordCommand> swordCommandSwordDeserializer = new SwordCommandDeserializer();
+            swordData.setValue(swordCommandSwordDeserializer.deserialize(valueBytes));
+        }
 
         swordData.setTimestamp(byteBuffer.getLong());
         int crcLen = byteBuffer.getInt();
-        byte[] crcBytes = new byte[crcLen];
-        byteBuffer.get(crcBytes);
-        swordData.setCrc(new String(crcBytes));
+        if(crcLen > 0){
+            byte[] crcBytes = new byte[crcLen];
+            byteBuffer.get(crcBytes);
+            swordData.setCrc(new String(crcBytes));
+        }
         return swordData;
     }
 }

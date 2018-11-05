@@ -17,27 +17,44 @@ public class SwordDataSerializer implements SwordSerializer<SwordData> {
     public byte[] serialize(SwordData defaultSwordData) {
 
         Long id = defaultSwordData.getId();
+        if(id == null){
+            id = 0L;
+        }
 
-        SwordSerializer<SwordCommand> swordCommandSwordSerializer = new  SwordCommandSerializer();
+        byte[] bytes = null;
+        int valueLen = 0;
+
         SwordCommand value = defaultSwordData.getValue();
-        byte[] bytes = swordCommandSwordSerializer.serialize(value);
-        int valueLen = bytes.length;
+        if (value != null) {
+            SwordSerializer<SwordCommand> swordCommandSwordSerializer = new  SwordCommandSerializer();
+            bytes = swordCommandSwordSerializer.serialize(value);
+            valueLen = bytes.length;
+        }
 
         long timestamp  = defaultSwordData.getTimestamp();
 
+        byte[] crcBytes = null;
+        int crcLen = 0;
         String crc = defaultSwordData.getCrc();
-        byte[] crcBytes = crc.getBytes();
-        int crcLen = crcBytes.length;
+        if(crc != null){
+            crcBytes = crc.getBytes();
+            crcLen = crcBytes.length;
+        }
+
 
         int capacity = 16 + 8 + valueLen + 16 + 8 + crcLen;
 
         ByteBuffer byteBuffer = ByteBuffer.allocate(capacity);
         byteBuffer.putLong(id);
         byteBuffer.putInt(valueLen);
-        byteBuffer.put(bytes);
+        if(bytes != null){
+            byteBuffer.put(bytes);
+        }
         byteBuffer.putLong(timestamp);
         byteBuffer.putInt(crcLen);
-        byteBuffer.put(crcBytes);
+        if(crcBytes != null){
+            byteBuffer.put(crcBytes);
+        }
         return byteBuffer.array();
     }
 }

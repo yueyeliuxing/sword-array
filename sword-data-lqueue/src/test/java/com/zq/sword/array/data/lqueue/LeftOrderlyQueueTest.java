@@ -34,8 +34,8 @@ public class LeftOrderlyQueueTest {
             orderSwordData.setId(Long.valueOf(i));
             SwordCommand swordCommand = new SwordCommand();
             swordCommand.setType((byte)1);
-            swordCommand.setKey("user");
-            swordCommand.setValue("123");
+            swordCommand.setKey("user_"+i);
+            swordCommand.setValue("7852sff_"+i);
             orderSwordData.setValue(swordCommand);
             orderSwordData.setTimestamp(System.currentTimeMillis());
             orderSwordData.setCrc("11212");
@@ -43,8 +43,12 @@ public class LeftOrderlyQueueTest {
             while (!isSucess){
                 isSucess = leftOrderlyQueue.push(orderSwordData);
             }
-            orderSwordData = leftOrderlyQueue.poll();
-            System.out.println(orderSwordData);
+            SwordData swordData = null;
+            while (swordData == null){
+                swordData = leftOrderlyQueue.poll();
+            }
+
+            System.out.println(swordData);
         }
 
         System.in.read();

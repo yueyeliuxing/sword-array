@@ -19,19 +19,23 @@ public class SwordCommandDeserializer implements SwordDeserializer<SwordCommand>
 
         SwordCommand swordCommand = new SwordCommand();
         ByteBuffer byteBuffer = ByteBuffer.wrap(data);
-
-        swordCommand.setType(byteBuffer.get());
+        Byte type = byteBuffer.get();
+        swordCommand.setType(type == 0 ? null : type);
 
         int keyLen = byteBuffer.getInt();
-        byte[] keyBytes = new byte[keyLen];
-        byteBuffer.get(keyBytes);
-        swordCommand.setKey(new String(keyBytes));
+        if (keyLen > 0) {
+            byte[] keyBytes = new byte[keyLen];
+            byteBuffer.get(keyBytes);
+            swordCommand.setKey(new String(keyBytes));
+        }
+
 
         int valueLen = byteBuffer.getInt();
-        byte[] valueBytes = new byte[valueLen];
-        byteBuffer.get(valueBytes);
-        swordCommand.setValue(new String(valueBytes));
-
+        if(valueLen > 0){
+            byte[] valueBytes = new byte[valueLen];
+            byteBuffer.get(valueBytes);
+            swordCommand.setValue(new String(valueBytes));
+        }
         //swordCommand.setEx(byteBuffer.getInt());
 
         //swordCommand.setPx(byteBuffer.getLong());

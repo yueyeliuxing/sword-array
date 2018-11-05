@@ -17,25 +17,38 @@ public class SwordCommandSerializer implements SwordSerializer<SwordCommand> {
     public byte[] serialize(SwordCommand commandSword) {
 
         Byte type = commandSword.getType();
+        if(type == null){
+            type = 0;
+        }
 
+        byte[] bytes = null;
+        int keyLen = 0;
         String key = commandSword.getKey();
-        byte[] bytes = key.getBytes();
-        int keyLen = bytes.length;
+        if(key != null){
+            bytes = key.getBytes();
+            keyLen = bytes.length;
+        }
 
+        byte[] valueBytes = null;
+        int valueLen = 0;
         String value = commandSword.getValue();
-        byte[] valueBytes = value.getBytes();
-        int valueLen = valueBytes.length;
-
+        if(value != null){
+            valueBytes = value.getBytes();
+            valueLen = valueBytes.length;
+        }
 
         int capacity = 1 + 8 + keyLen + 8 + valueLen;
-
 
         ByteBuffer byteBuffer = ByteBuffer.allocate(capacity);
         byteBuffer.put(type);
         byteBuffer.putInt(keyLen);
-        byteBuffer.put(bytes);
+        if(bytes != null){
+            byteBuffer.put(bytes);
+        }
         byteBuffer.putInt(valueLen);
-        byteBuffer.put(valueBytes);
+        if(valueBytes != null){
+            byteBuffer.put(valueBytes);
+        }
 
         //byteBuffer.putInt(commandSword.getEx());
         //byteBuffer.putLong(commandSword.getPx());
