@@ -25,6 +25,7 @@ public class SwordDataSerializer implements SwordSerializer<SwordData> {
         int valueLen = 0;
 
         SwordCommand value = defaultSwordData.getValue();
+        value = value == SwordCommand.DELETE_COMMAND ? null : value;
         if (value != null) {
             SwordSerializer<SwordCommand> swordCommandSwordSerializer = new  SwordCommandSerializer();
             bytes = swordCommandSwordSerializer.serialize(value);

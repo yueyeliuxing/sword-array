@@ -43,7 +43,7 @@ public interface LeftOrderlyQueue<T extends Sword> {
      * @param id 数据项ID
      * @return 数据项
      */
-    List<T> pollAfterId(Long id);
+    List<T> selectAfterId(Long id);
 
     /**
      * 获取指定ID之后的数据项
@@ -51,7 +51,7 @@ public interface LeftOrderlyQueue<T extends Sword> {
      * @param maxNum 最大获取的数目
      * @return 数据项
      */
-    List<T> pollAfterId(Long id, Integer maxNum);
+    List<T> selectAfterId(Long id, Integer maxNum);
 
     /**
      * 返回队列状态

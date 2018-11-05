@@ -25,7 +25,7 @@ public class SwordRedisClient implements RedisClient<SwordCommand> {
         try {
             switch (data.getType()){
                 case (byte)1:
-                    jedisClient.saveValueByKey(0, data.getKey().getBytes(), data.getValue().getBytes(), data.getEx());
+                    jedisClient.saveValueByKey(0, data.getKey().getBytes(), data.getValue().getBytes(), 0);
                     break;
                 default:
                     break;

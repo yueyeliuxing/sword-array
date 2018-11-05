@@ -175,6 +175,10 @@ public class OrderSwordDataProcessor {
         orderSwordDataQueue.add(swordData);
         lastDataId = swordData.getId();
 
+        writeDataFile(swordData);
+    }
+
+    private void writeDataFile(SwordData swordData) {
         String fileName = DateUtil.formatDate(new Date(swordData.getTimestamp()), DateUtil.YYYY_MM_DD);
         String dataItemFilePath = getDataItemFilePath(fileName);
         try{
@@ -186,7 +190,7 @@ public class OrderSwordDataProcessor {
             logger.error("写文件错误", e);
         }
     }
-    
+
     public SwordData pollSwordData() {
         SwordData swordData = orderSwordDataQueue.poll();
         if(swordData != null){
@@ -195,7 +199,7 @@ public class OrderSwordDataProcessor {
             delSwordData.setValue(DELETE_COMMAND);
             delSwordData.setTimestamp(swordData.getTimestamp());
             delSwordData.setCrc(swordData.getCrc());
-            addSwordData(delSwordData);
+            writeDataFile(swordData);
         }
         return swordData;
     }

@@ -22,6 +22,7 @@ public class SwordDataDeserializer implements SwordDeserializer<SwordData> {
         swordData.setId(id == 0 ? null : id);
 
         int len = byteBuffer.getInt();
+        swordData.setValue(SwordCommand.DELETE_COMMAND);
         if(len > 0){
             byte[] valueBytes = new byte[len];
             byteBuffer.get(valueBytes);

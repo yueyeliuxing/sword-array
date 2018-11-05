@@ -46,7 +46,7 @@ public class ProvideSwordDataTransferBackupHandler extends TransferHandler {
             ctx.fireChannelRead(buildPushTRightBackupDataResp(dataItems));
         }else if(message.getHeader() != null && message.getHeader().getType() == MessageType.POLL_T_LEFT_DATA_BACKUP_REQ.value()) {
             Long dataItemId = (Long)message.getBody();
-            List<SwordData> dataItems = leftOrderlyQueue.pollAfterId(dataItemId);
+            List<SwordData> dataItems = leftOrderlyQueue.selectAfterId(dataItemId);
             ctx.fireChannelRead(buildPushTLeftBackupDataResp(dataItems));
         }else {
             ctx.fireChannelRead(msg);

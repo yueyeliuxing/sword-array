@@ -71,12 +71,12 @@ public class BitcaskLeftOrderlyQueue implements LeftOrderlyQueue<SwordData> {
     }
 
     @Override
-    public List<SwordData> pollAfterId(Long id) {
-        return pollAfterId(id, null);
+    public List<SwordData> selectAfterId(Long id) {
+        return selectAfterId(id, null);
     }
 
     @Override
-    public List<SwordData> pollAfterId(Long id, Integer maxNum) {
+    public List<SwordData> selectAfterId(Long id, Integer maxNum) {
         return orderSwordDataProcessor.pollAfterId(id, maxNum);
     }
 
