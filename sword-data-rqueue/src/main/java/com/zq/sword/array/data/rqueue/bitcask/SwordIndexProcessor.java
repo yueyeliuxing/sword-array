@@ -40,6 +40,10 @@ public class SwordIndexProcessor {
      */
     private String indexFilePath;
 
+    /**
+     * 最开始的数据ID
+     */
+    private volatile Long firstDataId;
 
     /**
      * 数据ID->数据索引数据 字典
@@ -166,6 +170,9 @@ public class SwordIndexProcessor {
     public void addSwordIndex(SwordIndex swordIndex){
         //内存数据维护
         Long dataId = swordIndex.getDataId();
+        if(firstDataId == null){
+            firstDataId = dataId;
+        }
         swordIndexDic.put(dataId, swordIndex);
         String date = DateUtil.formatDate(new Date(swordIndex.getTimestamp()), DateUtil.YYYY_MM_DD);
         if(dataIdTimeDic.containsKey(date)){
@@ -187,6 +194,7 @@ public class SwordIndexProcessor {
      * @return
      */
     public SwordIndex getSwordIndex(Long dataId){
+        dataId = dataId == null || dataId == 0 ? firstDataId : dataId;
         return swordIndexDic.get(dataId);
     }
 

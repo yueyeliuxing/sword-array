@@ -8,6 +8,8 @@ import com.zq.sword.array.netty.handler.TransferHandler;
 import com.zq.sword.array.netty.message.Header;
 import com.zq.sword.array.netty.message.MessageType;
 import com.zq.sword.array.netty.message.TransferMessage;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 
 import java.util.List;
@@ -18,6 +20,7 @@ import java.util.List;
  * @author: zhouqi1
  * @create: 2018-08-01 20:44
  **/
+@ChannelHandler.Sharable
 public class ProvideSwordDataTransferHandler extends TransferHandler {
 
     private RightRandomQueue<SwordData> rightRandomQueue;
@@ -46,11 +49,11 @@ public class ProvideSwordDataTransferHandler extends TransferHandler {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         TransferMessage message = (TransferMessage)msg;
-
+        System.out.println(message);
         if(message.getHeader() != null && message.getHeader().getType() == MessageType.POLL_DATA_TRANSFER_REQ.value()) {
             Long dataId = (Long)message.getBody();
             List<SwordData> dataItems = rightRandomQueue.pollAfterId(dataId);
-            ctx.fireChannelRead(buildPushTransferMessageResp(dataItems));
+            ctx.writeAndFlush(buildPushTransferMessageResp(dataItems));
         }else {
             ctx.fireChannelRead(msg);
         }
@@ -61,7 +64,9 @@ public class ProvideSwordDataTransferHandler extends TransferHandler {
         Header header = new Header();
         header.setType(MessageType.PUSH_DATA_TRANSFER_RESP.value());
         message.setHeader(header);
-        message.setBody(dataItems);
+        if(dataItems != null){
+            message.setBody(dataItems);
+        }
         return message;
     }
 }

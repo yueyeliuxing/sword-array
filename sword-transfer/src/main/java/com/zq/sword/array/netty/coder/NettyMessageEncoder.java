@@ -55,5 +55,8 @@ public final class NettyMessageEncoder extends MessageToMessageEncoder<TransferM
             sendBuf.writeInt(0);
         }
         sendBuf.setInt(4, sendBuf.readableBytes());
+        sendBuf.writeLong(0L);
+
+        out.add(sendBuf);
     }
 }

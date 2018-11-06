@@ -11,8 +11,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.timeout.ReadTimeoutHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -27,7 +25,7 @@ import java.util.concurrent.TimeUnit;
  **/
 public class DefaultTransferClient implements TransferClient {
 
-    private Logger logger = LoggerFactory.getLogger(DefaultTransferClient.class);
+    //private Logger logger = LoggerFactory.getLogger(DefaultTransferClient.class);
 
     private String host;
 
@@ -58,7 +56,8 @@ public class DefaultTransferClient implements TransferClient {
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
-                            ChannelPipeline pipeline = ch.pipeline().addLast(new NettyMessageDecoder(1024*1024, 4, 4))
+                            ChannelPipeline pipeline = ch.pipeline();
+                            pipeline.addLast(new NettyMessageDecoder(Integer.MAX_VALUE, 4, 4))
                                     .addLast("MessageEncoder", new NettyMessageEncoder())
                                     .addLast("readTimeoutHandler", new ReadTimeoutHandler(50))
                                     .addLast("LoginAuthHandler", new LoginAuthReqHandler())
@@ -71,10 +70,10 @@ public class DefaultTransferClient implements TransferClient {
                             }
                         }
                     });
-            ChannelFuture future = b.connect(new InetSocketAddress(host, port)).sync();
+            ChannelFuture future = b.connect(host, port).sync();
             future.channel().closeFuture().sync();
         }catch (Exception e){
-            logger.error("sync error", e);
+            //logger.error("sync error", e);
         }finally {
             group.execute(new Runnable() {
                 @Override
