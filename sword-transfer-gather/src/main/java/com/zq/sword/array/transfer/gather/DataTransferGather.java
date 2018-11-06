@@ -1,4 +1,4 @@
-package com.zq.sword.array.transfer.client;
+package com.zq.sword.array.transfer.gather;
 
 /**
  * @program: sword-array

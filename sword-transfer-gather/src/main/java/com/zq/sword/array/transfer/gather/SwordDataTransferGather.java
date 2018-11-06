@@ -1,4 +1,4 @@
-package com.zq.sword.array.transfer.client;
+package com.zq.sword.array.transfer.gather;
 
 import com.zq.sword.array.common.event.DataEvent;
 import com.zq.sword.array.data.SwordData;

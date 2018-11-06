@@ -1,4 +1,4 @@
-package com.zq.sword.array.transfer.client;
+package com.zq.sword.array.transfer.gather;
 
 import com.zq.sword.array.transfer.coder.NettyMessageDecoder;
 import com.zq.sword.array.transfer.coder.NettyMessageEncoder;

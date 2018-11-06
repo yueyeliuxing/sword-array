@@ -1,7 +1,7 @@
 package com.zq.sword.array.transfer;
 
-import com.zq.sword.array.transfer.client.DefaultTransferClient;
-import com.zq.sword.array.transfer.client.TransferClient;
+import com.zq.sword.array.transfer.gather.DefaultTransferClient;
+import com.zq.sword.array.transfer.gather.TransferClient;
 import com.zq.sword.array.transfer.server.DefaultTransferServer;
 import com.zq.sword.array.transfer.server.TransferServer;
 import org.junit.Test;
