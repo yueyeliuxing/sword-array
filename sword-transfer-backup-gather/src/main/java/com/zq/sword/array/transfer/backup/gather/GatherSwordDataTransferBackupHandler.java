@@ -3,8 +3,6 @@ package com.zq.sword.array.transfer.backup.gather;
 import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.lqueue.LeftOrderlyQueue;
 import com.zq.sword.array.data.rqueue.RightRandomQueue;
-import com.zq.sword.array.metadata.data.ConsumedDataInfo;
-import com.zq.sword.array.metadata.data.NodeId;
 import com.zq.sword.array.netty.handler.TransferHandler;
 import com.zq.sword.array.netty.message.Header;
 import com.zq.sword.array.netty.message.MessageType;
@@ -12,7 +10,6 @@ import com.zq.sword.array.netty.message.TransferMessage;
 import io.netty.channel.ChannelHandlerContext;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -97,7 +94,7 @@ public class GatherSwordDataTransferBackupHandler extends TransferHandler {
             Header header = new Header();
             header.setType(MessageType.POLL_T_LEFT_DATA_BACKUP_REQ.value());
             message.setHeader(header);
-            message.setBody(getLastDataId());
+            message.setBody(getLeftQueueLastDataId());
             return message;
         }
 
@@ -106,11 +103,15 @@ public class GatherSwordDataTransferBackupHandler extends TransferHandler {
             Header header = new Header();
             header.setType(MessageType.POLL_T_RIGHT_DATA_BACKUP_REQ.value());
             message.setHeader(header);
-            message.setBody(getLastDataId());
+            message.setBody(getRightQueueLastDataId());
             return message;
         }
 
-        private Long getLastDataId() {
+        private Long getRightQueueLastDataId() {
+            return leftOrderlyQueue.getLastDataId();
+        }
+
+        private Long getLeftQueueLastDataId() {
             return leftOrderlyQueue.getLastDataId();
         }
 
