@@ -13,6 +13,8 @@ import io.netty.channel.ChannelHandlerContext;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @program: sword-array
@@ -21,6 +23,8 @@ import java.util.Map;
  * @create: 2018-08-01 20:44
  **/
 public class GatherSwordDataTransferHandler extends TransferHandler {
+
+    private volatile ScheduledFuture<?> gatherSwordDataFuture;
 
     private NodeId clientNodeServerId;
 
@@ -37,12 +41,16 @@ public class GatherSwordDataTransferHandler extends TransferHandler {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        if(gatherSwordDataFuture != null) {
+            gatherSwordDataFuture.cancel(true);
+            gatherSwordDataFuture = null;
+        }
         ctx.fireExceptionCaught(cause);
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        ctx.writeAndFlush(buildPollTransferMessageReq(getLastDataId()));
+        super.channelActive(ctx);
     }
 
     @Override
@@ -50,7 +58,7 @@ public class GatherSwordDataTransferHandler extends TransferHandler {
         TransferMessage message = (TransferMessage)msg;
 
         if(message.getHeader() != null && message.getHeader().getType() == MessageType.PUSH_DATA_TRANSFER_RESP.value()) {
-            Long lastDataId = getLastDataId();
+            Long lastDataId = 0L;
             List<SwordData> dataItems = (List<SwordData>)message.getBody();
             if(dataItems != null && !dataItems.isEmpty()){
                 for(SwordData swordData : dataItems){
@@ -59,28 +67,52 @@ public class GatherSwordDataTransferHandler extends TransferHandler {
                 }
                 dataConsumerServiceCoordinator.commitConsumedDataInfo(clientNodeServerId, new ConsumedDataInfo(lastDataId));
             }
-            ctx.fireChannelRead(buildPollTransferMessageReq(lastDataId));
+            ctx.fireChannelRead(msg);
+        } else if (message.getHeader() != null && message.getHeader().getType() == MessageType.HEARTBEAT_RESP.value()) {
+            if(gatherSwordDataFuture == null) {
+                gatherSwordDataFuture = ctx.executor().scheduleAtFixedRate(new HeartBeatTask(ctx), 0, 5000, TimeUnit.MILLISECONDS);
+            }else {
+                ctx.fireChannelRead(msg);
+            }
         }else {
             ctx.fireChannelRead(msg);
         }
     }
 
-    private TransferMessage buildPollTransferMessageReq(Long dataId) {
-        TransferMessage message = new TransferMessage();
-        Header header = new Header();
-        header.setType(MessageType.POLL_DATA_TRANSFER_REQ.value());
-        message.setHeader(header);
-        message.setBody(dataId);
-        return message;
+    public class HeartBeatTask implements Runnable {
+
+        private final ChannelHandlerContext ctx;
+
+        public HeartBeatTask(ChannelHandlerContext ctx) {
+            this.ctx = ctx;
+        }
+
+        @Override
+        public void run() {
+            TransferMessage heatBeat = buildPollTransferMessageReq();
+            System.out.println("Client send heart beat message to server : --> " + heatBeat);
+            ctx.writeAndFlush(heatBeat);
+        }
+
+        private TransferMessage buildPollTransferMessageReq() {
+            TransferMessage message = new TransferMessage();
+            Header header = new Header();
+            header.setType(MessageType.POLL_DATA_TRANSFER_REQ.value());
+            message.setHeader(header);
+            message.setBody(getLastDataId());
+            return message;
+        }
+
+        private Long getLastDataId(){
+            Long lastDataId = 0L;
+            Map<NodeId, ConsumedDataInfo> consumptionInfoMap = dataConsumerServiceCoordinator.getConsumedNodeDataInfo();
+            if(consumptionInfoMap != null && !consumptionInfoMap.isEmpty()){
+                ConsumedDataInfo consumedDataInfo = consumptionInfoMap.get(clientNodeServerId);
+                lastDataId = consumedDataInfo.getDataId();
+            }
+            return lastDataId;
+        }
     }
 
-    private Long getLastDataId(){
-        Long lastDataId = 0L;
-        Map<NodeId, ConsumedDataInfo> consumptionInfoMap = dataConsumerServiceCoordinator.getConsumedNodeDataInfo();
-        if(consumptionInfoMap != null && !consumptionInfoMap.isEmpty()){
-            ConsumedDataInfo consumedDataInfo = consumptionInfoMap.get(clientNodeServerId);
-            lastDataId = consumedDataInfo.getDataId();
-        }
-        return lastDataId;
-    }
+
 }
