@@ -1,4 +1,4 @@
-package com.zq.sword.array.netty.message;
+package com.zq.sword.array.transfer.message;
 
 public enum MessageType {
     /**

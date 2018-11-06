@@ -1,9 +1,9 @@
-package com.zq.sword.array.netty;
+package com.zq.sword.array.transfer;
 
-import com.zq.sword.array.netty.client.DefaultTransferClient;
-import com.zq.sword.array.netty.client.TransferClient;
-import com.zq.sword.array.netty.server.DefaultTransferServer;
-import com.zq.sword.array.netty.server.TransferServer;
+import com.zq.sword.array.transfer.client.DefaultTransferClient;
+import com.zq.sword.array.transfer.client.TransferClient;
+import com.zq.sword.array.transfer.server.DefaultTransferServer;
+import com.zq.sword.array.transfer.server.TransferServer;
 import org.junit.Test;
 
 /**

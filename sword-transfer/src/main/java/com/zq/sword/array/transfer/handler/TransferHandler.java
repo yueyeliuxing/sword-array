@@ -1,4 +1,4 @@
-package com.zq.sword.array.netty.handler;
+package com.zq.sword.array.transfer.handler;
 
 import io.netty.channel.ChannelHandlerAdapter;
 

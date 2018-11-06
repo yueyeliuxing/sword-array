@@ -1,10 +1,10 @@
-package com.zq.sword.array.netty.server;
+package com.zq.sword.array.transfer.server;
 
-import com.zq.sword.array.netty.coder.NettyMessageDecoder;
-import com.zq.sword.array.netty.coder.NettyMessageEncoder;
-import com.zq.sword.array.netty.handler.HeartBeatRespHandler;
-import com.zq.sword.array.netty.handler.LoginAuthRespHandler;
-import com.zq.sword.array.netty.handler.TransferHandler;
+import com.zq.sword.array.transfer.coder.NettyMessageDecoder;
+import com.zq.sword.array.transfer.coder.NettyMessageEncoder;
+import com.zq.sword.array.transfer.handler.HeartBeatRespHandler;
+import com.zq.sword.array.transfer.handler.LoginAuthRespHandler;
+import com.zq.sword.array.transfer.handler.TransferHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;

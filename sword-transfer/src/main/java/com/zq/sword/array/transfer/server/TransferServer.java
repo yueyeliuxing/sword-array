@@ -1,6 +1,6 @@
-package com.zq.sword.array.netty.server;
+package com.zq.sword.array.transfer.server;
 
-import com.zq.sword.array.netty.handler.TransferHandler;
+import com.zq.sword.array.transfer.handler.TransferHandler;
 
 /**
  * @program: sword-array

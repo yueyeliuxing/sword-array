@@ -1,8 +1,8 @@
-package com.zq.sword.array.netty.handler;
+package com.zq.sword.array.transfer.handler;
 
-import com.zq.sword.array.netty.message.Header;
-import com.zq.sword.array.netty.message.MessageType;
-import com.zq.sword.array.netty.message.TransferMessage;
+import com.zq.sword.array.transfer.message.Header;
+import com.zq.sword.array.transfer.message.MessageType;
+import com.zq.sword.array.transfer.message.TransferMessage;
 import io.netty.channel.ChannelHandlerContext;
 
 import java.util.concurrent.ScheduledFuture;

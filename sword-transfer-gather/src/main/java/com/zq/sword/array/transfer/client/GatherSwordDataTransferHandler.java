@@ -5,10 +5,10 @@ import com.zq.sword.array.data.lqueue.LeftOrderlyQueue;
 import com.zq.sword.array.metadata.DataConsumerServiceCoordinator;
 import com.zq.sword.array.metadata.data.ConsumedDataInfo;
 import com.zq.sword.array.metadata.data.NodeId;
-import com.zq.sword.array.netty.handler.TransferHandler;
-import com.zq.sword.array.netty.message.Header;
-import com.zq.sword.array.netty.message.MessageType;
-import com.zq.sword.array.netty.message.TransferMessage;
+import com.zq.sword.array.transfer.handler.TransferHandler;
+import com.zq.sword.array.transfer.message.Header;
+import com.zq.sword.array.transfer.message.MessageType;
+import com.zq.sword.array.transfer.message.TransferMessage;
 import io.netty.channel.ChannelHandlerContext;
 
 import java.util.List;

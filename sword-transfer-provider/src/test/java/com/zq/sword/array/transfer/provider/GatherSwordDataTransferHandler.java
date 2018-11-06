@@ -1,10 +1,10 @@
 package com.zq.sword.array.transfer.provider;
 
 import com.zq.sword.array.data.SwordData;
-import com.zq.sword.array.netty.handler.TransferHandler;
-import com.zq.sword.array.netty.message.Header;
-import com.zq.sword.array.netty.message.MessageType;
-import com.zq.sword.array.netty.message.TransferMessage;
+import com.zq.sword.array.transfer.handler.TransferHandler;
+import com.zq.sword.array.transfer.message.Header;
+import com.zq.sword.array.transfer.message.MessageType;
+import com.zq.sword.array.transfer.message.TransferMessage;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 

@@ -1,10 +1,10 @@
-package com.zq.sword.array.netty.client;
+package com.zq.sword.array.transfer.client;
 
-import com.zq.sword.array.netty.coder.NettyMessageDecoder;
-import com.zq.sword.array.netty.coder.NettyMessageEncoder;
-import com.zq.sword.array.netty.handler.HeartBeatReqHandler;
-import com.zq.sword.array.netty.handler.LoginAuthReqHandler;
-import com.zq.sword.array.netty.handler.TransferHandler;
+import com.zq.sword.array.transfer.coder.NettyMessageDecoder;
+import com.zq.sword.array.transfer.coder.NettyMessageEncoder;
+import com.zq.sword.array.transfer.handler.HeartBeatReqHandler;
+import com.zq.sword.array.transfer.handler.LoginAuthReqHandler;
+import com.zq.sword.array.transfer.handler.TransferHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -12,7 +12,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 
-import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;

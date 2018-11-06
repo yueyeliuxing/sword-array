@@ -1,4 +1,4 @@
-package com.zq.sword.array.netty.coder;
+package com.zq.sword.array.transfer.coder;
 
 import io.netty.handler.codec.marshalling.DefaultMarshallerProvider;
 import io.netty.handler.codec.marshalling.DefaultUnmarshallerProvider;

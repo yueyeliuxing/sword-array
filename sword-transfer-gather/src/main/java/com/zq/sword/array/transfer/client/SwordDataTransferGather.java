@@ -6,8 +6,6 @@ import com.zq.sword.array.data.lqueue.LeftOrderlyQueue;
 import com.zq.sword.array.metadata.DataConsumerServiceCoordinator;
 import com.zq.sword.array.metadata.data.NodeId;
 import com.zq.sword.array.metadata.data.NodeNamingInfo;
-import com.zq.sword.array.netty.client.DefaultTransferClient;
-import com.zq.sword.array.netty.client.TransferClient;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

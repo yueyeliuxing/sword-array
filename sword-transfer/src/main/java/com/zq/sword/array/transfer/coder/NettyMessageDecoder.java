@@ -1,7 +1,7 @@
-package com.zq.sword.array.netty.coder;
+package com.zq.sword.array.transfer.coder;
 
-import com.zq.sword.array.netty.message.Header;
-import com.zq.sword.array.netty.message.TransferMessage;
+import com.zq.sword.array.transfer.message.Header;
+import com.zq.sword.array.transfer.message.TransferMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
