@@ -30,6 +30,11 @@ public class SwordCommand extends Sword {
      */
     private String value;
 
+    /**
+     * 索引
+     */
+    private long index;
+
     private Integer ex;
 
     private Long px;
