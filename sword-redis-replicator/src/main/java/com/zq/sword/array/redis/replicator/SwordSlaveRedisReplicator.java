@@ -6,9 +6,9 @@ import com.moilioncircle.redis.replicator.Replicator;
 import com.moilioncircle.redis.replicator.cmd.Command;
 import com.moilioncircle.redis.replicator.event.Event;
 import com.moilioncircle.redis.replicator.event.EventListener;
+import com.zq.sword.array.data.DataQueue;
 import com.zq.sword.array.data.SwordCommand;
 import com.zq.sword.array.data.SwordData;
-import com.zq.sword.array.data.rqueue.RightRandomQueue;
 import com.zq.sword.array.id.IdGenerator;
 import com.zq.sword.array.id.SnowFlakeIdGenerator;
 import org.slf4j.Logger;
@@ -29,14 +29,14 @@ public class SwordSlaveRedisReplicator implements SlaveRedisReplicator<SwordComm
 
     private Replicator replicator;
 
-    private RightRandomQueue<SwordData> rightRandomQueue;
+    private DataQueue<SwordData> dataQueue;
 
     private IdGenerator idGenerator;
 
-    private SwordSlaveRedisReplicator(long workerId, long datacenterId, String uri, RightRandomQueue<SwordData> rightRandomQueue) {
+    private SwordSlaveRedisReplicator(long workerId, long datacenterId, String uri, DataQueue<SwordData> dataQueue) {
         logger.info("SwordSlaveRedisReplicator start...");
         idGenerator = new SnowFlakeIdGenerator(workerId, datacenterId);
-        this.rightRandomQueue = rightRandomQueue;
+        this.dataQueue = dataQueue;
         try {
             replicator = new RedisReplicator(uri);
         } catch (URISyntaxException e) {
@@ -52,7 +52,7 @@ public class SwordSlaveRedisReplicator implements SlaveRedisReplicator<SwordComm
         private long workerId;
         private long datacenterId;
         private String uri;
-        private RightRandomQueue<SwordData> rightRandomQueue;
+        private DataQueue<SwordData> dataQueue;
 
         public static SwordSlaveRedisReplicatorBuilder create(){
             return new SwordSlaveRedisReplicatorBuilder();
@@ -69,21 +69,21 @@ public class SwordSlaveRedisReplicator implements SlaveRedisReplicator<SwordComm
             return this;
         }
 
-        public SwordSlaveRedisReplicatorBuilder bindingDataSource(RightRandomQueue<SwordData> rightRandomQueue){
-            this.rightRandomQueue = rightRandomQueue;
+        public SwordSlaveRedisReplicatorBuilder bindingDataSource(DataQueue<SwordData> dataQueue){
+            this.dataQueue = dataQueue;
             return this;
         }
 
         public SwordSlaveRedisReplicator build(){
-            return new SwordSlaveRedisReplicator(workerId, datacenterId, uri, rightRandomQueue);
+            return new SwordSlaveRedisReplicator(workerId, datacenterId, uri, dataQueue);
         }
     }
 
     @Override
     public void start() {
-        if(rightRandomQueue == null){
-            logger.error("target data source rightRandomQueue is null");
-            throw new NullPointerException("rightRandomQueue");
+        if(dataQueue == null){
+            logger.error("target data source dataQueue is null");
+            throw new NullPointerException("dataQueue");
         }
         try {
             replicator.addEventListener(new EventListener() {
@@ -97,7 +97,7 @@ public class SwordSlaveRedisReplicator implements SlaveRedisReplicator<SwordComm
                         swordData.setTimestamp(System.currentTimeMillis());
                         swordData.setCrc("1");
                         System.out.println(swordData);
-                        rightRandomQueue.push(swordData);
+                        dataQueue.push(swordData);
                     }
                 }
             });

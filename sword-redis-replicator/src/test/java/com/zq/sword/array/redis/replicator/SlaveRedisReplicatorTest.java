@@ -1,6 +1,8 @@
 package com.zq.sword.array.redis.replicator;
 
 
+import com.zq.sword.array.data.Sword;
+import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.rqueue.RightRandomQueue;
 import com.zq.sword.array.data.rqueue.bitcask.BitcaskRightRandomQueue;
 import org.junit.Test;
@@ -14,7 +16,7 @@ public class SlaveRedisReplicatorTest {
         //初始化R-queue
         String rightDataFilePath = "E:\\sword\\right\\data";
         String rightIndexFilePath = "E:\\sword\\right\\index";
-        RightRandomQueue rightRandomQueue = new BitcaskRightRandomQueue(rightDataFilePath, rightIndexFilePath);
+        RightRandomQueue<SwordData> rightRandomQueue = new BitcaskRightRandomQueue(rightDataFilePath, rightIndexFilePath);
 
         //初始化redis slave replicator
         String redisUri = "redis://127.0.0.1:6379";
