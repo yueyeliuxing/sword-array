@@ -70,7 +70,7 @@ public class BitcaskRightRandomQueue implements RightRandomQueue<SwordData> {
     }
 
     @Override
-    public Long getLastSwordDataId() {
+    public Long getLastDataId() {
         return swordDataProcessor.getLastSwordDataId();
     }
 

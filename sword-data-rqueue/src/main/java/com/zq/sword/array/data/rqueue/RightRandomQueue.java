@@ -31,7 +31,7 @@ public interface RightRandomQueue<T extends Sword> {
      * 获取最新的id
      * @return
      */
-    Long getLastSwordDataId();
+    Long getLastDataId();
 
     /**
      * 添加数据项

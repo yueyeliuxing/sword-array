@@ -108,7 +108,7 @@ public class GatherSwordDataTransferBackupHandler extends TransferHandler {
         }
 
         private Long getRightQueueLastDataId() {
-            return leftOrderlyQueue.getLastDataId();
+            return rightRandomQueue.getLastDataId();
         }
 
         private Long getLeftQueueLastDataId() {
