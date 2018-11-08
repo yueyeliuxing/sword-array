@@ -66,7 +66,7 @@
 
 		
 		<Root level="info">
-			<AppenderRef ref="Console" level="${sys:logging.console.level:-off}"/>
+			<AppenderRef ref="Console" level="${sys:logging.console.level:-debug}"/>
 			<AppenderRef ref="RollingRandomAccessFile" />
 			<AppenderRef ref="RollingRandomAccessFileWarn" />
 			<AppenderRef ref="RollingRandomAccessFileError" />

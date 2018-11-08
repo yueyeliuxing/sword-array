@@ -11,7 +11,7 @@ import com.zq.sword.array.metadata.data.NodeId;
  **/
 public class ZkTreePathBuilder {
 
-    public static final String ZK_ROOT = "/sword";
+    public static final String ZK_ROOT = "/p-piper";
 
     public static final String ZK_SWORD_UNITS= "/units";
 
