@@ -1,5 +1,8 @@
 package com.zq.sword.array.data.lqueue.bitcask;
 
+import com.zq.sword.array.common.event.DataEvent;
+import com.zq.sword.array.common.event.DataEventListener;
+import com.zq.sword.array.common.event.DataEventType;
 import com.zq.sword.array.data.SwordCommand;
 import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.bridge.DataCycleDisposeBridge;
@@ -8,6 +11,7 @@ import com.zq.sword.array.data.lqueue.QueueState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,9 +30,13 @@ public class BitcaskLeftOrderlyQueue implements LeftOrderlyQueue<SwordData> {
 
     private DataCycleDisposeBridge<SwordCommand> dataCycleDisposeBridge;
 
+    private List<DataEventListener<SwordData>> dataEventListeners;
+
 
     public BitcaskLeftOrderlyQueue(String dataFilePath){
         state = QueueState.NEW;
+
+        dataEventListeners = new ArrayList<>();
 
         orderSwordDataProcessor = new OrderSwordDataProcessor(dataFilePath, this);
         orderSwordDataProcessor.start();
@@ -39,6 +47,11 @@ public class BitcaskLeftOrderlyQueue implements LeftOrderlyQueue<SwordData> {
     @Override
     public void bindingDataCycleDisposeBridge(DataCycleDisposeBridge<SwordCommand> dataCycleDisposeBridge) {
         this.dataCycleDisposeBridge = dataCycleDisposeBridge;
+    }
+
+    @Override
+    public void registerSwordDataListener(DataEventListener<SwordData> dataEventListener) {
+
     }
 
     @Override
@@ -53,6 +66,16 @@ public class BitcaskLeftOrderlyQueue implements LeftOrderlyQueue<SwordData> {
             return false;
         }
         orderSwordDataProcessor.addSwordData(swordData);
+
+        //数据添加通知监听器
+        if(dataEventListeners != null && !dataEventListeners.isEmpty()){
+            for(DataEventListener<SwordData> dataDataEventListener : dataEventListeners){
+                DataEvent<SwordData> dataEvent = new DataEvent<>();
+                dataEvent.setType(DataEventType.NODE_DATA_ITEM_CHANGE);
+                dataEvent.setData(swordData);
+                dataDataEventListener.listen(dataEvent);
+            }
+        }
         return true;
     }
 
@@ -78,11 +101,6 @@ public class BitcaskLeftOrderlyQueue implements LeftOrderlyQueue<SwordData> {
     @Override
     public List<SwordData> selectAfterId(Long id, Integer maxNum) {
         return orderSwordDataProcessor.pollAfterId(id, maxNum);
-    }
-
-    @Override
-    public QueueState state() {
-        return state;
     }
 
     public void setState(QueueState state){

@@ -75,11 +75,11 @@ public class BitcaskRightRandomQueue implements RightRandomQueue<SwordData> {
     }
 
     @Override
-    public void push(SwordData swordData) {
+    public boolean push(SwordData swordData) {
 
         //过滤掉循环数据
         if(dataCycleDisposeBridge != null && dataCycleDisposeBridge.isCycleData(swordData.getValue())){
-            return;
+            return false;
         }
 
         SwordIndex swordIndex = swordDataProcessor.addSwordData(swordData);
@@ -94,15 +94,21 @@ public class BitcaskRightRandomQueue implements RightRandomQueue<SwordData> {
                 dataDataEventListener.listen(dataEvent);
             }
         }
+        return true;
     }
 
     @Override
-    public List<SwordData> pollAfterId(Long id) {
-        return pollAfterId(id, null);
+    public SwordData poll() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<SwordData> pollAfterId(Long id, Integer maxNum) {
+    public List<SwordData> selectAfterId(Long id) {
+        return selectAfterId(id, null);
+    }
+
+    @Override
+    public List<SwordData> selectAfterId(Long id, Integer maxNum) {
         SwordIndex swordIndex = swordIndexProcessor.getSwordIndex(id);
         if(swordIndex == null){
             logger.error("无法获取指定ID{}的索引数据", id);

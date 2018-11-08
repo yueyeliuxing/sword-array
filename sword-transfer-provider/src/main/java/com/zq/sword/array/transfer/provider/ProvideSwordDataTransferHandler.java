@@ -51,7 +51,7 @@ public class ProvideSwordDataTransferHandler extends TransferHandler {
         System.out.println(message);
         if(message.getHeader() != null && message.getHeader().getType() == MessageType.POLL_DATA_TRANSFER_REQ.value()) {
             Long dataId = (Long)message.getBody();
-            List<SwordData> dataItems = rightRandomQueue.pollAfterId(dataId);
+            List<SwordData> dataItems = rightRandomQueue.selectAfterId(dataId);
             ctx.writeAndFlush(buildPushTransferMessageResp(dataItems));
         }else {
             ctx.fireChannelRead(msg);

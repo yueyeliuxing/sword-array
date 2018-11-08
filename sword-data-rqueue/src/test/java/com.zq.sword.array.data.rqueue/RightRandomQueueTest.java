@@ -43,7 +43,7 @@ public class RightRandomQueueTest {
         swordData.setCrc("112");
         rightRandomQueue.push(swordData);
 
-        List<SwordData> swordDatas = rightRandomQueue.pollAfterId(5L);
+        List<SwordData> swordDatas = rightRandomQueue.selectAfterId(5L);
         System.out.println(swordDatas);
     }
 
