@@ -1,7 +1,7 @@
 package com.zq.sword.array.transfer.gather;
 
+import com.zq.sword.array.data.DataQueue;
 import com.zq.sword.array.data.SwordData;
-import com.zq.sword.array.data.lqueue.LeftOrderlyQueue;
 import com.zq.sword.array.metadata.DataConsumerServiceCoordinator;
 import com.zq.sword.array.metadata.data.ConsumedDataInfo;
 import com.zq.sword.array.metadata.data.NodeId;
@@ -28,14 +28,14 @@ public class GatherSwordDataTransferHandler extends TransferHandler {
 
     private NodeId clientNodeServerId;
 
-    private LeftOrderlyQueue<SwordData> leftQueueService;
+    private DataQueue<SwordData> dataQueue;
 
     private DataConsumerServiceCoordinator dataConsumerServiceCoordinator;
 
-    public GatherSwordDataTransferHandler(NodeId clientNodeServerId, LeftOrderlyQueue<SwordData> leftQueueService,
+    public GatherSwordDataTransferHandler(NodeId clientNodeServerId, DataQueue<SwordData> dataQueue,
                                           DataConsumerServiceCoordinator dataConsumerServiceCoordinator) {
         this.clientNodeServerId = clientNodeServerId;
-        this.leftQueueService = leftQueueService;
+        this.dataQueue = dataQueue;
         this.dataConsumerServiceCoordinator = dataConsumerServiceCoordinator;
     }
 
@@ -62,7 +62,7 @@ public class GatherSwordDataTransferHandler extends TransferHandler {
             List<SwordData> dataItems = (List<SwordData>)message.getBody();
             if(dataItems != null && !dataItems.isEmpty()){
                 for(SwordData swordData : dataItems){
-                    leftQueueService.push(swordData);
+                    dataQueue.push(swordData);
                     lastDataId = swordData.getId();
                 }
                 dataConsumerServiceCoordinator.commitConsumedDataInfo(clientNodeServerId, new ConsumedDataInfo(lastDataId));

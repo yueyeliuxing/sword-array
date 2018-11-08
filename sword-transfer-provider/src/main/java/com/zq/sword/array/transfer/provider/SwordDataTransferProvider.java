@@ -1,7 +1,7 @@
 package com.zq.sword.array.transfer.provider;
 
 import com.zq.sword.array.data.SwordData;
-import com.zq.sword.array.data.rqueue.RightRandomQueue;
+import com.zq.sword.array.data.DataQueue;
 import com.zq.sword.array.transfer.server.DefaultTransferServer;
 import com.zq.sword.array.transfer.server.TransferServer;
 
@@ -15,14 +15,14 @@ public class SwordDataTransferProvider implements DataTransferProvider {
 
     private TransferServer transferServer;
 
-    private SwordDataTransferProvider(int port, RightRandomQueue<SwordData> rightRandomQueue) {
+    private SwordDataTransferProvider(int port, DataQueue<SwordData> dataQueue) {
         transferServer = new DefaultTransferServer(port);
-        transferServer.registerTransferHandler(new ProvideSwordDataTransferHandler(rightRandomQueue));
+        transferServer.registerTransferHandler(new ProvideSwordDataTransferHandler(dataQueue));
     }
 
     public static class SwordDataTransferProviderBuilder {
         private int port;
-        private RightRandomQueue<SwordData> rightRandomQueue;
+        private DataQueue<SwordData> dataQueue;
 
         public static SwordDataTransferProviderBuilder create(){
             return new SwordDataTransferProviderBuilder();
@@ -33,13 +33,13 @@ public class SwordDataTransferProvider implements DataTransferProvider {
             return this;
         }
 
-        public SwordDataTransferProviderBuilder bindingDataSource(RightRandomQueue<SwordData> rightRandomQueue){
-            this.rightRandomQueue = rightRandomQueue;
+        public SwordDataTransferProviderBuilder bindingDataSource(DataQueue<SwordData> dataQueue){
+            this.dataQueue = dataQueue;
             return this;
         }
 
         public SwordDataTransferProvider build(){
-            return new SwordDataTransferProvider(port, rightRandomQueue);
+            return new SwordDataTransferProvider(port, dataQueue);
         }
     }
 

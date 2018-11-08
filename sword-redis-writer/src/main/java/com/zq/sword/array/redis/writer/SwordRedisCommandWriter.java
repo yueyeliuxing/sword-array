@@ -1,8 +1,8 @@
 package com.zq.sword.array.redis.writer;
 
+import com.zq.sword.array.data.DataQueue;
 import com.zq.sword.array.data.SwordCommand;
 import com.zq.sword.array.data.SwordData;
-import com.zq.sword.array.data.lqueue.LeftOrderlyQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,21 +18,21 @@ public class SwordRedisCommandWriter implements RedisCommandWriter {
 
     private SwordRedisCommandBackgroundExecutor swordRedisCommandBackgroundExecutor;
 
-    private LeftOrderlyQueue<SwordData> leftOrderlyQueue;
+    private DataQueue<SwordData> dataQueue;
 
     private RedisClient<SwordCommand> redisClient;
 
     private volatile boolean SUCCESS_TAG = true;
 
-    private SwordRedisCommandWriter(RedisConfig redisConfig, LeftOrderlyQueue<SwordData> leftOrderlyQueue) {
+    private SwordRedisCommandWriter(RedisConfig redisConfig, DataQueue<SwordData> dataQueue) {
         redisClient = new SwordRedisClient(redisConfig);
         swordRedisCommandBackgroundExecutor = new SwordRedisCommandBackgroundExecutor();
-        this.leftOrderlyQueue = leftOrderlyQueue;
+        this.dataQueue = dataQueue;
     }
 
     public static class SwordRedisCommandWriterBuilder{
         private RedisConfig redisConfig;
-        private LeftOrderlyQueue<SwordData> leftOrderlyQueue;
+        private DataQueue<SwordData> dataQueue;
 
         public static SwordRedisCommandWriterBuilder create(){
             return new SwordRedisCommandWriterBuilder();
@@ -43,13 +43,13 @@ public class SwordRedisCommandWriter implements RedisCommandWriter {
             return this;
         }
 
-        public SwordRedisCommandWriterBuilder bindingDataSource(LeftOrderlyQueue<SwordData> leftOrderlyQueue){
-            this.leftOrderlyQueue = leftOrderlyQueue;
+        public SwordRedisCommandWriterBuilder bindingDataSource(DataQueue<SwordData> dataQueue){
+            this.dataQueue = dataQueue;
             return this;
         }
 
         public SwordRedisCommandWriter build(){
-            return new SwordRedisCommandWriter(redisConfig, leftOrderlyQueue);
+            return new SwordRedisCommandWriter(redisConfig, dataQueue);
         }
     }
 
@@ -68,9 +68,9 @@ public class SwordRedisCommandWriter implements RedisCommandWriter {
     @Override
     public void start() {
 
-        if(leftOrderlyQueue == null) {
-            logger.error("leftOrderlyQueue is not connect success");
-            throw new NullPointerException("leftOrderlyQueue");
+        if(dataQueue == null) {
+            logger.error("dataQueue is not connect success");
+            throw new NullPointerException("dataQueue");
         }
 
         //初始化任务
@@ -80,7 +80,7 @@ public class SwordRedisCommandWriter implements RedisCommandWriter {
     private void initTasks() {
         swordRedisCommandBackgroundExecutor.execute(()->{
             while (SUCCESS_TAG && !Thread.currentThread().isInterrupted()){
-                SwordData swordData = leftOrderlyQueue.poll();
+                SwordData swordData = dataQueue.poll();
                 if(swordData != null){
                     redisClient.write(swordData.getValue());
                 }else {

@@ -1,8 +1,8 @@
 package com.zq.sword.array.transfer.gather;
 
 import com.zq.sword.array.common.event.DataEvent;
+import com.zq.sword.array.data.DataQueue;
 import com.zq.sword.array.data.SwordData;
-import com.zq.sword.array.data.lqueue.LeftOrderlyQueue;
 import com.zq.sword.array.metadata.DataConsumerServiceCoordinator;
 import com.zq.sword.array.metadata.data.NodeId;
 import com.zq.sword.array.metadata.data.NodeNamingInfo;
@@ -23,7 +23,7 @@ public class SwordDataTransferGather implements DataTransferGather {
      */
     private Map<NodeId, TransferClient> transferClients;
 
-    private SwordDataTransferGather(LeftOrderlyQueue<SwordData> leftOrderlyQueue,
+    private SwordDataTransferGather(DataQueue<SwordData> dataQueue,
                                      DataConsumerServiceCoordinator dataConsumerServiceCoordinator){
         Map<NodeId, NodeNamingInfo> nodeNamingInfosOfNodeId = dataConsumerServiceCoordinator.getNeedToConsumeNodeNamingInfo((DataEvent<Map<NodeId, NodeNamingInfo>> dataEvent)->{
             if(transferClients == null){
@@ -42,7 +42,7 @@ public class SwordDataTransferGather implements DataTransferGather {
                         if(transferClient != null){
                             transferClient.disconnect();
                         }
-                        TransferClient client = getTransferClient(nodeId, nodeNamingInfo, leftOrderlyQueue, dataConsumerServiceCoordinator);
+                        TransferClient client = getTransferClient(nodeId, nodeNamingInfo, dataQueue, dataConsumerServiceCoordinator);
                         client.connect();
                         transferClients.put(nodeId, client);
                     }
@@ -65,7 +65,7 @@ public class SwordDataTransferGather implements DataTransferGather {
         Map<NodeId, TransferClient> transferClients = new ConcurrentHashMap<>();
         if(nodeNamingInfosOfNodeId != null && !nodeNamingInfosOfNodeId.isEmpty()){
             nodeNamingInfosOfNodeId.forEach((clientNodeId, nodeNamingInfo)->{
-                TransferClient transferClient = getTransferClient(clientNodeId, nodeNamingInfo, leftOrderlyQueue, dataConsumerServiceCoordinator);
+                TransferClient transferClient = getTransferClient(clientNodeId, nodeNamingInfo, dataQueue, dataConsumerServiceCoordinator);
                 transferClients.put(clientNodeId, transferClient);
             });
         }
@@ -73,10 +73,10 @@ public class SwordDataTransferGather implements DataTransferGather {
     }
 
     private TransferClient getTransferClient(NodeId clientNodeId, NodeNamingInfo nodeNamingInfo,
-                                             LeftOrderlyQueue<SwordData> leftQueueService,
+                                             DataQueue<SwordData> dataQueue,
                                              DataConsumerServiceCoordinator dataConsumerServiceCoordinator){
         TransferClient transferClient = new DefaultTransferClient(nodeNamingInfo.getHost(), nodeNamingInfo.getPort());
-        transferClient.registerTransferHandler(new GatherSwordDataTransferHandler(clientNodeId, leftQueueService, dataConsumerServiceCoordinator));
+        transferClient.registerTransferHandler(new GatherSwordDataTransferHandler(clientNodeId, dataQueue, dataConsumerServiceCoordinator));
         return transferClient;
     }
 
@@ -84,7 +84,7 @@ public class SwordDataTransferGather implements DataTransferGather {
 
         private DataConsumerServiceCoordinator dataConsumerServiceCoordinator;
 
-        private LeftOrderlyQueue<SwordData> leftOrderlyQueue;
+        private DataQueue<SwordData> dataQueue;
 
         public static SwordDataTransferGatherBuilder create(){
             return new SwordDataTransferGatherBuilder();
@@ -94,13 +94,13 @@ public class SwordDataTransferGather implements DataTransferGather {
             this.dataConsumerServiceCoordinator = dataConsumerServiceCoordinator;
             return this;
         }
-        public SwordDataTransferGatherBuilder bindingTargetDataSource(LeftOrderlyQueue<SwordData> leftOrderlyQueue){
-            this.leftOrderlyQueue = leftOrderlyQueue;
+        public SwordDataTransferGatherBuilder bindingTargetDataSource(DataQueue<SwordData> dataQueue){
+            this.dataQueue = dataQueue;
             return this;
         }
 
         public SwordDataTransferGather build(){
-            return new SwordDataTransferGather(leftOrderlyQueue, dataConsumerServiceCoordinator);
+            return new SwordDataTransferGather(dataQueue, dataConsumerServiceCoordinator);
         }
     }
 
