@@ -1,4 +1,4 @@
-package com.zq.sword.array.transfer.gather;
+package com.zq.sword.array.transfer.client;
 
 import com.zq.sword.array.transfer.handler.TransferHandler;
 

@@ -6,6 +6,8 @@ import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.metadata.DataConsumerServiceCoordinator;
 import com.zq.sword.array.metadata.data.NodeId;
 import com.zq.sword.array.metadata.data.NodeNamingInfo;
+import com.zq.sword.array.transfer.client.DefaultTransferClient;
+import com.zq.sword.array.transfer.client.TransferClient;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
