@@ -11,6 +11,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.timeout.ReadTimeoutHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +26,7 @@ import java.util.concurrent.TimeUnit;
  **/
 public class DefaultTransferClient implements TransferClient {
 
-    //private Logger logger = LoggerFactory.getLogger(DefaultTransferClient.class);
+    private Logger logger = LoggerFactory.getLogger(DefaultTransferClient.class);
 
     private String host;
 
@@ -72,7 +74,7 @@ public class DefaultTransferClient implements TransferClient {
             ChannelFuture future = b.connect(host, port).sync();
             future.channel().closeFuture().sync();
         }catch (Exception e){
-            //logger.error("sync error", e);
+            logger.error("sync error", e);
         }finally {
             group.execute(new Runnable() {
                 @Override

@@ -4,7 +4,15 @@ import com.zq.sword.array.transfer.client.DefaultTransferClient;
 import com.zq.sword.array.transfer.client.TransferClient;
 import com.zq.sword.array.transfer.server.DefaultTransferServer;
 import com.zq.sword.array.transfer.server.TransferServer;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import org.junit.Test;
+
+import java.nio.channels.Selector;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 
 /**
  * @program: sword-array
@@ -25,5 +33,16 @@ public class NettyTest {
         TransferClient transferClient = new DefaultTransferClient("127.0.0.1", 8975);
         transferClient.connect();
         System.in.read();
+    }
+
+    public static void main(String[] args) {
+        ServerBootstrap serverBootstrap = null;
+        Bootstrap bootstrap = null;
+        NioServerSocketChannel serverSocketChannel = null;
+        NioSocketChannel nioSocketChannel = null;
+
+        SocketChannel socketChannel = null;
+        ServerSocketChannel serverSocketChannel1 = null;
+        Selector selector = null;
     }
 }
