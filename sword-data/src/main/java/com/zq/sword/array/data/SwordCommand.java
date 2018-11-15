@@ -3,6 +3,8 @@ package com.zq.sword.array.data;
 import lombok.Data;
 import lombok.ToString;
 
+import java.util.Map;
+
 /**
  * @program: sword-array
  * @description: 命令数据
@@ -18,24 +20,39 @@ public class SwordCommand extends Sword {
     /**
      * 类型
      */
-    private Byte type;
+    private byte type;
 
     /**
      * redis 命令 key
      */
-    private String key;
+    private byte[] key;
+
+    /**
+     * LSET
+     */
+    private long index;
+
+    /**
+     * HSET
+     */
+    private byte[] field;
+
+    /**
+     * HMSET
+     */
+    private Map<byte[], byte[]> fields;
 
     /**
      * redis 命令序列化值
      */
-    private String value;
+    private byte[] value;
 
     /**
-     * 索引
+     * SET
      */
-    private long index;
+    private byte[][] members;
 
-    private Integer ex;
+    private int ex;
 
-    private Long px;
+    private long px;
 }

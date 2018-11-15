@@ -1,6 +1,7 @@
 package com.zq.sword.array.redis.writer;
 
 import com.zq.sword.array.data.SwordCommand;
+import com.zq.sword.array.redis.CommandType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,9 +24,28 @@ public class SwordRedisClient implements RedisClient<SwordCommand> {
     @Override
     public boolean write(SwordCommand data) {
         try {
-            switch (data.getType()){
-                case (byte)1:
-                    jedisClient.saveValueByKey(0, data.getKey().getBytes(), data.getValue().getBytes(), 0);
+            CommandType type = CommandType.toEnum(data.getType());
+            switch (type){
+                case SET:
+                    jedisClient.saveValueByKey(data.getKey(), data.getValue(), data.getEx());
+                    break;
+                case INCR:
+                    jedisClient.incr(data.getKey());
+                    break;
+                case DECR:
+                    jedisClient.decr(data.getKey());
+                    break;
+                case SADD:
+                    jedisClient.sadd(data.getKey(), data.getMembers());
+                    break;
+                case HSET:
+                    jedisClient.hset(data.getKey(), data.getField(), data.getValue());
+                    break;
+                case HMSET:
+                    jedisClient.hmset(data.getKey(), data.getFields());
+                    break;
+                case LSET:
+                    jedisClient.lset(data.getKey(), data.getIndex(), data.getValue());
                     break;
                 default:
                     break;

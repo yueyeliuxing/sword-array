@@ -123,9 +123,31 @@ public class JedisClient {
      * @param map 对应关系
      * @return 状态，成功返回OK
      */
-    public String hmset(String key, Map<String, String> map) {
+    public String hmset(byte[] key, Map<byte[], byte[]> map) {
         Jedis jedis = getJedis();
         String s = jedis.hmset(key, map);
+        returnJedis(jedis);
+        return s;
+    }
+
+    public String lset(byte[] key, long index, byte[] value) {
+        Jedis jedis = getJedis();
+        String s = jedis.lset(key, index, value);
+        returnJedis(jedis);
+        return s;
+    }
+
+    /**
+     * 添加对应关系，如果对应关系已存在，则覆盖
+     *
+     * @param key
+     * @param field 对应关系
+     * @param value 对应关系
+     * @return 状态，成功返回OK
+     */
+    public Long hset(byte[] key, byte[] field, byte[] value) {
+        Jedis jedis = getJedis();
+        Long s = jedis.hset(key, field, value);
         returnJedis(jedis);
         return s;
     }
@@ -184,13 +206,12 @@ public class JedisClient {
         return s;
     }
     
-    public void saveValueByKey(int dbIndex, byte[] key, byte[] value, int expireTime)
+    public void saveValueByKey(byte[] key, byte[] value, int expireTime)
             throws Exception {
         Jedis jedis = null;
         boolean isBroken = false;
         try {
             jedis = getJedis();
-            jedis.select(dbIndex);
             jedis.set(key, value);
             if (expireTime > 0)
                 jedis.expire(key, expireTime);
@@ -320,9 +341,33 @@ public class JedisClient {
      * @param key
      * @return
      */
-    public long incr(String key){
+    public long incr(byte[] key){
     	Jedis jedis = getJedis();
     	long l = jedis.incr(key);
+        returnJedis(jedis);
+        return l;
+    }
+
+    /**
+     * 返回指定key序列值
+     * @param key
+     * @return
+     */
+    public long decr(byte[] key){
+        Jedis jedis = getJedis();
+        long l = jedis.decr(key);
+        returnJedis(jedis);
+        return l;
+    }
+
+    /**
+     * 返回指定key序列值
+     * @param key
+     * @return
+     */
+    public long sadd(byte[] key, byte[][] members){
+        Jedis jedis = getJedis();
+        long l = jedis.sadd(key, members);
         returnJedis(jedis);
         return l;
     }

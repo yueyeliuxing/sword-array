@@ -36,8 +36,8 @@ public class RightRandomQueueTest {
         swordData.setId(5L);
         SwordCommand swordCommand = new SwordCommand();
         swordCommand.setType((byte)1);
-        swordCommand.setKey("user");
-        swordCommand.setValue("123");
+        swordCommand.setKey("user".getBytes());
+        swordCommand.setValue("123".getBytes());
         swordData.setValue(swordCommand);
         swordData.setTimestamp(System.currentTimeMillis());
         swordData.setCrc("112");

@@ -4,6 +4,7 @@ import com.zq.sword.array.common.utils.JsonUtil;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.util.Map;
 
 /**
  * @program: sword-array
@@ -21,23 +22,49 @@ public class SwordCommandSerializer implements SwordSerializer<SwordCommand> {
             type = 0;
         }
 
-        byte[] bytes = null;
         int keyLen = 0;
-        String key = commandSword.getKey();
-        if(key != null){
-            bytes = key.getBytes();
+        byte[] bytes = commandSword.getKey();
+        if(bytes != null){
             keyLen = bytes.length;
         }
 
-        byte[] valueBytes = null;
+        int fieldLen = 0;
+        byte[] field = commandSword.getField();
+        if(field != null){
+            fieldLen = field.length;
+        }
+
+        int fieldsLen = 0;
+        int fieldsValueLen = 0;
+        Map<byte[], byte[]> fields = commandSword.getFields();
+        if(fields != null){
+            fieldsLen = fields.size();
+            for(byte[] k : fields.keySet()){
+                fieldsValueLen += 8;
+                fieldsValueLen += k.length;
+                fieldsValueLen += 8;
+                fieldsValueLen += fields.get(k).length;
+            }
+        }
+
         int valueLen = 0;
-        String value = commandSword.getValue();
-        if(value != null){
-            valueBytes = value.getBytes();
+        byte[] valueBytes = commandSword.getValue();
+        if(valueBytes != null){
             valueLen = valueBytes.length;
         }
 
-        int capacity = 1 + 8 + keyLen + 8 + valueLen;
+        int memeLen = 0;
+        int memValueLen = 0;
+        byte[][] memebers = commandSword.getMembers();
+        if(memebers != null){
+            memeLen = memebers.length;
+            for(int i = 0; i < memeLen; i++){
+                memValueLen += 8;
+                memValueLen += memebers[i].length;
+            }
+        }
+
+        int capacity = 1 + 8 + keyLen + 16 + 8 + fieldLen + 8 + valueLen + memeLen * 8 + memValueLen + 8 + 16 + fieldsLen + fieldsValueLen;
 
         ByteBuffer byteBuffer = ByteBuffer.allocate(capacity);
         byteBuffer.put(type);
@@ -45,13 +72,38 @@ public class SwordCommandSerializer implements SwordSerializer<SwordCommand> {
         if(bytes != null){
             byteBuffer.put(bytes);
         }
+        byteBuffer.putLong(commandSword.getIndex());
+
+        byteBuffer.putInt(fieldLen);
+        if(field != null){
+            byteBuffer.put(field);
+        }
+
+        byteBuffer.putInt(fieldsLen);
+        if(fields != null){
+            for(byte[] k : fields.keySet()){
+                byteBuffer.putInt(k.length);
+                byteBuffer.put(k);
+                byteBuffer.putInt(fields.get(k).length);
+                byteBuffer.put(fields.get(k));
+            }
+        }
+
         byteBuffer.putInt(valueLen);
         if(valueBytes != null){
             byteBuffer.put(valueBytes);
         }
 
-        //byteBuffer.putInt(commandSword.getEx());
-        //byteBuffer.putLong(commandSword.getPx());
+        byteBuffer.putInt(memeLen);
+        if(memebers != null){
+            for(int i = 0; i < memeLen; i++){
+                byteBuffer.putInt(memebers[i].length);
+                byteBuffer.put(memebers[i]);
+            }
+        }
+
+        byteBuffer.putInt(commandSword.getEx());
+        byteBuffer.putLong(commandSword.getPx());
 
         return byteBuffer.array();
     }

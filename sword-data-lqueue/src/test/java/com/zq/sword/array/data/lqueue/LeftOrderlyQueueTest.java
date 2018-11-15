@@ -34,8 +34,8 @@ public class LeftOrderlyQueueTest {
             orderSwordData.setId(Long.valueOf(i));
             SwordCommand swordCommand = new SwordCommand();
             swordCommand.setType((byte)1);
-            swordCommand.setKey("user_"+i);
-            swordCommand.setValue("7852sff_"+i);
+            swordCommand.setKey(("user_"+i).getBytes());
+            swordCommand.setValue(("7852sff_"+i).getBytes());
             orderSwordData.setValue(swordCommand);
             orderSwordData.setTimestamp(System.currentTimeMillis());
             orderSwordData.setCrc("11212");

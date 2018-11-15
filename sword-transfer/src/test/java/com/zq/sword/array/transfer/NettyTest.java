@@ -38,11 +38,11 @@ public class NettyTest {
     public static void main(String[] args) {
         ServerBootstrap serverBootstrap = null;
         Bootstrap bootstrap = null;
-        NioServerSocketChannel serverSocketChannel = null;
+        NioServerSocketChannel nioServerSocketChannel = null;
         NioSocketChannel nioSocketChannel = null;
 
         SocketChannel socketChannel = null;
-        ServerSocketChannel serverSocketChannel1 = null;
+        ServerSocketChannel serverSocketChannel = null;
         Selector selector = null;
     }
 }

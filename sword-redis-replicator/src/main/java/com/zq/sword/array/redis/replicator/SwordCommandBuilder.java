@@ -1,10 +1,7 @@
 package com.zq.sword.array.redis.replicator;
 
 import com.moilioncircle.redis.replicator.cmd.Command;
-import com.moilioncircle.redis.replicator.cmd.impl.SetCommand;
-import com.moilioncircle.redis.replicator.cmd.impl.SetExCommand;
-import com.moilioncircle.redis.replicator.cmd.impl.SetNxCommand;
-import com.moilioncircle.redis.replicator.cmd.impl.SetRangeCommand;
+import com.moilioncircle.redis.replicator.cmd.impl.*;
 import com.zq.sword.array.data.SwordCommand;
 import com.zq.sword.array.redis.CommandType;
 
@@ -26,27 +23,57 @@ public class SwordCommandBuilder {
         if(command instanceof SetCommand){
             SetCommand setCommand = (SetCommand) command;
             swordCommand.setType(CommandType.SET.getValue());
-            swordCommand.setKey(new String((setCommand.getKey())));
-            swordCommand.setValue(new String(setCommand.getValue()));
+            swordCommand.setKey(setCommand.getKey());
+            swordCommand.setValue(setCommand.getValue());
             swordCommand.setEx(setCommand.getEx());
             swordCommand.setPx(setCommand.getPx());
         }else if (command instanceof SetExCommand){
             SetExCommand setCommand = (SetExCommand) command;
             swordCommand.setType(CommandType.SET_EX.getValue());
-            swordCommand.setKey(new String((setCommand.getKey())));
-            swordCommand.setValue(new String(setCommand.getValue()));
+            swordCommand.setKey(setCommand.getKey());
+            swordCommand.setValue(setCommand.getValue());
             swordCommand.setEx(setCommand.getEx());
         }else if (command instanceof SetNxCommand){
             SetNxCommand setCommand = (SetNxCommand) command;
             swordCommand.setType(CommandType.SET_NX.getValue());
-            swordCommand.setKey(new String((setCommand.getKey())));
-            swordCommand.setValue(new String(setCommand.getValue()));
+            swordCommand.setKey(setCommand.getKey());
+            swordCommand.setValue(setCommand.getValue());
         }else if (command instanceof SetRangeCommand){
             SetRangeCommand setCommand = (SetRangeCommand) command;
             swordCommand.setType(CommandType.SET_NX.getValue());
-            swordCommand.setKey(new String((setCommand.getKey())));
-            swordCommand.setValue(new String(setCommand.getValue()));
+            swordCommand.setKey(setCommand.getKey());
+            swordCommand.setValue(setCommand.getValue());
             swordCommand.setIndex(setCommand.getIndex());
+        }else if (command instanceof IncrCommand){
+            IncrCommand incrCommand = (IncrCommand) command;
+            swordCommand.setType(CommandType.INCR.getValue());
+            swordCommand.setKey(incrCommand.getKey());
+        }else if (command instanceof DecrCommand){
+            DecrCommand decrCommand = (DecrCommand) command;
+            swordCommand.setType(CommandType.DECR.getValue());
+            swordCommand.setKey(decrCommand.getKey());
+        }else if (command instanceof SAddCommand){
+            SAddCommand sAddCommand = (SAddCommand) command;
+            swordCommand.setType(CommandType.SADD.getValue());
+            swordCommand.setKey(sAddCommand.getKey());
+            swordCommand.setMembers(sAddCommand.getMembers());
+        }else if (command instanceof HSetCommand){
+            HSetCommand hSetCommand = (HSetCommand) command;
+            swordCommand.setType(CommandType.HSET.getValue());
+            swordCommand.setKey(hSetCommand.getKey());
+            swordCommand.setField(hSetCommand.getField());
+            swordCommand.setValue(hSetCommand.getValue());
+        }else if (command instanceof HMSetCommand){
+            HMSetCommand hSetCommand = (HMSetCommand) command;
+            swordCommand.setType(CommandType.HMSET.getValue());
+            swordCommand.setKey(hSetCommand.getKey());
+            swordCommand.setFields(hSetCommand.getFields());
+        }else if (command instanceof LSetCommand){
+            LSetCommand lSetCommand = (LSetCommand) command;
+            swordCommand.setType(CommandType.LSET.getValue());
+            swordCommand.setKey(lSetCommand.getKey());
+            swordCommand.setIndex(lSetCommand.getIndex());
+            swordCommand.setValue(lSetCommand.getValue());
         }
         return swordCommand;
     }
