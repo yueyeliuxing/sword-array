@@ -36,6 +36,8 @@ public class DefaultTransferClient implements TransferClient {
 
     private EventLoopGroup group = new NioEventLoopGroup();
 
+    private Channel channel;
+
     public DefaultTransferClient(String host, int port) {
         this.host = host;
         this.port = port;
@@ -72,8 +74,11 @@ public class DefaultTransferClient implements TransferClient {
                         }
                     });
             ChannelFuture future = b.connect(host, port).sync();
-            future.channel().closeFuture().sync();
+
+            channel = future.channel();
+            channel.closeFuture().sync();
         }catch (Exception e){
+            group.shutdownGracefully();
             logger.error("sync error", e);
         }finally {
             group.execute(new Runnable() {
@@ -96,7 +101,7 @@ public class DefaultTransferClient implements TransferClient {
 
     @Override
     public void disconnect() {
-
+        channel.close();
     }
 
     @Override
