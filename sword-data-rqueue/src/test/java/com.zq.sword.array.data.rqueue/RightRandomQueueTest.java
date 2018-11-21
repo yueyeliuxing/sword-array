@@ -7,6 +7,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.List;
 
 public class RightRandomQueueTest {
@@ -31,9 +32,9 @@ public class RightRandomQueueTest {
     }
 
     @Test
-    public void push() {
+    public void push() throws IOException {
         SwordData swordData = new SwordData();
-        swordData.setId(5L);
+        swordData.setId(7L);
         SwordCommand swordCommand = new SwordCommand();
         swordCommand.setType((byte)1);
         swordCommand.setKey("user".getBytes());
@@ -43,8 +44,9 @@ public class RightRandomQueueTest {
         swordData.setCrc("112");
         rightRandomQueue.push(swordData);
 
-        List<SwordData> swordDatas = rightRandomQueue.selectAfterId(5L);
+        List<SwordData> swordDatas = rightRandomQueue.selectAfterId(7L);
         System.out.println(swordDatas);
+        System.in.read();
     }
 
     @Test

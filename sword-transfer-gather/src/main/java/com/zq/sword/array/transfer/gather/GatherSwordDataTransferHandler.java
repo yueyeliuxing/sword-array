@@ -24,6 +24,8 @@ import java.util.concurrent.TimeUnit;
  **/
 public class GatherSwordDataTransferHandler extends TransferHandler {
 
+    private long lastDataId;
+
     private volatile ScheduledFuture<?> gatherSwordDataFuture;
 
     private NodeId clientNodeServerId;
@@ -57,6 +59,10 @@ public class GatherSwordDataTransferHandler extends TransferHandler {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         TransferMessage message = (TransferMessage)msg;
 
+        if(gatherSwordDataFuture == null) {
+            gatherSwordDataFuture = ctx.executor().scheduleAtFixedRate(new HeartBeatTask(ctx), 0, 5000, TimeUnit.MILLISECONDS);
+        }
+
         if(message.getHeader() != null && message.getHeader().getType() == MessageType.PUSH_DATA_TRANSFER_RESP.value()) {
             Long lastDataId = 0L;
             List<SwordData> dataItems = (List<SwordData>)message.getBody();
@@ -65,18 +71,15 @@ public class GatherSwordDataTransferHandler extends TransferHandler {
                     dataQueue.push(swordData);
                     lastDataId = swordData.getId();
                 }
-                dataConsumerServiceCoordinator.commitConsumedDataInfo(clientNodeServerId, new ConsumedDataInfo(lastDataId));
+                this.lastDataId = lastDataId;
+                if(dataConsumerServiceCoordinator != null){
+                    dataConsumerServiceCoordinator.commitConsumedDataInfo(clientNodeServerId, new ConsumedDataInfo(lastDataId));
+                }
+
             }
-            ctx.fireChannelRead(msg);
-        } else if (message.getHeader() != null && message.getHeader().getType() == MessageType.HEARTBEAT_RESP.value()) {
-            if(gatherSwordDataFuture == null) {
-                gatherSwordDataFuture = ctx.executor().scheduleAtFixedRate(new HeartBeatTask(ctx), 0, 5000, TimeUnit.MILLISECONDS);
-            }else {
-                ctx.fireChannelRead(msg);
-            }
-        }else {
-            ctx.fireChannelRead(msg);
+
         }
+        ctx.fireChannelRead(msg);
     }
 
     public class HeartBeatTask implements Runnable {
@@ -104,11 +107,13 @@ public class GatherSwordDataTransferHandler extends TransferHandler {
         }
 
         private Long getLastDataId(){
-            Long lastDataId = 0L;
-            Map<NodeId, ConsumedDataInfo> consumptionInfoMap = dataConsumerServiceCoordinator.getConsumedNodeDataInfo();
-            if(consumptionInfoMap != null && !consumptionInfoMap.isEmpty()){
-                ConsumedDataInfo consumedDataInfo = consumptionInfoMap.get(clientNodeServerId);
-                lastDataId = consumedDataInfo.getDataId();
+            Long lastDataId = GatherSwordDataTransferHandler.this.lastDataId;
+            if(dataConsumerServiceCoordinator != null){
+                Map<NodeId, ConsumedDataInfo> consumptionInfoMap = dataConsumerServiceCoordinator.getConsumedNodeDataInfo();
+                if(consumptionInfoMap != null && !consumptionInfoMap.isEmpty()){
+                    ConsumedDataInfo consumedDataInfo = consumptionInfoMap.get(clientNodeServerId);
+                    lastDataId = consumedDataInfo.getDataId();
+                }
             }
             return lastDataId;
         }

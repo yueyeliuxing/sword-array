@@ -6,7 +6,7 @@
 		<Property name="local.logging.path">D:/logs</Property>
 		<Property name="logging.file.path">${local.logging.path}/${project.name}</Property>
 		<Property name="action.file.path">${logging.file.path}</Property>
-		<Property name="project.name">sword-transfer-provider</Property>
+		<Property name="project.name">sword-transfer-gather</Property>
 		<Property name="logging.file.name">${sys:logging.file.path}/${project.name}.log</Property>
 		<Property name="logging.file.warn.name">${sys:logging.file.path}/${project.name}-warn.log</Property>
 		<Property name="logging.file.error.name">${sys:logging.file.path}/${project.name}-error.log</Property>

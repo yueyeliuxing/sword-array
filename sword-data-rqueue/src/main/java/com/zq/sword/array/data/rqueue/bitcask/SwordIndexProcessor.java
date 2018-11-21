@@ -139,20 +139,24 @@ public class SwordIndexProcessor {
         //定时内存索引持久化
         swordIndexBackgroundExecutor.execute(()->{
             long prevTime = System.currentTimeMillis();
+            List<SwordIndex> dataIndices = new ArrayList<>();
             while(true){
-                List<SwordIndex> dataIndices = new ArrayList<>();
-                while (!swordIndexQueue.isEmpty()){
+                SwordIndex swordIndex = swordIndexQueue.poll();
+                if(swordIndex != null){
                     dataIndices.add(swordIndexQueue.poll());
-                    if(dataIndices.size() >= maxAddSwordIndexQueueSize || (System.currentTimeMillis() - prevTime >= maxAddSwordIndexQueueFreeTime)){
-                        persistenceSwordIndexFile(dataIndices);
-                        dataIndices = new ArrayList<>();
-                        prevTime = System.currentTimeMillis();
+                }else {
+                    try{
+                        Thread.sleep(1000);
+                    }catch (Exception e){
+                        logger.error("Thread.sleep 1000", e);
                     }
                 }
-                try{
-                    Thread.sleep(1000);
-                }catch (Exception e){
-                    logger.error("Thread.sleep 1000", e);
+                if(!dataIndices.isEmpty() &&
+                        (dataIndices.size() >= maxAddSwordIndexQueueSize
+                                || System.currentTimeMillis() - prevTime >= maxAddSwordIndexQueueFreeTime)){
+                    persistenceSwordIndexFile(dataIndices);
+                    dataIndices = new ArrayList<>();
+                    prevTime = System.currentTimeMillis();
                 }
             }
         });

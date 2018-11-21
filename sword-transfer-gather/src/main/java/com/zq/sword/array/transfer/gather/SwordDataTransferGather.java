@@ -25,6 +25,13 @@ public class SwordDataTransferGather implements DataTransferGather {
      */
     private Map<NodeId, TransferClient> transferClients;
 
+    public SwordDataTransferGather(String host, int port, DataQueue<SwordData> dataQueue){
+        this.transferClients = new ConcurrentHashMap<>();
+        TransferClient transferClient = new DefaultTransferClient(host, port);
+        transferClient.registerTransferHandler(new GatherSwordDataTransferHandler(null, dataQueue, null));
+        transferClients.put(new NodeId(), transferClient);
+    }
+
     private SwordDataTransferGather(DataQueue<SwordData> dataQueue,
                                      DataConsumerServiceCoordinator dataConsumerServiceCoordinator){
         Map<NodeId, NodeNamingInfo> nodeNamingInfosOfNodeId = dataConsumerServiceCoordinator.getNeedToConsumeNodeNamingInfo((DataEvent<Map<NodeId, NodeNamingInfo>> dataEvent)->{
@@ -96,6 +103,7 @@ public class SwordDataTransferGather implements DataTransferGather {
             this.dataConsumerServiceCoordinator = dataConsumerServiceCoordinator;
             return this;
         }
+
         public SwordDataTransferGatherBuilder bindingTargetDataSource(DataQueue<SwordData> dataQueue){
             this.dataQueue = dataQueue;
             return this;
