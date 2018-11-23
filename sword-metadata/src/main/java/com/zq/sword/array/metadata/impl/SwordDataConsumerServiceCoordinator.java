@@ -56,9 +56,11 @@ public class SwordDataConsumerServiceCoordinator implements DataConsumerServiceC
         if(dcPaths != null && !dcPaths.isEmpty()){
             for(String dcPath : dcPaths){
                 String dcName = dcPath;
-                List<String> unitCategoryPaths =  zkClient.getChildren(ZkTreePathBuilder.ZK_ROOT+"/"+dcPath);
+                dcPath = ZkTreePathBuilder.ZK_ROOT+"/"+dcPath;
+                List<String> unitCategoryPaths =  zkClient.getChildren(dcPath);
                 if(unitCategoryPaths != null && !unitCategoryPaths.isEmpty()){
                     for(String unitCategoryPath : unitCategoryPaths){
+                        unitCategoryPath = dcPath+"/"+unitCategoryPath;
                         boolean success = false;
                         NodeType nodeType = nodeId.getType();
                         if(nodeType.equals(NodeType.DC_UNIT_PIPER)
@@ -74,29 +76,34 @@ public class SwordDataConsumerServiceCoordinator implements DataConsumerServiceC
                         if(!success){
                             continue;
                         }
-                        List<String> unitPaths =  zkClient.getChildren(ZkTreePathBuilder.ZK_ROOT+"/"+dcPath+"/"+unitCategoryPath);
+                        List<String> unitPaths =  zkClient.getChildren(unitCategoryPath);
                         if(unitPaths != null && !unitPaths.isEmpty()){
                             for(String unitPath : unitPaths){
-                                List<String> unitSwordPaths =  zkClient.getChildren(ZkTreePathBuilder.ZK_ROOT+"/"+dcPath+"/"+unitCategoryPath+"/"+unitPath);
+                                unitPath = unitCategoryPath+"/"+unitPath;
+                                List<String> unitSwordPaths =  zkClient.getChildren(unitPath);
                                 if(unitSwordPaths != null && !unitSwordPaths.isEmpty()){
                                     for(String unitSwordPath : unitSwordPaths){
+                                        unitSwordPath = unitPath+"/"+unitSwordPath;
                                         if(unitSwordPath.endsWith(ZK_SWORD_PIPER)){
-                                            List<String> unitSwordPiperPaths = zkClient.getChildren(ZkTreePathBuilder.ZK_ROOT+"/"+dcPath+"/"+unitCategoryPath+"/"+unitPath+"/"+unitSwordPath);
+                                            List<String> unitSwordPiperPaths = zkClient.getChildren(unitSwordPath);
                                             if(unitSwordPiperPaths != null && !unitSwordPiperPaths.isEmpty()){
                                                 for(String unitSwordPiperPath : unitSwordPiperPaths){
-                                                    List<String> unitSwordPiperMetadataPaths = zkClient.getChildren(ZkTreePathBuilder.ZK_ROOT+"/"+dcPath+"/"+unitCategoryPath+"/"+unitPath+"/"+unitSwordPath+"/"+unitSwordPiperPath);
+                                                    unitSwordPiperPath = unitSwordPath + "/" + unitSwordPiperPath;
+                                                    List<String> unitSwordPiperMetadataPaths = zkClient.getChildren(unitSwordPiperPath);
                                                     if(unitSwordPiperMetadataPaths != null && !unitSwordPiperMetadataPaths.isEmpty()){
-                                                        NodeId consumedNodeId = ZkTreePathBuilder.parseNodeServerMasterPath(ZkTreePathBuilder.ZK_ROOT+"/"+dcPath+"/"+unitCategoryPath+"/"+unitPath+"/"+unitSwordPath+"/"+unitSwordPiperPath);
+                                                        NodeId consumedNodeId = ZkTreePathBuilder.parseNodeServerMasterPath(unitSwordPiperPath);
                                                         if(nodeId.equals(consumedNodeId)){
                                                             continue;
                                                         }
                                                         for(String unitSwordPiperMetadataPath : unitSwordPiperMetadataPaths){
+                                                            unitSwordPiperMetadataPath = unitSwordPiperPath + "/" + unitSwordPiperMetadataPath;
                                                             if(unitSwordPiperMetadataPath.endsWith(ZK_SWORD_PIPER_MASTER)){
-                                                                List<String> masterRunningPaths =  zkClient.getChildren(ZkTreePathBuilder.ZK_ROOT+"/"+dcPath+"/"+unitCategoryPath+"/"+unitPath+"/"+unitSwordPath+"/"+unitSwordPiperPath+"/"+unitSwordPiperMetadataPath);
+                                                                List<String> masterRunningPaths =  zkClient.getChildren(unitSwordPiperMetadataPath);
                                                                 if(masterRunningPaths != null && !masterRunningPaths.isEmpty()){
                                                                     for(String masterRunningPath : masterRunningPaths){
+                                                                        masterRunningPath = unitSwordPiperMetadataPath + "/" + masterRunningPath;
                                                                         if(masterRunningPath.endsWith(ZK_SWORD_PIPER_MASTER_RUNNING)){
-                                                                            String masterInfo = zkClient.readData(ZkTreePathBuilder.ZK_ROOT+"/"+dcPath+"/"+unitCategoryPath+"/"+unitPath+"/"+unitSwordPath+"/"+unitSwordPiperPath+"/"+unitSwordPiperMetadataPath+"/"+masterRunningPath);
+                                                                            String masterInfo = zkClient.readData(masterRunningPath);
                                                                             NodeNamingInfo nodeNamingInfo = NodeNamingInfoBuilder.buildNodeNamingInfo(masterInfo);
                                                                             nodeNamingInfoOfNodeIds.put(consumedNodeId, nodeNamingInfo);
 

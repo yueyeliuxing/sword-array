@@ -25,7 +25,7 @@ public class MasterSlaveServiceCoordinatorTest {
 //        node.id.unit.category.name=units
 //        node.id.unit.name=unit1
 //        node.id.group.name=piperName
-        NodeId nodeId = new NodeId(NodeType.DC_UNIT_PIPER, "hz", "units", "unit1", "piperName");
+        NodeId nodeId = new NodeId(NodeType.DC_UNIT_PIPER, "hz", "units", "unit2", "piperName");
         MetadataCenter metadataCenter = new ZkMatedataCenter(connectAddr, timeout);
         MasterSlaveServiceCoordinator masterSlaveServiceCoordinator = metadataCenter.getMasterSlaveServiceCoordinator(nodeId);
         NodeNamingInfo nodeNamingInfo = new NodeNamingInfo();

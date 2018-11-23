@@ -53,9 +53,9 @@ public class ZkTreePathBuilder {
         }
         String[] pathItems = nodeServerMasterPath.split("/");
         NodeId nodeId = new NodeId();
-        nodeId.setDc(pathItems[1]);
-        nodeId.setUnitCategory(pathItems[2]);
-        nodeId.setUnit(pathItems[3]);
+        nodeId.setDc(pathItems[2]);
+        nodeId.setUnitCategory(pathItems[3]);
+        nodeId.setUnit(pathItems[4]);
         nodeId.setGroup(pathItems[5]);
 
         if(ZK_SWORD_UNITS.endsWith(nodeId.getUnitCategory())){
