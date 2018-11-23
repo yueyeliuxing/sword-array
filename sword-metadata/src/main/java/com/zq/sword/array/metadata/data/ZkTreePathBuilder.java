@@ -1,7 +1,5 @@
 package com.zq.sword.array.metadata.data;
 
-import com.zq.sword.array.common.node.NodeServerId;
-
 /**
  * @program: sword-array
  * @description: ZK树节点路径帮助类
@@ -30,16 +28,6 @@ public class ZkTreePathBuilder {
 
     public static String getRealPath(String path) {
         return ZK_ROOT+path;
-    }
-
-    /**
-     * 获取服务节点的父路径
-     * @param nodeId
-     * @return
-     */
-    public static String getNodeServerPath(NodeServerId nodeId){
-        return getRealPath(String.format("/%s/%s/%s%s/%s", nodeId.getDcName(),nodeId.getUnitCategoryName(),
-                nodeId.getUnitName(), ZK_SWORD_PIPER, nodeId.getServerName()));
     }
 
     /**
@@ -77,16 +65,6 @@ public class ZkTreePathBuilder {
     public static String buildNodeConfigPath(NodeId nodeId) {
         return getRealPath(String.format("/%s/%s/%s%s/%s%s", nodeId.getDc(),nodeId.getUnitCategory(),
                 nodeId.getUnit(), ZK_SWORD_PIPER, nodeId.getGroup(), ZK_SWORD_PIPER_CONFIG));
-    }
-
-    /**
-     * 转换得到piper服务的Master
-     * @param nodeId
-     * @return
-     */
-    public static String getNodeServerMasterPath(NodeServerId nodeId) {
-        return getRealPath(String.format("/%s/%s/%s%s/%s%s", nodeId.getDcName(),nodeId.getUnitCategoryName(),
-                nodeId.getUnitName(), ZK_SWORD_PIPER, nodeId.getServerName(), ZK_SWORD_PIPER_MASTER));
     }
 
     /**
