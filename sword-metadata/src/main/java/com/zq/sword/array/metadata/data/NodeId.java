@@ -1,7 +1,5 @@
 package com.zq.sword.array.metadata.data;
 
-import com.zq.sword.array.common.node.NodeServerRole;
-import com.zq.sword.array.common.node.NodeServerType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -40,15 +38,15 @@ public class NodeId {
     private String unitName;
 
     /**
-     * 服务器名称
+     * piper 组名称
      */
-    private String serverName;
+    private String group;
 
-    public NodeId(NodeType type, String dcName, String unitCategoryName, String unitName, String serverName) {
+    public NodeId(NodeType type, String dcName, String unitCategoryName, String unitName, String group) {
         this.type = type;
         this.dcName = dcName;
         this.unitCategoryName = unitCategoryName;
         this.unitName = unitName;
-        this.serverName = serverName;
+        this.group = group;
     }
 }

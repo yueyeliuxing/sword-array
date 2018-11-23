@@ -32,7 +32,6 @@ import com.zq.sword.array.transfer.provider.SwordDataTransferProvider;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
 
 /**
  * @program: sword-array
@@ -168,7 +167,7 @@ public class SwordServerStarter implements CommandLineRunner, EnvironmentAware {
         nodeId.setDcName(getParam("node.id.dc.name"));
         nodeId.setUnitCategoryName(getParam("node.id.unit.category.name"));
         nodeId.setUnitName(getParam("node.id.unit.name"));
-        nodeId.setServerName(getParam("node.id.server.name"));
+        nodeId.setGroup(getParam("node.id.group.name"));
         return nodeId;
     }
 
