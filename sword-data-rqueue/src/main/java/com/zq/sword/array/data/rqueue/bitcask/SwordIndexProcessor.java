@@ -143,7 +143,7 @@ public class SwordIndexProcessor {
             while(true){
                 SwordIndex swordIndex = swordIndexQueue.poll();
                 if(swordIndex != null){
-                    dataIndices.add(swordIndexQueue.poll());
+                    dataIndices.add(swordIndex);
                 }else {
                     try{
                         Thread.sleep(1000);
