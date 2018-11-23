@@ -24,7 +24,7 @@ public class ZkMatedataCenter implements MetadataCenter {
         zkClient = new ZkClient(new ZkConnection(connectAddr), sessionTimeOut, new ZkSerializer() {
             @Override
             public byte[] serialize(Object data) throws ZkMarshallingError {
-                return ((String)data).getBytes();
+                return (data.toString()).getBytes();
             }
 
             @Override

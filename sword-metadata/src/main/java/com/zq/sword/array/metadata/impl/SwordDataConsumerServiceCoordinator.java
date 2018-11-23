@@ -151,9 +151,11 @@ public class SwordDataConsumerServiceCoordinator implements DataConsumerServiceC
         List<String> consumedUnitDataPaths = zkClient.getChildren(consumedDataPath);
         if(consumedUnitDataPaths != null && !consumedUnitDataPaths.isEmpty()){
             for(String consumedUnitDataPath : consumedUnitDataPaths){
-                String nodeIdString = consumedUnitDataPath.substring(consumedUnitDataPath.lastIndexOf("/")+1);
-                NodeId id = NodeIdBuilder.buildNodeId(nodeIdString);
-                String data =  zkClient.readData(consumedDataPath);
+                if(!consumedUnitDataPath.contains("|")){
+                    continue;
+                }
+                NodeId id = NodeIdBuilder.buildNodeId(consumedUnitDataPath);
+                String data =  zkClient.readData(consumedDataPath+"/"+consumedUnitDataPath);
                 consumedDataInfoOfNodeId.put(id, new ConsumedDataInfo(Long.parseLong(data)));
             }
         }
