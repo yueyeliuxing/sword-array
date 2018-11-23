@@ -1,8 +1,4 @@
 package com.zq.sword.array.metadata.data;
-
-import com.zq.sword.array.common.node.NodeServerInfo;
-import com.zq.sword.array.metadata.data.NodeNamingInfo;
-
 /**
  * @program: sword-array
  * @description: NodeNamingInfo 构建类

@@ -1,7 +1,5 @@
 package com.zq.sword.array.metadata.data;
 
-import com.zq.sword.array.common.node.NodeServerRole;
-import com.zq.sword.array.common.node.NodeServerType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;

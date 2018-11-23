@@ -1,8 +1,5 @@
 package com.zq.sword.array.common.task;
 
-import com.zq.sword.array.common.service.AbstractService;
-import com.zq.sword.array.common.service.TaskService;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
