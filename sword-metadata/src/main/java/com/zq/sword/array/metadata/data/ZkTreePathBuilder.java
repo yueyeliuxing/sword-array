@@ -53,16 +53,16 @@ public class ZkTreePathBuilder {
         }
         String[] pathItems = nodeServerMasterPath.split("/");
         NodeId nodeId = new NodeId();
-        nodeId.setDcName(pathItems[1]);
-        nodeId.setUnitCategoryName(pathItems[2]);
-        nodeId.setUnitName(pathItems[3]);
+        nodeId.setDc(pathItems[1]);
+        nodeId.setUnitCategory(pathItems[2]);
+        nodeId.setUnit(pathItems[3]);
         nodeId.setGroup(pathItems[5]);
 
-        if(ZK_SWORD_UNITS.endsWith(nodeId.getUnitCategoryName())){
+        if(ZK_SWORD_UNITS.endsWith(nodeId.getUnitCategory())){
             nodeId.setType(NodeType.DC_UNIT_PIPER);
-        }else if(ZK_SWORD_PROXY_UNITS.endsWith(nodeId.getUnitCategoryName())){
+        }else if(ZK_SWORD_PROXY_UNITS.endsWith(nodeId.getUnitCategory())){
             nodeId.setType(NodeType.DC_UNIT_PROXY_PIPER);
-        }else if(ZK_SWORD_OTHER_PROXY_UNITS.endsWith(nodeId.getUnitCategoryName())){
+        }else if(ZK_SWORD_OTHER_PROXY_UNITS.endsWith(nodeId.getUnitCategory())){
             nodeId.setType(NodeType.OTHER_DC_UNIT_PROXY_PIPER);
         }
         return nodeId;
@@ -75,8 +75,8 @@ public class ZkTreePathBuilder {
      * @return
      */
     public static String buildNodeConfigPath(NodeId nodeId) {
-        return getRealPath(String.format("/%s/%s/%s%s/%s%s", nodeId.getDcName(),nodeId.getUnitCategoryName(),
-                nodeId.getUnitName(), ZK_SWORD_PIPER, nodeId.getGroup(), ZK_SWORD_PIPER_CONFIG));
+        return getRealPath(String.format("/%s/%s/%s%s/%s%s", nodeId.getDc(),nodeId.getUnitCategory(),
+                nodeId.getUnit(), ZK_SWORD_PIPER, nodeId.getGroup(), ZK_SWORD_PIPER_CONFIG));
     }
 
     /**
@@ -95,8 +95,8 @@ public class ZkTreePathBuilder {
      * @return
      */
     public static String buildNodeServerMasterRunningPath(NodeId nodeId) {
-        return getRealPath(String.format("/%s/%s/%s%s/%s%s%s", nodeId.getDcName(),nodeId.getUnitCategoryName(),
-                nodeId.getUnitName(), ZK_SWORD_PIPER, nodeId.getGroup(), ZK_SWORD_PIPER_MASTER, ZK_SWORD_PIPER_MASTER_RUNNING));
+        return getRealPath(String.format("/%s/%s/%s%s/%s%s%s", nodeId.getDc(),nodeId.getUnitCategory(),
+                nodeId.getUnit(), ZK_SWORD_PIPER, nodeId.getGroup(), ZK_SWORD_PIPER_MASTER, ZK_SWORD_PIPER_MASTER_RUNNING));
     }
 
 
@@ -106,7 +106,7 @@ public class ZkTreePathBuilder {
      * @return
      */
     public static String buildConsumedNodeDataPath(NodeId nodeId, NodeId consumeNodeId) {
-        return getRealPath(String.format("/%s/%s/%s%s/%s%s/%s", nodeId.getDcName(),nodeId.getUnitCategoryName(),nodeId.getUnitName(),
+        return getRealPath(String.format("/%s/%s/%s%s/%s%s/%s", nodeId.getDc(),nodeId.getUnitCategory(),nodeId.getUnit(),
                 ZK_SWORD_PIPER, nodeId.getGroup(), ZK_SWORD_PIPER_DATA, NodeIdBuilder.toNodeIdString(consumeNodeId)));
     }
 
@@ -116,7 +116,7 @@ public class ZkTreePathBuilder {
      * @return
      */
     public static String buildConsumedNodeDataParentPath(NodeId nodeId) {
-        return getRealPath(String.format("/%s/%s/%s%s/%s%s", nodeId.getDcName(),nodeId.getUnitCategoryName(),nodeId.getUnitName(),
+        return getRealPath(String.format("/%s/%s/%s%s/%s%s", nodeId.getDc(),nodeId.getUnitCategory(),nodeId.getUnit(),
                 ZK_SWORD_PIPER, nodeId.getGroup(), ZK_SWORD_PIPER_DATA));
     }
 

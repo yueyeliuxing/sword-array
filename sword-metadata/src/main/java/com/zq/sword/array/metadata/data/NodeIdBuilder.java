@@ -14,8 +14,8 @@ public class NodeIdBuilder {
      * @return
      */
     public static String toNodeIdString(NodeId nodeId) {
-        return String.format("%s|%s|%s|%s|%s", nodeId.getType().name(), nodeId.getDcName(), nodeId.getUnitCategoryName(),
-                nodeId.getUnitName(), nodeId.getGroup());
+        return String.format("%s|%s|%s|%s|%s", nodeId.getType().name(), nodeId.getDc(), nodeId.getUnitCategory(),
+                nodeId.getUnit(), nodeId.getGroup());
     }
 
     /**

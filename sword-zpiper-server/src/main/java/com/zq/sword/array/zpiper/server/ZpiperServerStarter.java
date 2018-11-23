@@ -72,9 +72,9 @@ public class ZpiperServerStarter implements CommandLineRunner, EnvironmentAware 
     private NodeId buildNodeId() {
         NodeId nodeId = new NodeId();
         nodeId.setType(NodeType.valueOf(getParam("node.id.type")));
-        nodeId.setDcName(getParam("node.id.dc.name"));
-        nodeId.setUnitCategoryName(getParam("node.id.unit.category.name"));
-        nodeId.setUnitName(getParam("node.id.unit.name"));
+        nodeId.setDc(getParam("node.id.dc.name"));
+        nodeId.setUnitCategory(getParam("node.id.unit.category.name"));
+        nodeId.setUnit(getParam("node.id.unit.name"));
         nodeId.setGroup(getParam("node.id.server.name"));
         return nodeId;
     }

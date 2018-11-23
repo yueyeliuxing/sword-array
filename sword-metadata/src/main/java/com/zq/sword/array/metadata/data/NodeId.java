@@ -25,28 +25,28 @@ public class NodeId {
     /**
      * 机房名称
      */
-    private String dcName;
+    private String dc;
 
     /**
      * 单元类别名称
      */
-    private String unitCategoryName;
+    private String unitCategory;
 
     /**
      * 单元名称
      */
-    private String unitName;
+    private String unit;
 
     /**
      * piper 组名称
      */
     private String group;
 
-    public NodeId(NodeType type, String dcName, String unitCategoryName, String unitName, String group) {
+    public NodeId(NodeType type, String dc, String unitCategory, String unit, String group) {
         this.type = type;
-        this.dcName = dcName;
-        this.unitCategoryName = unitCategoryName;
-        this.unitName = unitName;
+        this.dc = dc;
+        this.unitCategory = unitCategory;
+        this.unit = unit;
         this.group = group;
     }
 }
