@@ -1,6 +1,7 @@
 package com.zq.sword.array.data;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.util.Map;
@@ -13,6 +14,7 @@ import java.util.Map;
  **/
 @Data
 @ToString
+@EqualsAndHashCode
 public class SwordCommand extends Sword {
 
     public static final SwordCommand DELETE_COMMAND = new SwordCommand();
