@@ -7,6 +7,8 @@ import com.zq.sword.array.metadata.MetadataCenter;
 import com.zq.sword.array.metadata.data.*;
 import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
+import org.I0Itec.zkclient.exception.ZkMarshallingError;
+import org.I0Itec.zkclient.serialize.ZkSerializer;
 
 /**
  * @program: sword-array
@@ -19,7 +21,17 @@ public class ZkMatedataCenter implements MetadataCenter {
     private ZkClient zkClient;
 
     public ZkMatedataCenter(String connectAddr, int sessionTimeOut) {
-        zkClient = new ZkClient(new ZkConnection(connectAddr), sessionTimeOut);
+        zkClient = new ZkClient(new ZkConnection(connectAddr), sessionTimeOut, new ZkSerializer() {
+            @Override
+            public byte[] serialize(Object data) throws ZkMarshallingError {
+                return ((String)data).getBytes();
+            }
+
+            @Override
+            public Object deserialize(byte[] bytes) throws ZkMarshallingError {
+                return new String(bytes);
+            }
+        });
     }
 
     @Override

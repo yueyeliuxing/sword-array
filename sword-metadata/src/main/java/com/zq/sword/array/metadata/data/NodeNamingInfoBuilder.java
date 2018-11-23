@@ -28,7 +28,7 @@ public class NodeNamingInfoBuilder {
     public static NodeNamingInfo buildNodeNamingInfo(String nodeNamingInfoString) {
         if(nodeNamingInfoString != null) {
             String[] items = nodeNamingInfoString.split(":");
-            if(items.length != 2) {
+            if(items.length != 3) {
                 return null;
             }
             return new NodeNamingInfo(items[0], Integer.parseInt(items[1]), Integer.parseInt(items[2]));
