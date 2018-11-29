@@ -44,7 +44,7 @@ public class ZkTreePathBuilder {
         nodeId.setDc(pathItems[2]);
         nodeId.setUnitCategory(pathItems[3]);
         nodeId.setUnit(pathItems[4]);
-        nodeId.setGroup(pathItems[5]);
+        nodeId.setGroup(pathItems[6]);
 
         if(ZK_SWORD_UNITS.endsWith(nodeId.getUnitCategory())){
             nodeId.setType(NodeType.DC_UNIT_PIPER);

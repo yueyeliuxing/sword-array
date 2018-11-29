@@ -148,6 +148,7 @@ public class SwordDataConsumerServiceCoordinator implements DataConsumerServiceC
                 }
             }
         }
+        nodeNamingInfoOfNodeIds.remove(nodeId);
         return Collections.unmodifiableMap(nodeNamingInfoOfNodeIds);
     }
 
