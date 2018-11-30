@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
  * @author: zhouqi1
  * @create: 2018-10-19 10:15
  **/
-@Component
+//@Component
 public class ZpiperServerStarter implements CommandLineRunner, EnvironmentAware {
 
     private Environment environment;

@@ -2,6 +2,8 @@ package com.zq.sword.array.data.bridge;
 
 
 import com.zq.sword.array.data.SwordCommand;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -15,11 +17,14 @@ import java.util.concurrent.TimeUnit;
  **/
 public class SwordCommandCycleDisposeBridge implements DataCycleDisposeBridge<SwordCommand> {
 
+    private Logger logger = LoggerFactory.getLogger(SwordCommandCycleDisposeBridge.class);
+
     private Set<SwordCommand> consumedSwordDataSet;
 
     private CycleSwordCommandBackgroundExecutor cycleSwordCommandBackgroundExecutor;
 
     public SwordCommandCycleDisposeBridge() {
+        logger.info("SwordCommandCycleDisposeBridge 模块启动成功");
         consumedSwordDataSet = new CopyOnWriteArraySet<>();
         cycleSwordCommandBackgroundExecutor = new CycleSwordCommandBackgroundExecutor();
     }

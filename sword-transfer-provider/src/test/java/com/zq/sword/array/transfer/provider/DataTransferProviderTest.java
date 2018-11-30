@@ -29,6 +29,7 @@ public class DataTransferProviderTest {
                 .bind(8990)
                 .build();
         dataTransferProvider.start();
+        System.in.read();
     }
 
     @Test

@@ -1,5 +1,6 @@
 package com.zq.sword.array.transfer.server;
 
+import com.zq.sword.array.common.utils.IPUtil;
 import com.zq.sword.array.transfer.coder.NettyMessageDecoder;
 import com.zq.sword.array.transfer.coder.NettyMessageEncoder;
 import com.zq.sword.array.transfer.handler.HeartBeatRespHandler;
@@ -13,11 +14,13 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.util.concurrent.GenericFutureListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Future;
 
 /**
  * @program: sword-array
@@ -34,6 +37,8 @@ public class DefaultTransferServer implements TransferServer {
     private List<TransferHandler> transferHandlers;
 
     private ServerBootstrap bootstrap;
+
+    private volatile boolean started = false;
 
     public DefaultTransferServer(int port) {
         this.port = port;
@@ -76,7 +81,14 @@ public class DefaultTransferServer implements TransferServer {
                         }
                     });
             System.out.println("Netty server start ok :" + port);
-            ChannelFuture f = bootstrap.bind("127.0.0.1",port).sync();
+            ChannelFuture f = bootstrap.bind(IPUtil.getServerIp(),port)
+                    .addListener(new GenericFutureListener(){
+
+                        @Override
+                        public void operationComplete(io.netty.util.concurrent.Future future) throws Exception {
+                            started = true;
+                        }
+                    }).sync();
             f.channel().closeFuture().sync();
         }catch (Exception e){
            logger.error("start error", e);
@@ -86,10 +98,18 @@ public class DefaultTransferServer implements TransferServer {
 
     @Override
     public void shutdown() {
+
     }
 
     @Override
     public void restart() {
         start();
     }
+
+    @Override
+    public boolean started() {
+        return started;
+    }
+
+
 }

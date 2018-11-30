@@ -22,6 +22,8 @@ public class ZkTreePathBuilder {
 
     public static final String ZK_SWORD_PIPER_MASTER_RUNNING = "/running";
 
+    public static final String ZK_SWORD_PIPER_MASTER_STATER_STATE = "/stater-state";
+
     public static final String ZK_SWORD_PIPER_DATA = "/data";
 
     public static final String ZK_SWORD_PIPER_CONFIG = "/config";
@@ -75,6 +77,16 @@ public class ZkTreePathBuilder {
     public static String buildNodeServerMasterRunningPath(NodeId nodeId) {
         return getRealPath(String.format("/%s/%s/%s%s/%s%s%s", nodeId.getDc(),nodeId.getUnitCategory(),
                 nodeId.getUnit(), ZK_SWORD_PIPER, nodeId.getGroup(), ZK_SWORD_PIPER_MASTER, ZK_SWORD_PIPER_MASTER_RUNNING));
+    }
+
+    /**
+     * 转换得到piper服务的Master
+     * @param nodeId
+     * @return
+     */
+    public static String buildNodeServerMasterStaterStatePath(NodeId nodeId) {
+        return getRealPath(String.format("/%s/%s/%s%s/%s%s%s", nodeId.getDc(),nodeId.getUnitCategory(),
+                nodeId.getUnit(), ZK_SWORD_PIPER, nodeId.getGroup(), ZK_SWORD_PIPER_MASTER, ZK_SWORD_PIPER_MASTER_STATER_STATE));
     }
 
 

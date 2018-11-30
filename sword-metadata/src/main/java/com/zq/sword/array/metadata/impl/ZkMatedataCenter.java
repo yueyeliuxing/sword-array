@@ -9,6 +9,8 @@ import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
 import org.I0Itec.zkclient.exception.ZkMarshallingError;
 import org.I0Itec.zkclient.serialize.ZkSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @program: sword-array
@@ -18,9 +20,12 @@ import org.I0Itec.zkclient.serialize.ZkSerializer;
  **/
 public class ZkMatedataCenter implements MetadataCenter {
 
+    private Logger logger = LoggerFactory.getLogger(ZkMatedataCenter.class);
+
     private ZkClient zkClient;
 
     public ZkMatedataCenter(String connectAddr, int sessionTimeOut) {
+        logger.info("metadata module starting...");
         zkClient = new ZkClient(new ZkConnection(connectAddr), sessionTimeOut, new ZkSerializer() {
             @Override
             public byte[] serialize(Object data) throws ZkMarshallingError {

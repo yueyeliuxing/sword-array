@@ -7,6 +7,8 @@ import com.zq.sword.array.metadata.MasterSlaveServiceCoordinator;
 import com.zq.sword.array.metadata.data.*;
 import org.I0Itec.zkclient.IZkDataListener;
 import org.I0Itec.zkclient.ZkClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,6 +20,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @create: 2018-10-23 16:17
  **/
 public class SwordMasterSlaveServiceCoordinator implements MasterSlaveServiceCoordinator {
+
+    private Logger logger = LoggerFactory.getLogger(SwordMasterSlaveServiceCoordinator.class);
 
     private NodeId nodeId;
 
@@ -44,6 +48,15 @@ public class SwordMasterSlaveServiceCoordinator implements MasterSlaveServiceCoo
     }
 
     @Override
+    public void setMasterStaterState(MasterStaterState masterStaterState) {
+        String masterStaterStatePath = ZkTreePathBuilder.buildNodeServerMasterStaterStatePath(nodeId);
+        if(!zkClient.exists(masterStaterStatePath)){
+            zkClient.createPersistent(masterStaterStatePath);
+        }
+        zkClient.writeData(masterStaterStatePath, masterStaterState.name());
+    }
+
+    @Override
     public NodeInfo register(NodeNamingInfo nodeNamingInfo) {
         NodeInfo nodeInfo = new NodeInfo(nodeId);
         String masterRunningPath = ZkTreePathBuilder.buildNodeServerMasterRunningPath(nodeId);
@@ -54,6 +67,7 @@ public class SwordMasterSlaveServiceCoordinator implements MasterSlaveServiceCoo
             nodeInfo.setRole(NodeRole.PIPER_MASTER);
             zkClient.createEphemeral(masterRunningPath, NodeNamingInfoBuilder.toNodeNamingInfoString(nodeNamingInfo));
         }
+        logger.info("server 注册成功 角色是{}", nodeInfo.getRole().name());
         return nodeInfo;
     }
 

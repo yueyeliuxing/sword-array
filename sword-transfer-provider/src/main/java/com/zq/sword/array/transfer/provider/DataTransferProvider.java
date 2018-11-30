@@ -17,4 +17,10 @@ public interface DataTransferProvider {
      * 提供者关闭
      */
     void stop();
+
+    /**
+     * 是否启动成功
+     * @return
+     */
+    boolean started();
 }

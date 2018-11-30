@@ -34,6 +34,7 @@ public class BitcaskLeftOrderlyQueue implements LeftOrderlyQueue<SwordData> {
 
 
     public BitcaskLeftOrderlyQueue(String dataFilePath){
+        logger.info("BitcaskLeftOrderlyQueue init...");
         state = QueueState.NEW;
 
         dataEventListeners = new ArrayList<>();

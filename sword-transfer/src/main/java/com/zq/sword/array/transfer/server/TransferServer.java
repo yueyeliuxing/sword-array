@@ -31,4 +31,10 @@ public interface TransferServer {
      * 重启
      */
     void restart();
+
+    /**
+     * 是否启动成功
+     * @return
+     */
+    boolean started();
 }

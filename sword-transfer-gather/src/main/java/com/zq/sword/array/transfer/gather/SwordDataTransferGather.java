@@ -8,6 +8,8 @@ import com.zq.sword.array.metadata.data.NodeId;
 import com.zq.sword.array.metadata.data.NodeNamingInfo;
 import com.zq.sword.array.transfer.client.DefaultTransferClient;
 import com.zq.sword.array.transfer.client.TransferClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,6 +21,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @create: 2018-10-24 15:42
  **/
 public class SwordDataTransferGather implements DataTransferGather {
+
+    private Logger logger = LoggerFactory.getLogger(SwordDataTransferGather.class);
 
     /**
      * 维护的数据传输客户端
@@ -42,6 +46,7 @@ public class SwordDataTransferGather implements DataTransferGather {
             if(nodeNamingInfoOfNodeId == null || nodeNamingInfoOfNodeId.isEmpty()){
                 return;
             }
+            logger.info("消费piper改变{}", dataEvent);
             switch (dataEvent.getType()){
                 //机器上线
                 case NODE_MASTER_DATA_CHANGE:
@@ -52,7 +57,6 @@ public class SwordDataTransferGather implements DataTransferGather {
                             transferClient.disconnect();
                         }
                         TransferClient client = getTransferClient(nodeId, nodeNamingInfo, dataQueue, dataConsumerServiceCoordinator);
-                        client.connect();
                         transferClients.put(nodeId, client);
                     }
                     break;
@@ -66,11 +70,20 @@ public class SwordDataTransferGather implements DataTransferGather {
                         }
                     }
                     break;
+                //机器启动成功
+                case NODE_MASTER_STATED:
+                    for(NodeId nodeId : nodeNamingInfoOfNodeId.keySet()){
+                        TransferClient transferClient = transferClients.get(nodeId);
+                        if(transferClient != null){
+                            transferClient.connect();
+                        }
+                    }
+                    break;
                 default:
                     break;
             }
         });
-
+        logger.info("获取消费的piper地址{}", nodeNamingInfosOfNodeId);
         Map<NodeId, TransferClient> transferClients = new ConcurrentHashMap<>();
         if(nodeNamingInfosOfNodeId != null && !nodeNamingInfosOfNodeId.isEmpty()){
             nodeNamingInfosOfNodeId.forEach((clientNodeId, nodeNamingInfo)->{
@@ -116,12 +129,16 @@ public class SwordDataTransferGather implements DataTransferGather {
 
     @Override
     public void start() {
-        if(transferClients == null){
-            throw new NullPointerException("transferClients");
-        }
-        for(TransferClient transferClient : transferClients.values()){
-            transferClient.connect();
-        }
+        new Thread(()->{
+            if(transferClients == null){
+                throw new NullPointerException("transferClients");
+            }
+            for(TransferClient transferClient : transferClients.values()){
+                transferClient.connect();
+            }
+            logger.info("连接需要消费的piper启动成功");
+        }).start();
+
     }
 
     @Override

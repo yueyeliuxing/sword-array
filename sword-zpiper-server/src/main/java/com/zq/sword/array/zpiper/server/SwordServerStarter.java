@@ -29,9 +29,12 @@ import com.zq.sword.array.transfer.gather.DataTransferGather;
 import com.zq.sword.array.transfer.gather.SwordDataTransferGather;
 import com.zq.sword.array.transfer.provider.DataTransferProvider;
 import com.zq.sword.array.transfer.provider.SwordDataTransferProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
 /**
  * @program: sword-array
@@ -39,8 +42,10 @@ import org.springframework.core.env.Environment;
  * @author: zhouqi1
  * @create: 2018-10-19 10:15
  **/
-//@Component
+@Component
 public class SwordServerStarter implements CommandLineRunner, EnvironmentAware {
+
+    private Logger logger = LoggerFactory.getLogger(SwordServerStarter.class);
 
     private Environment environment;
 
@@ -58,6 +63,7 @@ public class SwordServerStarter implements CommandLineRunner, EnvironmentAware {
         int port = getParam("transfer.provider.bind.port", Integer.class);
         int backupPort = getParam("transfer.backup.provider.bind.port", Integer.class);
 
+        logger.info("metadata 模块开始启动");
         //1.zk获取参数
         String connectAddr = getParam("zk.connect.address");
         int timeout = getParam("zk.connect.timeout", Integer.class);
@@ -65,6 +71,10 @@ public class SwordServerStarter implements CommandLineRunner, EnvironmentAware {
         MasterSlaveServiceCoordinator masterSlaveServiceCoordinator = metadataCenter.getMasterSlaveServiceCoordinator(nodeId);
         ConfigManager configManager = metadataCenter.getConfigManager(nodeId);
         DataConsumerServiceCoordinator dataConsumerServiceCoordinator = metadataCenter.getDataConsumerServiceCoordinator(nodeId);
+        logger.info("metadata 模块启动成功");
+
+        masterSlaveServiceCoordinator.setMasterStaterState(MasterStaterState.STARTING);
+        logger.info("metadata 设置服务为启动中");
 
         //初始化data-birdge
         DataCycleDisposeBridge<SwordCommand> dataCycleDisposeBridge = new SwordCommandCycleDisposeBridge();
@@ -85,16 +95,6 @@ public class SwordServerStarter implements CommandLineRunner, EnvironmentAware {
         NodeInfo nodeInfo = masterSlaveServiceCoordinator.register(nodeNamingInfo);
         NodeRole nodeRole = nodeInfo.getRole();
         if(nodeRole.equals(NodeRole.PIPER_MASTER)){
-            //初始化redis slave replicator
-            long workId = getParam("redis.replicator.work.id", Long.class);
-            long datacenterId = getParam("redis.replicator.datacenter.id", Long.class);
-            String redisUri = getParam("redis.replicator.redis.uri");
-            SlaveRedisReplicator slaveRedisReplicator = SwordSlaveRedisReplicator.SwordSlaveRedisReplicatorBuilder.create()
-                    .idGenerat(workId, datacenterId)
-                    .bindingDataSource(rightRandomQueue)
-                    .listen(redisUri)
-                    .build();
-            slaveRedisReplicator.start();
 
             //初始化 数据传输提供者
             DataTransferProvider dataTransferProvider = SwordDataTransferProvider.SwordDataTransferProviderBuilder.create()
@@ -118,12 +118,34 @@ public class SwordServerStarter implements CommandLineRunner, EnvironmentAware {
             redisCommandWriter.start();
 
             //初始化 数据传输备份提供者
-            DataTransferBackupProvider dataTransferBackupProvider = SwordDataTransferBackupProvider.SwordDataTransferBackupProviderBuilder.create()
+          /*  DataTransferBackupProvider dataTransferBackupProvider = SwordDataTransferBackupProvider.SwordDataTransferBackupProviderBuilder.create()
                     .bindingDataSource(rightRandomQueue, leftOrderlyQueue)
                     .bind(backupPort)
                     .build();
-            dataTransferBackupProvider.start();
-        }else {
+            dataTransferBackupProvider.start();*/
+
+            //初始化redis slave replicator
+            long workId = getParam("redis.replicator.work.id", Long.class);
+            long datacenterId = getParam("redis.replicator.datacenter.id", Long.class);
+            String redisUri = getParam("redis.replicator.redis.uri");
+            SlaveRedisReplicator slaveRedisReplicator = SwordSlaveRedisReplicator.SwordSlaveRedisReplicatorBuilder.create()
+                    .idGenerat(workId, datacenterId)
+                    .bindingDataSource(rightRandomQueue)
+                    .listen(redisUri)
+                    .build();
+            slaveRedisReplicator.start();
+
+            boolean switchTag = true;
+            while (switchTag){
+                while (dataTransferProvider.started()){
+                    masterSlaveServiceCoordinator.setMasterStaterState(MasterStaterState.STARTED);
+                    logger.info("metadata 设置服务为启动成功");
+                    switchTag = false;
+                    break;
+                }
+            }
+
+        }/*else {
             NodeNamingInfo masterNodeNamingInfo = masterSlaveServiceCoordinator.getMasterNodeNamingInfo((DataEvent<NodeNamingInfo> dataEvent)->{
                 NodeNamingInfo changeNodeNamingInfo = dataEvent.getData();
                 switch (dataEvent.getType()){
@@ -144,20 +166,28 @@ public class SwordServerStarter implements CommandLineRunner, EnvironmentAware {
                     .connect(masterHost, masterBackupPort)
                     .build();
             dataTransferBackupGather.start();
-        }
+        }*/
 
 
     }
 
     private RedisConfig getRedisConfig() {
-        String host = getParam("redis.host");
+       /* String host = getParam("redis.host");
         String port = getParam("redis.port");
         String pass = getParam("redis.pass");
         String timeout = getParam("redis.timeout");
         String maxIdle = getParam("redis.maxIdle");
         String maxTotal = getParam("redis.maxTotal");
         String maxWaitMillis = getParam("redis.maxWaitMillis");
-        String testOnBorrow = getParam("redis.testOnBorrow");
+        String testOnBorrow = getParam("redis.testOnBorrow");*/
+        String host = "127.0.0.1";
+        String port = "6379";
+        String pass = null;
+        String timeout = "100000";
+        String maxIdle = "10";
+        String maxTotal = "100";
+        String maxWaitMillis = "30000";
+        String testOnBorrow =  null;
         return new RedisConfig(host, port, pass, timeout, maxIdle, maxTotal, maxWaitMillis, testOnBorrow);
     }
 

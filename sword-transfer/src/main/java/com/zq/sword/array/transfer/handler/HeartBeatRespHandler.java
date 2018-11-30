@@ -5,6 +5,8 @@ import com.zq.sword.array.transfer.message.MessageType;
 import com.zq.sword.array.transfer.message.TransferMessage;
 import io.netty.channel.ChannelHandlerContext;
 
+import java.io.IOException;
+
 /**
  * @program: sword-array
  * @description: 心跳返回消息处理器
@@ -14,7 +16,9 @@ import io.netty.channel.ChannelHandlerContext;
 public class HeartBeatRespHandler extends TransferHandler {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
+        if (cause instanceof IOException){
+            ctx.close();
+        }
     }
 
     @Override

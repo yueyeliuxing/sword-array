@@ -5,6 +5,7 @@ import com.zq.sword.array.common.event.DataEventListener;
 import com.zq.sword.array.common.event.DataEventType;
 import com.zq.sword.array.metadata.DataConsumerServiceCoordinator;
 import com.zq.sword.array.metadata.data.*;
+import org.I0Itec.zkclient.IZkChildListener;
 import org.I0Itec.zkclient.IZkDataListener;
 import org.I0Itec.zkclient.ZkClient;
 
@@ -113,9 +114,9 @@ public class SwordDataConsumerServiceCoordinator implements DataConsumerServiceC
                                                                                 public void handleDataChange(String dataPath, Object data) throws Exception {
 
                                                                                     DataEvent<Map<NodeId, NodeNamingInfo>> dataEvent = new DataEvent<>();
-                                                                                    dataEvent.setType(DataEventType.NODE_CONFIG_DATA_CHANGE);
+                                                                                    dataEvent.setType(DataEventType.NODE_MASTER_DATA_CHANGE);
                                                                                     Map<NodeId, NodeNamingInfo> nodeNamingInfosOfNodeId = new HashMap<>();
-                                                                                    nodeNamingInfosOfNodeId.put(consumedNodeId, nodeNamingInfo);
+                                                                                    nodeNamingInfosOfNodeId.put(consumedNodeId, NodeNamingInfoBuilder.buildNodeNamingInfo(data.toString()));
                                                                                     dataEvent.setData(nodeNamingInfosOfNodeId);
                                                                                     nodeNamingInfoDataEventListener.listen(dataEvent);
                                                                                 }
@@ -123,7 +124,7 @@ public class SwordDataConsumerServiceCoordinator implements DataConsumerServiceC
                                                                                 @Override
                                                                                 public void handleDataDeleted(String dataPath) throws Exception {
                                                                                     DataEvent<Map<NodeId, NodeNamingInfo>> dataEvent = new DataEvent();
-                                                                                    dataEvent.setType(DataEventType.NODE_CONFIG_DATA_DELETE);
+                                                                                    dataEvent.setType(DataEventType.NODE_MASTER_DATA_DELETE);
                                                                                     Map<NodeId, NodeNamingInfo> nodeNamingInfosOfNodeId = new HashMap<>();
                                                                                     nodeNamingInfosOfNodeId.put(consumedNodeId, nodeNamingInfo);
                                                                                     dataEvent.setData(nodeNamingInfosOfNodeId);
@@ -131,9 +132,53 @@ public class SwordDataConsumerServiceCoordinator implements DataConsumerServiceC
                                                                                 }
                                                                             });
 
+                                                                        }else if(masterRunningPath.endsWith(ZK_SWORD_PIPER_MASTER_STATER_STATE)){
+                                                                            zkClient.subscribeDataChanges(masterRunningPath, new IZkDataListener(){
+
+                                                                                @Override
+                                                                                public void handleDataChange(String dataPath, Object data) throws Exception {
+
+                                                                                    MasterStaterState masterStaterState = MasterStaterState.valueOf(data.toString());
+                                                                                    if(masterStaterState.equals(MasterStaterState.STARTED)){
+                                                                                        DataEvent<Map<NodeId, NodeNamingInfo>> dataEvent = new DataEvent<>();
+                                                                                        dataEvent.setType(DataEventType.NODE_MASTER_STATED);
+                                                                                        Map<NodeId, NodeNamingInfo> nodeNamingInfosOfNodeId = new HashMap<>();
+                                                                                        nodeNamingInfosOfNodeId.put(consumedNodeId, new NodeNamingInfo());
+                                                                                        dataEvent.setData(nodeNamingInfosOfNodeId);
+                                                                                        nodeNamingInfoDataEventListener.listen(dataEvent);
+                                                                                    }
+                                                                                }
+
+                                                                                @Override
+                                                                                public void handleDataDeleted(String dataPath) throws Exception {
+                                                                                }
+                                                                            });
                                                                         }
                                                                     }
                                                                 }
+                                                                zkClient.subscribeChildChanges(unitSwordPiperMetadataPath, new IZkChildListener(){
+
+                                                                    @Override
+                                                                    public void handleChildChange(String parentPath, List<String> currentChilds) throws Exception {
+                                                                        if(currentChilds != null && !currentChilds.isEmpty()){
+                                                                            for(String currentChild : currentChilds){
+                                                                                String masterRunningPath = parentPath + "/" + currentChild;
+                                                                                if(masterRunningPath.endsWith(ZK_SWORD_PIPER_MASTER_RUNNING)) {
+                                                                                    String masterInfo = zkClient.readData(masterRunningPath);
+                                                                                    NodeNamingInfo nodeNamingInfo = NodeNamingInfoBuilder.buildNodeNamingInfo(masterInfo);
+
+                                                                                    DataEvent<Map<NodeId, NodeNamingInfo>> dataEvent = new DataEvent();
+                                                                                    dataEvent.setType(DataEventType.NODE_MASTER_DATA_CHANGE);
+                                                                                    Map<NodeId, NodeNamingInfo> nodeNamingInfosOfNodeId = new HashMap<>();
+                                                                                    nodeNamingInfosOfNodeId.put(consumedNodeId, nodeNamingInfo);
+                                                                                    dataEvent.setData(nodeNamingInfosOfNodeId);
+                                                                                    nodeNamingInfoDataEventListener.listen(dataEvent);
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                });
+
                                                             }
                                                         }
                                                     }

@@ -82,6 +82,7 @@ public class SwordRedisCommandWriter implements RedisCommandWriter {
             while (SUCCESS_TAG && !Thread.currentThread().isInterrupted()){
                 SwordData swordData = dataQueue.poll();
                 if(swordData != null){
+                    logger.error("get dataQueue data {}", swordData);
                     redisClient.write(swordData.getValue());
                 }else {
                     try {

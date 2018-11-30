@@ -19,7 +19,7 @@ public class LoginAuthRespHandler extends TransferHandler {
 
     private Map<String, Boolean> nodeCheck = new ConcurrentHashMap<>();
 
-    private String[] whitekList = {"127.0.0.1", "192.168.100.121"};
+    private String[] whitekList = null;//{"127.0.0.1", "192.168.100.121"};
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
@@ -46,12 +46,17 @@ public class LoginAuthRespHandler extends TransferHandler {
                 InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
                 String ip = address.getAddress().getHostAddress();
                 boolean isOK = false;
-                for (String WIP : whitekList){
-                    if(WIP.equals(ip)){
-                        isOK = true;
-                        break;
+                if(whitekList != null && whitekList.length > 0){
+                    for (String WIP : whitekList){
+                        if(WIP.equals(ip)){
+                            isOK = true;
+                            break;
+                        }
                     }
+                }else {
+                    isOK = true;
                 }
+
                 loginResp = isOK ? buildResponse((byte)0) : buildResponse((byte)-1);
                 if(isOK){
                     nodeCheck.put(nodeIndex, true);

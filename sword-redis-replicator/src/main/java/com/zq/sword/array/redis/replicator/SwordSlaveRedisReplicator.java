@@ -81,31 +81,34 @@ public class SwordSlaveRedisReplicator implements SlaveRedisReplicator<SwordComm
 
     @Override
     public void start() {
-        if(dataQueue == null){
-            logger.error("target data source dataQueue is null");
-            throw new NullPointerException("dataQueue");
-        }
-        try {
-            replicator.addEventListener(new EventListener() {
-                @Override
-                public void onEvent(Replicator replicator, Event event) {
-                    if(event instanceof Command){
-                        Command command = (Command) event;
-                        SwordData swordData = new SwordData();
-                        swordData.setId(idGenerator.nextId());
-                        swordData.setValue(SwordCommandBuilder.buildSwordCommand(command));
-                        swordData.setTimestamp(System.currentTimeMillis());
-                        swordData.setCrc("1");
-                        System.out.println(swordData);
-                        dataQueue.push(swordData);
+        new Thread(()->{
+            if(dataQueue == null){
+                logger.error("target data source dataQueue is null");
+                throw new NullPointerException("dataQueue");
+            }
+            try {
+                replicator.addEventListener(new EventListener() {
+                    @Override
+                    public void onEvent(Replicator replicator, Event event) {
+                        if(event instanceof Command){
+                            Command command = (Command) event;
+                            SwordData swordData = new SwordData();
+                            swordData.setId(idGenerator.nextId());
+                            swordData.setValue(SwordCommandBuilder.buildSwordCommand(command));
+                            swordData.setTimestamp(System.currentTimeMillis());
+                            swordData.setCrc("1");
+                            System.out.println(swordData);
+                            dataQueue.push(swordData);
+                        }
                     }
-                }
-            });
-            replicator.open();
-        } catch (IOException e) {
-            logger.error("error", e);
-            throw new RuntimeException(e);
-        }
+                });
+                replicator.open();
+            } catch (IOException e) {
+                logger.error("error", e);
+                throw new RuntimeException(e);
+            }
+        }).start();
+
     }
 
     @Override

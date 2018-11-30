@@ -29,6 +29,11 @@ public enum DataEventType {
     NODE_MASTER_DATA_DELETE,
 
     /**
+     * 节点Master 启动成功
+     */
+    NODE_MASTER_STATED,
+
+    /**
      * 节点数据改变
      */
     NODE_DATA_ITEM_CHANGE,

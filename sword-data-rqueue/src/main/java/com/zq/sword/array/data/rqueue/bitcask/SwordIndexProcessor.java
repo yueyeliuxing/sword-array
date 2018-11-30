@@ -43,7 +43,7 @@ public class SwordIndexProcessor {
     /**
      * 最开始的数据ID
      */
-    private volatile Long firstDataId;
+    private volatile Long firstDataId = 0L;
 
     /**
      * 数据ID->数据索引数据 字典

@@ -1,5 +1,6 @@
 package com.zq.sword.array.transfer.gather;
 
+import com.zq.sword.array.common.utils.IPUtil;
 import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.lqueue.LeftOrderlyQueue;
 import com.zq.sword.array.data.lqueue.bitcask.BitcaskLeftOrderlyQueue;
@@ -17,7 +18,7 @@ public class DataTransferGatherTest {
     @Before
     public void setUp() throws Exception {
         LeftOrderlyQueue<SwordData> leftOrderlyQueue = new BitcaskLeftOrderlyQueue("E:\\sword\\left\\data");
-        dataTransferGather = new SwordDataTransferGather("127.0.0.1", 8990, leftOrderlyQueue);
+        dataTransferGather = new SwordDataTransferGather(IPUtil.getServerIp(), 8990, leftOrderlyQueue);
     }
 
     @Test

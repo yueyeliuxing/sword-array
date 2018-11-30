@@ -73,6 +73,7 @@ public class DefaultTransferClient implements TransferClient {
                             }
                         }
                     });
+            logger.info("连接服务：{}:{}", host, port);
             ChannelFuture future = b.connect(host, port).sync();
 
             channel = future.channel();
@@ -80,7 +81,7 @@ public class DefaultTransferClient implements TransferClient {
         }catch (Exception e){
             group.shutdownGracefully();
             logger.error("sync error", e);
-        }finally {
+        }/*finally {
             group.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -96,12 +97,13 @@ public class DefaultTransferClient implements TransferClient {
                     }
                 }
             });
-        }
+        }*/
     }
 
     @Override
     public void disconnect() {
         channel.close();
+        group.shutdownGracefully();
     }
 
     @Override

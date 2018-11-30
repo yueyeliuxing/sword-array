@@ -1,6 +1,7 @@
 package com.zq.sword.array.metadata;
 
 import com.zq.sword.array.common.event.DataEventListener;
+import com.zq.sword.array.metadata.data.MasterStaterState;
 import com.zq.sword.array.metadata.data.NodeId;
 import com.zq.sword.array.metadata.data.NodeInfo;
 import com.zq.sword.array.metadata.data.NodeNamingInfo;
@@ -12,6 +13,11 @@ import com.zq.sword.array.metadata.data.NodeNamingInfo;
  * @create: 2018-10-23 14:43
  **/
 public interface MasterSlaveServiceCoordinator {
+
+    /**
+     * 设置master 状态
+     */
+    void setMasterStaterState(MasterStaterState masterStaterState);
 
     /**
      * 服务注册
