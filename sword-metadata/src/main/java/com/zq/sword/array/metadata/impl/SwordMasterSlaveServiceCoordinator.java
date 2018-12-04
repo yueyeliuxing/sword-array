@@ -60,12 +60,22 @@ public class SwordMasterSlaveServiceCoordinator implements MasterSlaveServiceCoo
     public NodeInfo register(NodeNamingInfo nodeNamingInfo) {
         NodeInfo nodeInfo = new NodeInfo(nodeId);
         String masterRunningPath = ZkTreePathBuilder.buildNodeServerMasterRunningPath(nodeId);
+        String namingInfo = NodeNamingInfoBuilder.toNodeNamingInfoString(nodeNamingInfo);
         //master 节点已经存在
         if(zkClient.exists(masterRunningPath)){
             nodeInfo.setRole(NodeRole.PIPER_SLAVE);
+            if(namingInfo.equals(zkClient.readData(masterRunningPath).toString())){
+                try{
+                    zkClient.delete(masterRunningPath);
+                }catch (Exception e){
+                    logger.error("删除节点失败", e);
+                }
+                nodeInfo.setRole(NodeRole.PIPER_MASTER);
+                zkClient.createEphemeral(masterRunningPath, namingInfo);
+            }
         }else {
             nodeInfo.setRole(NodeRole.PIPER_MASTER);
-            zkClient.createEphemeral(masterRunningPath, NodeNamingInfoBuilder.toNodeNamingInfoString(nodeNamingInfo));
+            zkClient.createEphemeral(masterRunningPath, namingInfo);
         }
         logger.info("server 注册成功 角色是{}", nodeInfo.getRole().name());
         return nodeInfo;
