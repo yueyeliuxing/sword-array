@@ -68,8 +68,8 @@ public class SwordDataConsumerServiceCoordinator implements DataConsumerServiceC
                                 && dcName.equals(nodeId.getDc())
                                 && (unitCategoryPath.endsWith(ZK_SWORD_UNITS) || unitCategoryPath.endsWith(ZK_SWORD_PROXY_UNITS))){
                             success = true;
-                        }else if(nodeType.equals(NodeType.DC_UNIT_PROXY_PIPER)
-                                && !dcName.equals(nodeId.getDc())
+                        }else if(nodeType.equals(NodeType.OTHER_DC_UNIT_PROXY_PIPER)
+                                && dcName.equals(nodeId.getDc())
                                 && unitCategoryPath.endsWith(ZK_SWORD_UNITS)){
                             success = true;
                         }
