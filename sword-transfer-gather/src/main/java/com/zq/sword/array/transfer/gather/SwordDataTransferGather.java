@@ -1,5 +1,6 @@
 package com.zq.sword.array.transfer.gather;
 
+import com.google.common.collect.Lists;
 import com.zq.sword.array.common.event.DataEvent;
 import com.zq.sword.array.data.DataQueue;
 import com.zq.sword.array.data.SwordData;
@@ -11,6 +12,8 @@ import com.zq.sword.array.transfer.client.TransferClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -37,61 +40,62 @@ public class SwordDataTransferGather implements DataTransferGather {
     }
 
     private SwordDataTransferGather(DataQueue<SwordData> dataQueue,
-                                     DataConsumerServiceCoordinator dataConsumerServiceCoordinator){
-        Map<NodeId, NodeNamingInfo> nodeNamingInfosOfNodeId = dataConsumerServiceCoordinator.getNeedToConsumeNodeNamingInfo((DataEvent<Map<NodeId, NodeNamingInfo>> dataEvent)->{
-            if(transferClients == null){
-                return;
-            }
-            Map<NodeId, NodeNamingInfo> nodeNamingInfoOfNodeId = dataEvent.getData();
-            if(nodeNamingInfoOfNodeId == null || nodeNamingInfoOfNodeId.isEmpty()){
-                return;
-            }
-            logger.info("消费piper改变{}", dataEvent);
-            switch (dataEvent.getType()){
-                //机器上线
-                case NODE_MASTER_DATA_CHANGE:
-                    for(NodeId nodeId : nodeNamingInfoOfNodeId.keySet()){
-                        NodeNamingInfo nodeNamingInfo = nodeNamingInfoOfNodeId.get(nodeId);
-                        TransferClient transferClient = transferClients.get(nodeId);
-                        if(transferClient != null){
-                            transferClient.disconnect();
-                        }
-                        TransferClient client = getTransferClient(nodeId, nodeNamingInfo, dataQueue, dataConsumerServiceCoordinator);
-                        transferClients.put(nodeId, client);
+                                     List<DataConsumerServiceCoordinator> dataConsumerServiceCoordinators){
+        this.transferClients = new ConcurrentHashMap<>();
+        if(dataConsumerServiceCoordinators != null && !dataConsumerServiceCoordinators.isEmpty()){
+            for(DataConsumerServiceCoordinator dataConsumerServiceCoordinator : dataConsumerServiceCoordinators){
+                Map<NodeId, NodeNamingInfo> nodeNamingInfosOfNodeId = dataConsumerServiceCoordinator.getNeedToConsumeNodeNamingInfo((DataEvent<Map<NodeId, NodeNamingInfo>> dataEvent)->{
+                    Map<NodeId, NodeNamingInfo> nodeNamingInfoOfNodeId = dataEvent.getData();
+                    if(nodeNamingInfoOfNodeId == null || nodeNamingInfoOfNodeId.isEmpty()){
+                        return;
                     }
-                    break;
-                //机器掉线
-                case NODE_MASTER_DATA_DELETE:
-                    for(NodeId nodeId : nodeNamingInfoOfNodeId.keySet()){
-                        TransferClient transferClient = transferClients.get(nodeId);
-                        if(transferClient != null){
-                            transferClient.disconnect();
-                            transferClients.remove(nodeId);
-                        }
+                    logger.info("消费piper改变{}", dataEvent);
+                    switch (dataEvent.getType()){
+                        //机器上线
+                        case NODE_MASTER_DATA_CHANGE:
+                            for(NodeId nodeId : nodeNamingInfoOfNodeId.keySet()){
+                                NodeNamingInfo nodeNamingInfo = nodeNamingInfoOfNodeId.get(nodeId);
+                                TransferClient transferClient = transferClients.get(nodeId);
+                                if(transferClient != null){
+                                    transferClient.disconnect();
+                                }
+                                TransferClient client = getTransferClient(nodeId, nodeNamingInfo, dataQueue, dataConsumerServiceCoordinator);
+                                transferClients.put(nodeId, client);
+                            }
+                            break;
+                        //机器掉线
+                        case NODE_MASTER_DATA_DELETE:
+                            for(NodeId nodeId : nodeNamingInfoOfNodeId.keySet()){
+                                TransferClient transferClient = transferClients.get(nodeId);
+                                if(transferClient != null){
+                                    transferClient.disconnect();
+                                    transferClients.remove(nodeId);
+                                }
+                            }
+                            break;
+                        //机器启动成功
+                        case NODE_MASTER_STATED:
+                            for(NodeId nodeId : nodeNamingInfoOfNodeId.keySet()){
+                                TransferClient transferClient = transferClients.get(nodeId);
+                                if(transferClient != null){
+                                    transferClient.connect();
+                                }
+                            }
+                            break;
+                        default:
+                            break;
                     }
-                    break;
-                //机器启动成功
-                case NODE_MASTER_STATED:
-                    for(NodeId nodeId : nodeNamingInfoOfNodeId.keySet()){
-                        TransferClient transferClient = transferClients.get(nodeId);
-                        if(transferClient != null){
-                            transferClient.connect();
-                        }
-                    }
-                    break;
-                default:
-                    break;
+                });
+                logger.info("获取消费的piper地址{}", nodeNamingInfosOfNodeId);
+                if(nodeNamingInfosOfNodeId != null && !nodeNamingInfosOfNodeId.isEmpty()){
+                    nodeNamingInfosOfNodeId.forEach((clientNodeId, nodeNamingInfo)->{
+                        TransferClient transferClient = getTransferClient(clientNodeId, nodeNamingInfo, dataQueue, dataConsumerServiceCoordinator);
+                        transferClients.put(clientNodeId, transferClient);
+                    });
+                }
             }
-        });
-        logger.info("获取消费的piper地址{}", nodeNamingInfosOfNodeId);
-        Map<NodeId, TransferClient> transferClients = new ConcurrentHashMap<>();
-        if(nodeNamingInfosOfNodeId != null && !nodeNamingInfosOfNodeId.isEmpty()){
-            nodeNamingInfosOfNodeId.forEach((clientNodeId, nodeNamingInfo)->{
-                TransferClient transferClient = getTransferClient(clientNodeId, nodeNamingInfo, dataQueue, dataConsumerServiceCoordinator);
-                transferClients.put(clientNodeId, transferClient);
-            });
         }
-        this.transferClients = transferClients;
+
     }
 
     private TransferClient getTransferClient(NodeId clientNodeId, NodeNamingInfo nodeNamingInfo,
@@ -104,7 +108,7 @@ public class SwordDataTransferGather implements DataTransferGather {
 
     public static class SwordDataTransferGatherBuilder {
 
-        private DataConsumerServiceCoordinator dataConsumerServiceCoordinator;
+        private List<DataConsumerServiceCoordinator> dataConsumerServiceCoordinators;
 
         private DataQueue<SwordData> dataQueue;
 
@@ -112,8 +116,8 @@ public class SwordDataTransferGather implements DataTransferGather {
             return new SwordDataTransferGatherBuilder();
         }
 
-        public SwordDataTransferGatherBuilder bindingDataConsumerServiceCoordinator(DataConsumerServiceCoordinator dataConsumerServiceCoordinator){
-            this.dataConsumerServiceCoordinator = dataConsumerServiceCoordinator;
+        public SwordDataTransferGatherBuilder bindingDataConsumerServiceCoordinator(DataConsumerServiceCoordinator... dataConsumerServiceCoordinators){
+            this.dataConsumerServiceCoordinators = Lists.newArrayList(dataConsumerServiceCoordinators);
             return this;
         }
 
@@ -123,7 +127,7 @@ public class SwordDataTransferGather implements DataTransferGather {
         }
 
         public SwordDataTransferGather build(){
-            return new SwordDataTransferGather(dataQueue, dataConsumerServiceCoordinator);
+            return new SwordDataTransferGather(dataQueue, dataConsumerServiceCoordinators);
         }
     }
 
