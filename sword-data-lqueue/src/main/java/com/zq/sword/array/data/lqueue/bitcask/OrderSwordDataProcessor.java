@@ -199,7 +199,7 @@ public class OrderSwordDataProcessor {
             delSwordData.setValue(DELETE_COMMAND);
             delSwordData.setTimestamp(swordData.getTimestamp());
             delSwordData.setCrc(swordData.getCrc());
-            writeDataFile(swordData);
+            writeDataFile(delSwordData);
         }
         return swordData;
     }

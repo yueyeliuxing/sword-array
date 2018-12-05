@@ -12,7 +12,7 @@ public class ZkTreePathBuilder {
 
     public static final String ZK_SWORD_UNITS= "/units";
 
-    public static final String ZK_SWORD_PROXY_UNITS= "/own-proxy-unit";
+    public static final String ZK_SWORD_PROXY_UNITS= "/own-proxy-units";
 
     public static final String ZK_SWORD_OTHER_PROXY_UNITS= "/other-proxy-units";
 

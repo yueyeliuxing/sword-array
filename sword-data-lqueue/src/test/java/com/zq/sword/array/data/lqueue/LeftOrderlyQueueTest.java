@@ -57,6 +57,8 @@ public class LeftOrderlyQueueTest {
 
     @Test
     public void poll() {
+        SwordData swordData = leftOrderlyQueue.poll();
+        System.out.println(swordData);
     }
 
     @Test
