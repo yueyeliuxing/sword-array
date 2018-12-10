@@ -1,5 +1,6 @@
 package com.zq.sword.array.transfer.backup.provider;
 
+import com.zq.sword.array.common.event.DataEventType;
 import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.lqueue.LeftOrderlyQueue;
 import com.zq.sword.array.data.rqueue.RightRandomQueue;
@@ -19,12 +20,30 @@ import java.util.List;
  **/
 public class ProvideSwordDataTransferBackupHandler extends TransferHandler {
 
+    private DataModify dataModify;
+
     private RightRandomQueue<SwordData> rightRandomQueue;
     private LeftOrderlyQueue<SwordData> leftOrderlyQueue;
 
     public ProvideSwordDataTransferBackupHandler(RightRandomQueue<SwordData> rightRandomQueue, LeftOrderlyQueue<SwordData> leftOrderlyQueue) {
         this.rightRandomQueue = rightRandomQueue;
         this.leftOrderlyQueue = leftOrderlyQueue;
+    }
+
+    private void initDataModify(RightRandomQueue<SwordData> rightRandomQueue, LeftOrderlyQueue<SwordData> leftOrderlyQueue){
+        this.dataModify = new DataModify();
+        rightRandomQueue.registerSwordDataListener((event)->{
+            if(event.getType().equals(DataEventType.SWORD_DATA_ADD)){
+                dataModify.addRightAddData(event.getData());
+            }
+        });
+        leftOrderlyQueue.registerSwordDataListener((event)->{
+            if(event.getType().equals(DataEventType.SWORD_DATA_ADD)){
+                dataModify.addLeftAddData(event.getData());
+            }else if(event.getType().equals(DataEventType.SWORD_DATA_DEL)){
+                dataModify.addLeftDelData(event.getData());
+            }
+        });
     }
 
     @Override
@@ -41,33 +60,40 @@ public class ProvideSwordDataTransferBackupHandler extends TransferHandler {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         TransferMessage message = (TransferMessage)msg;
         if(message.getHeader() != null && message.getHeader().getType() == MessageType.POLL_T_RIGHT_DATA_BACKUP_REQ.value()) {
-            Long dataItemId = (Long)message.getBody();
-            List<SwordData> dataItems = rightRandomQueue.selectAfterId(dataItemId);
-            ctx.fireChannelRead(buildPushTRightBackupDataResp(dataItems));
+            ctx.fireChannelRead(buildPushTRightBackupDataResp());
         }else if(message.getHeader() != null && message.getHeader().getType() == MessageType.POLL_T_LEFT_DATA_BACKUP_REQ.value()) {
-            Long dataItemId = (Long)message.getBody();
-            List<SwordData> dataItems = leftOrderlyQueue.selectAfterId(dataItemId);
-            ctx.fireChannelRead(buildPushTLeftBackupDataResp(dataItems));
+            ctx.fireChannelRead(buildPushTLeftBackupDataResp());
+        }else if(message.getHeader() != null && message.getHeader().getType() == MessageType.POLL_T_LEFT_DATA_DEL_BACKUP_REQ.value()) {
+            ctx.fireChannelRead(buildPushTLeftBackupDelDataResp());
         }else {
             ctx.fireChannelRead(msg);
         }
     }
 
-    private TransferMessage buildPushTLeftBackupDataResp(List<SwordData> dataItems) {
+    private TransferMessage buildPushTLeftBackupDelDataResp() {
+        TransferMessage message = new TransferMessage();
+        Header header = new Header();
+        header.setType(MessageType.POLL_T_LEFT_DATA_DEL_BACKUP_RESP.value());
+        message.setHeader(header);
+        message.setBody(dataModify.removeAllLeftDelDatas());
+        return message;
+    }
+
+    private TransferMessage buildPushTLeftBackupDataResp() {
         TransferMessage message = new TransferMessage();
         Header header = new Header();
         header.setType(MessageType.POLL_T_LEFT_DATA_BACKUP_RESP.value());
         message.setHeader(header);
-        message.setBody(dataItems);
+        message.setBody(dataModify.removeAllLeftAddDatas());
         return message;
     }
 
-    private TransferMessage buildPushTRightBackupDataResp(List<SwordData> dataItems) {
+    private TransferMessage buildPushTRightBackupDataResp() {
         TransferMessage message = new TransferMessage();
         Header header = new Header();
         header.setType(MessageType.POLL_T_RIGHT_DATA_BACKUP_RESP.value());
         message.setHeader(header);
-        message.setBody(dataItems);
+        message.setBody(dataModify.removeAllRightAddDatas());
         return message;
     }
 }

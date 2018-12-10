@@ -38,5 +38,15 @@ public enum DataEventType {
      */
     NODE_DATA_ITEM_CHANGE,
 
+    /**
+     * 数据添加
+     */
+    SWORD_DATA_ADD,
+
+    /**
+     * 数据删除
+     */
+    SWORD_DATA_DEL,
+
     ;
 }

@@ -80,7 +80,7 @@
 
 		<dependency>
 			<groupId>com.zq.sword</groupId>
-			<artifactId>sword-netty</artifactId>
+			<artifactId>sword-transfer</artifactId>
 			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>

@@ -89,7 +89,7 @@ public class BitcaskRightRandomQueue implements RightRandomQueue<SwordData> {
         if(dataEventListeners != null && !dataEventListeners.isEmpty()){
             for(DataEventListener<SwordData> dataDataEventListener : dataEventListeners){
                 DataEvent<SwordData> dataEvent = new DataEvent<>();
-                dataEvent.setType(DataEventType.NODE_DATA_ITEM_CHANGE);
+                dataEvent.setType(DataEventType.SWORD_DATA_ADD);
                 dataEvent.setData(swordData);
                 dataDataEventListener.listen(dataEvent);
             }

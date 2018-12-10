@@ -35,18 +35,4 @@ public interface DataQueue<T> {
      */
     T poll();
 
-    /**
-     * 获取指定ID之后的数据项
-     * @param id 数据项ID
-     * @return 数据项
-     */
-    List<T> selectAfterId(Long id);
-
-    /**
-     * 获取指定ID之后的数据项
-     * @param id 数据项ID
-     * @param maxNum 最大获取的数目
-     * @return 数据项
-     */
-    List<T> selectAfterId(Long id, Integer maxNum);
 }

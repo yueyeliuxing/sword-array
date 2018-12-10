@@ -203,18 +203,6 @@ public class OrderSwordDataProcessor {
         }
         return swordData;
     }
-    
-    public List<SwordData> pollAfterId(Long id, Integer maxNum) {
-        List<SwordData> dataItems = new ArrayList<>();
-        if(!orderSwordDataQueue.isEmpty()){
-            for (SwordData swordData : orderSwordDataQueue){
-                if(swordData.getId() >= id && (maxNum == null || dataItems.size() <= maxNum)){
-                    dataItems.add(swordData);
-                }
-            }
-        }
-        return dataItems;
-    }
 
     /**
      * 获取索引文件路径
@@ -224,11 +212,15 @@ public class OrderSwordDataProcessor {
         return String.format("%s/%s%s", dataFilePath, fileName, DATA_ITEM_FILE_SUFFIX);
     }
 
-    /**
-     * 获取索引文件路径
-     * @return
-     */
-    private String getDataItemFileTempPath(String fileName){
-        return String.format("%s/%s%s", dataFilePath, fileName, DATA_ITEM_FILE_TEMP_SUFFIX);
+    public void remove(SwordData swordData){
+        orderSwordDataQueue.remove(swordData);
+        if(swordData != null){
+            SwordData delSwordData = new SwordData();
+            delSwordData.setId(swordData.getId());
+            delSwordData.setValue(DELETE_COMMAND);
+            delSwordData.setTimestamp(swordData.getTimestamp());
+            delSwordData.setCrc(swordData.getCrc());
+            writeDataFile(delSwordData);
+        }
     }
 }

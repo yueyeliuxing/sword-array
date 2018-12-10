@@ -22,4 +22,10 @@ public interface LeftOrderlyQueue<T> extends DataQueue<T> {
      */
     void bindingDataCycleDisposeBridge(DataCycleDisposeBridge<SwordCommand> dataCycleDisposeBridge);
 
+    /**
+     * 删除指定数据
+     * @param data
+     */
+    void remove(T data);
+
 }

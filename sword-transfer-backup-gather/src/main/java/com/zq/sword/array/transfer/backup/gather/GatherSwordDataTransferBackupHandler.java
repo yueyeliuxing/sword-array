@@ -3,10 +3,10 @@ package com.zq.sword.array.transfer.backup.gather;
 import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.lqueue.LeftOrderlyQueue;
 import com.zq.sword.array.data.rqueue.RightRandomQueue;
-import com.zq.sword.array.netty.handler.TransferHandler;
-import com.zq.sword.array.netty.message.Header;
-import com.zq.sword.array.netty.message.MessageType;
-import com.zq.sword.array.netty.message.TransferMessage;
+import com.zq.sword.array.transfer.handler.TransferHandler;
+import com.zq.sword.array.transfer.message.Header;
+import com.zq.sword.array.transfer.message.MessageType;
+import com.zq.sword.array.transfer.message.TransferMessage;
 import io.netty.channel.ChannelHandlerContext;
 
 import java.util.List;
@@ -48,6 +48,9 @@ public class GatherSwordDataTransferBackupHandler extends TransferHandler {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         TransferMessage message = (TransferMessage) msg;
+        if (gatherSwordDataFuture == null) {
+            gatherSwordDataFuture = ctx.executor().scheduleAtFixedRate(new HeartBeatTask(ctx), 0, 5000, TimeUnit.MILLISECONDS);
+        }
         if (message.getHeader() != null && message.getHeader().getType() == MessageType.POLL_T_LEFT_DATA_BACKUP_RESP.value()) {
             List<SwordData> dataItems = (List<SwordData>) message.getBody();
             if (dataItems != null && !dataItems.isEmpty()) {
@@ -55,7 +58,6 @@ public class GatherSwordDataTransferBackupHandler extends TransferHandler {
                     leftOrderlyQueue.push(dataItem);
                 }
             }
-            ctx.fireChannelRead(msg);
         } else if (message.getHeader() != null && message.getHeader().getType() == MessageType.POLL_T_RIGHT_DATA_BACKUP_RESP.value()) {
             List<SwordData> dataItems = (List<SwordData>) message.getBody();
             if (dataItems != null && !dataItems.isEmpty()) {
@@ -63,16 +65,18 @@ public class GatherSwordDataTransferBackupHandler extends TransferHandler {
                     rightRandomQueue.push(dataItem);
                 }
             }
-            ctx.fireChannelRead(msg);
-        } else if (message.getHeader() != null && message.getHeader().getType() == MessageType.HEARTBEAT_RESP.value()) {
-            if (gatherSwordDataFuture == null) {
-                gatherSwordDataFuture = ctx.executor().scheduleAtFixedRate(new HeartBeatTask(ctx), 0, 5000, TimeUnit.MILLISECONDS);
-            } else {
-                ctx.fireChannelRead(msg);
+
+        } else if (message.getHeader() != null && message.getHeader().getType() == MessageType.POLL_T_LEFT_DATA_DEL_BACKUP_RESP.value()) {
+            List<SwordData> dataItems = (List<SwordData>) message.getBody();
+            if (dataItems != null && !dataItems.isEmpty()) {
+                for (SwordData dataItem : dataItems) {
+                    leftOrderlyQueue.remove(dataItem);
+                }
             }
-        } else {
-            ctx.fireChannelRead(msg);
+
         }
+
+        ctx.fireChannelRead(msg);
     }
 
     public class HeartBeatTask implements Runnable {
@@ -87,7 +91,18 @@ public class GatherSwordDataTransferBackupHandler extends TransferHandler {
         public void run() {
             ctx.writeAndFlush(buildPollTLeftDataBackupReq());
             ctx.writeAndFlush(buildPollTRightDataBackupReq());
+            ctx.writeAndFlush(buildPollTLeftDelDataBackupReq());
         }
+
+        private TransferMessage buildPollTLeftDelDataBackupReq() {
+            TransferMessage message = new TransferMessage();
+            Header header = new Header();
+            header.setType(MessageType.POLL_T_LEFT_DATA_DEL_BACKUP_REQ.value());
+            message.setHeader(header);
+            message.setBody(getLeftQueueLastDataId());
+            return message;
+        }
+
 
         private TransferMessage buildPollTLeftDataBackupReq() {
             TransferMessage message = new TransferMessage();

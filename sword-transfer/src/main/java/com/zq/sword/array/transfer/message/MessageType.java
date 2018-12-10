@@ -25,6 +25,9 @@ public enum MessageType {
 
     POLL_T_LEFT_DATA_BACKUP_REQ((byte)13),
     POLL_T_LEFT_DATA_BACKUP_RESP((byte)14),
+
+    POLL_T_LEFT_DATA_DEL_BACKUP_REQ((byte)15),
+    POLL_T_LEFT_DATA_DEL_BACKUP_RESP((byte)16),
     ;
 
     MessageType(byte value) {

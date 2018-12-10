@@ -51,8 +51,13 @@ public class BitcaskLeftOrderlyQueue implements LeftOrderlyQueue<SwordData> {
     }
 
     @Override
-    public void registerSwordDataListener(DataEventListener<SwordData> dataEventListener) {
+    public void remove(SwordData data) {
+        orderSwordDataProcessor.remove(data);
+    }
 
+    @Override
+    public void registerSwordDataListener(DataEventListener<SwordData> dataEventListener) {
+        dataEventListeners.add(dataEventListener);
     }
 
     @Override
@@ -72,7 +77,7 @@ public class BitcaskLeftOrderlyQueue implements LeftOrderlyQueue<SwordData> {
         if(dataEventListeners != null && !dataEventListeners.isEmpty()){
             for(DataEventListener<SwordData> dataDataEventListener : dataEventListeners){
                 DataEvent<SwordData> dataEvent = new DataEvent<>();
-                dataEvent.setType(DataEventType.NODE_DATA_ITEM_CHANGE);
+                dataEvent.setType(DataEventType.SWORD_DATA_ADD);
                 dataEvent.setData(swordData);
                 dataDataEventListener.listen(dataEvent);
             }
@@ -91,17 +96,18 @@ public class BitcaskLeftOrderlyQueue implements LeftOrderlyQueue<SwordData> {
         if(swordData != null && dataCycleDisposeBridge != null){
             dataCycleDisposeBridge.addCycleData(swordData.getValue());
         }
+
+        //数据添加通知监听器
+        if(dataEventListeners != null && !dataEventListeners.isEmpty()){
+            for(DataEventListener<SwordData> dataDataEventListener : dataEventListeners){
+                DataEvent<SwordData> dataEvent = new DataEvent<>();
+                dataEvent.setType(DataEventType.SWORD_DATA_DEL);
+                dataEvent.setData(swordData);
+                dataDataEventListener.listen(dataEvent);
+            }
+        }
+
         return swordData;
-    }
-
-    @Override
-    public List<SwordData> selectAfterId(Long id) {
-        return selectAfterId(id, null);
-    }
-
-    @Override
-    public List<SwordData> selectAfterId(Long id, Integer maxNum) {
-        return orderSwordDataProcessor.pollAfterId(id, maxNum);
     }
 
     public void setState(QueueState state){
