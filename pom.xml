@@ -33,6 +33,7 @@
 		<module>sword-transfer-backup-provider</module>
 		<module>sword-transfer-backup-gather</module>
 		<module>sword-zpiper-server</module>
+		<module>sword-zpiper-proxy-server</module>
 	</modules>
 
 	<licenses>
