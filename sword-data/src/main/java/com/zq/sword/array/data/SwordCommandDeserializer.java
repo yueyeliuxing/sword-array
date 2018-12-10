@@ -18,6 +18,9 @@ public class SwordCommandDeserializer implements SwordDeserializer<SwordCommand>
 
     @Override
     public SwordCommand deserialize(byte[] data) {
+        if(data.length == 1 && data[0] == 0){
+            return SwordCommand.DELETE_COMMAND;
+        }
 
         SwordCommand swordCommand = new SwordCommand();
         ByteBuffer byteBuffer = ByteBuffer.wrap(data);

@@ -16,6 +16,9 @@ public class SwordCommandSerializer implements SwordSerializer<SwordCommand> {
 
     @Override
     public byte[] serialize(SwordCommand commandSword) {
+        if(commandSword == SwordCommand.DELETE_COMMAND){
+            return new byte[]{0};
+        }
 
         Byte type = commandSword.getType();
         if(type == null){
