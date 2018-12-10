@@ -3,8 +3,8 @@ package com.zq.sword.array.transfer.backup.gather;
 import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.lqueue.LeftOrderlyQueue;
 import com.zq.sword.array.data.rqueue.RightRandomQueue;
-import com.zq.sword.array.netty.client.DefaultTransferClient;
-import com.zq.sword.array.netty.client.TransferClient;
+import com.zq.sword.array.transfer.client.DefaultTransferClient;
+import com.zq.sword.array.transfer.client.TransferClient;
 
 /**
  * @program: sword-array

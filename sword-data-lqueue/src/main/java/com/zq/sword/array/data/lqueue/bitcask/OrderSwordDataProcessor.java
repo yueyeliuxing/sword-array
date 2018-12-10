@@ -204,6 +204,18 @@ public class OrderSwordDataProcessor {
         return swordData;
     }
 
+    public List<SwordData> pollAfterId(Long id, Integer maxNum) {
+        List<SwordData> dataItems = new ArrayList<>();
+        if(!orderSwordDataQueue.isEmpty()){
+            for (SwordData swordData : orderSwordDataQueue){
+                if(swordData.getId() >= id && (maxNum == null || dataItems.size() <= maxNum)){
+                    dataItems.add(swordData);
+                }
+            }
+        }
+        return dataItems;
+    }
+
     /**
      * 获取索引文件路径
      * @return

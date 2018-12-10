@@ -19,20 +19,12 @@ import java.util.List;
  * @author: zhouqi1
  * @create: 2018-08-01 20:44
  **/
-@ChannelHandler.Sharable
 public class ProvideSwordDataTransferHandler extends TransferHandler {
 
     private DataQueue<SwordData> dataQueue;
 
     public ProvideSwordDataTransferHandler(DataQueue<SwordData> dataQueue) {
         this.dataQueue = dataQueue;
-        dataQueue.registerSwordDataListener(new DataEventListener<SwordData>(){
-
-            @Override
-            public void listen(DataEvent<SwordData> dataEvent) {
-
-            }
-        });
     }
 
     @Override
