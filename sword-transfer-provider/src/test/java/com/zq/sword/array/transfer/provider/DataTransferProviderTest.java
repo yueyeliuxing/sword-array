@@ -1,8 +1,8 @@
 package com.zq.sword.array.transfer.provider;
 
 import com.zq.sword.array.data.SwordData;
-import com.zq.sword.array.data.rqueue.RightRandomQueue;
-import com.zq.sword.array.data.rqueue.bitcask.BitcaskRightRandomQueue;
+import com.zq.sword.array.data.swdmq.RightRandomQueue;
+import com.zq.sword.array.data.swdmq.bitcask.BitcaskRightRandomQueue;
 import com.zq.sword.array.transfer.client.DefaultTransferClient;
 import com.zq.sword.array.transfer.client.TransferClient;
 import org.junit.After;

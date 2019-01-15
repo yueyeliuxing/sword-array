@@ -2,7 +2,7 @@ package com.zq.sword.array.transfer.backup.gather;
 
 import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.queue.DataQueue;
-import com.zq.sword.array.data.rqueue.RightRandomQueue;
+import com.zq.sword.array.data.swdmq.RightRandomQueue;
 import com.zq.sword.array.transfer.handler.TransferHandler;
 import com.zq.sword.array.transfer.message.Header;
 import com.zq.sword.array.transfer.message.MessageType;

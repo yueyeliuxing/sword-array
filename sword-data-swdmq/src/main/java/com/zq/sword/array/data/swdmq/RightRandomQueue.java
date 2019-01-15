@@ -1,12 +1,8 @@
-package com.zq.sword.array.data.rqueue;
+package com.zq.sword.array.data.swdmq;
 
-import com.zq.sword.array.common.event.DataEventListener;
 import com.zq.sword.array.data.DataQueue;
-import com.zq.sword.array.data.Sword;
 import com.zq.sword.array.data.SwordCommand;
 import com.zq.sword.array.data.bridge.DataCycleDisposeBridge;
-
-import java.util.List;
 
 /**
  * @program: sword-array

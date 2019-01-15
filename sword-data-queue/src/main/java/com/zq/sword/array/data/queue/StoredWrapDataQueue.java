@@ -106,10 +106,10 @@ public class StoredWrapDataQueue<T> extends AbstractQueue<T> implements DataQueu
             queue.state(QueueState.STOP);
 
             List<T> objectData = readAllObjectData();
-            ObjectFileSystemResourceStore objectFileSystemResourceStore = new ObjectFileSystemResourceStore(this.resourceStore, objectSerializer, objectDeserializer);
+            ObjectResourceStore objectResourceStore = new ObjectResourceStore(this.resourceStore, objectSerializer, objectDeserializer);
             ObjectResourceOutputStream resourceOutputStream = null;
             try {
-                resourceOutputStream = objectFileSystemResourceStore.openOutputStream();
+                resourceOutputStream = objectResourceStore.openOutputStream();
                 resourceOutputStream.clearStream();
                 if(objectData != null && !objectData.isEmpty()){
                     for(T t : objectData){
@@ -137,10 +137,10 @@ public class StoredWrapDataQueue<T> extends AbstractQueue<T> implements DataQueu
      */
     private List<T> readAllObjectData() {
         List<T> objectData = new LinkedList<>();
-        ObjectFileSystemResourceStore objectFileSystemResourceStore = new ObjectFileSystemResourceStore(this.resourceStore, objectSerializer, objectDeserializer);
+        ObjectResourceStore objectResourceStore = new ObjectResourceStore(this.resourceStore, objectSerializer, objectDeserializer);
         ObjectResourceInputStream resourceInputStream = null;
         try {
-            resourceInputStream = objectFileSystemResourceStore.openInputStream();
+            resourceInputStream = objectResourceStore.openInputStream();
             if(resourceInputStream.available() <= 0){
                 return objectData;
             }
@@ -180,10 +180,10 @@ public class StoredWrapDataQueue<T> extends AbstractQueue<T> implements DataQueu
 
 
     private void writeResourceStore(T t, int type) {
-        ObjectFileSystemResourceStore objectFileSystemResourceStore = new ObjectFileSystemResourceStore(this.resourceStore, objectSerializer, objectDeserializer);
+        ObjectResourceStore objectResourceStore = new ObjectResourceStore(this.resourceStore, objectSerializer, objectDeserializer);
         ObjectResourceOutputStream resourceOutputStream = null;
         try {
-            resourceOutputStream = objectFileSystemResourceStore.openOutputStream();
+            resourceOutputStream = objectResourceStore.openOutputStream();
             resourceOutputStream.writeInt(type);
             resourceOutputStream.writeObject(t);
         } catch (OutputStreamOpenException | IOException e) {
@@ -268,7 +268,7 @@ public class StoredWrapDataQueue<T> extends AbstractQueue<T> implements DataQueu
      * @author: zhouqi1
      * @create: 2019-01-14 10:58
      **/
-    private static class ObjectFileSystemResourceStore implements ResourceStore{
+    private static class ObjectResourceStore implements ResourceStore{
 
         /**
          * 实际的资源存储器
@@ -285,7 +285,7 @@ public class StoredWrapDataQueue<T> extends AbstractQueue<T> implements DataQueu
          */
         private ObjectDeserializer objectDeserializer;
 
-        public ObjectFileSystemResourceStore(ResourceStore resourceStore, ObjectSerializer objectSerializer, ObjectDeserializer objectDeserializer) {
+        public ObjectResourceStore(ResourceStore resourceStore, ObjectSerializer objectSerializer, ObjectDeserializer objectDeserializer) {
             this.resourceStore = resourceStore;
             this.objectSerializer = objectSerializer;
             this.objectDeserializer = objectDeserializer;

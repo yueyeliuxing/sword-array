@@ -1,4 +1,4 @@
-package com.zq.sword.array.data.rqueue.bitcask;
+package com.zq.sword.array.data.swdmq.bitcask;
 
 import com.zq.sword.array.data.SwordDataDeserializer;
 import com.zq.sword.array.data.SwordDataSerializer;
