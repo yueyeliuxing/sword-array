@@ -26,10 +26,10 @@
 		<module>sword-data-io</module>
 		<module>sword-data-bridge</module>
 		<module>sword-data-queue</module>
-		<module>sword-data-rqueue</module>
+		<module>sword-data-swdmq</module>
 		<module>sword-redis-writer</module>
 		<module>sword-redis-replicator</module>
-        <module>sword-transfer</module>
+        <module>sword-network-rpc</module>
 		<module>sword-transfer-provider</module>
 		<module>sword-transfer-gather</module>
 		<module>sword-transfer-backup-provider</module>
