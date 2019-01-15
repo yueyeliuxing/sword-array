@@ -1,7 +1,7 @@
 package com.zq.sword.array.transfer.backup.provider;
 
 import com.zq.sword.array.data.SwordData;
-import com.zq.sword.array.data.lqueue.LeftOrderlyQueue;
+import com.zq.sword.array.data.queue.DataQueue;
 import com.zq.sword.array.data.rqueue.RightRandomQueue;
 import com.zq.sword.array.transfer.server.DefaultTransferServer;
 import com.zq.sword.array.transfer.server.TransferServer;
@@ -16,7 +16,7 @@ public class SwordDataTransferBackupProvider implements DataTransferBackupProvid
 
     private TransferServer transferServer;
 
-    private SwordDataTransferBackupProvider(int port, RightRandomQueue<SwordData> rightRandomQueue, LeftOrderlyQueue<SwordData> leftOrderlyQueue) {
+    private SwordDataTransferBackupProvider(int port, RightRandomQueue<SwordData> rightRandomQueue, DataQueue<SwordData> leftOrderlyQueue) {
         transferServer = new DefaultTransferServer(port);
         transferServer.registerTransferHandler(new ProvideSwordDataTransferBackupHandler(rightRandomQueue, leftOrderlyQueue));
     }
@@ -24,7 +24,7 @@ public class SwordDataTransferBackupProvider implements DataTransferBackupProvid
     public static class SwordDataTransferBackupProviderBuilder {
         private int port;
         private RightRandomQueue<SwordData> rightRandomQueue;
-        private LeftOrderlyQueue<SwordData> leftOrderlyQueue;
+        private DataQueue<SwordData> leftOrderlyQueue;
 
         public static SwordDataTransferBackupProviderBuilder create(){
             return new SwordDataTransferBackupProviderBuilder();
@@ -35,7 +35,7 @@ public class SwordDataTransferBackupProvider implements DataTransferBackupProvid
             return this;
         }
 
-        public SwordDataTransferBackupProviderBuilder bindingDataSource(RightRandomQueue<SwordData> rightRandomQueue, LeftOrderlyQueue<SwordData> leftOrderlyQueue){
+        public SwordDataTransferBackupProviderBuilder bindingDataSource(RightRandomQueue<SwordData> rightRandomQueue, DataQueue<SwordData> leftOrderlyQueue){
             this.rightRandomQueue = rightRandomQueue;
             this.leftOrderlyQueue = leftOrderlyQueue;
             return this;

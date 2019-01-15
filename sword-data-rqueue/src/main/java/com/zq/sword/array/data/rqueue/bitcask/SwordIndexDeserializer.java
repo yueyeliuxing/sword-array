@@ -1,7 +1,7 @@
 package com.zq.sword.array.data.rqueue.bitcask;
 
 import com.zq.sword.array.common.utils.JsonUtil;
-import com.zq.sword.array.data.SwordDeserializer;
+import com.zq.sword.array.data.ObjectDeserializer;
 
 import java.io.UnsupportedEncodingException;
 
@@ -11,7 +11,7 @@ import java.io.UnsupportedEncodingException;
  * @author: zhouqi1
  * @create: 2018-10-17 15:06
  **/
-public class SwordIndexDeserializer implements SwordDeserializer<SwordIndex> {
+public class SwordIndexDeserializer implements ObjectDeserializer<SwordIndex> {
 
     @Override
     public SwordIndex deserialize(byte[] data) {

@@ -1,7 +1,7 @@
 package com.zq.sword.array.transfer.backup.gather;
 
 import com.zq.sword.array.data.SwordData;
-import com.zq.sword.array.data.lqueue.LeftOrderlyQueue;
+import com.zq.sword.array.data.queue.DataQueue;
 import com.zq.sword.array.data.rqueue.RightRandomQueue;
 import com.zq.sword.array.transfer.handler.TransferHandler;
 import com.zq.sword.array.transfer.message.Header;
@@ -24,9 +24,9 @@ public class GatherSwordDataTransferBackupHandler extends TransferHandler {
     private volatile ScheduledFuture<?> gatherSwordDataFuture;
 
     private RightRandomQueue<SwordData> rightRandomQueue;
-    private LeftOrderlyQueue<SwordData> leftOrderlyQueue;
+    private DataQueue<SwordData> leftOrderlyQueue;
 
-    public GatherSwordDataTransferBackupHandler(RightRandomQueue<SwordData> rightRandomQueue, LeftOrderlyQueue<SwordData> leftOrderlyQueue) {
+    public GatherSwordDataTransferBackupHandler(RightRandomQueue<SwordData> rightRandomQueue, DataQueue<SwordData> leftOrderlyQueue) {
         this.rightRandomQueue = rightRandomQueue;
         this.leftOrderlyQueue = leftOrderlyQueue;
     }

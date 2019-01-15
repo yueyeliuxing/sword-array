@@ -12,21 +12,21 @@ import java.util.List;
  * @author: zhouqi1
  * @create: 2018-10-30 11:20
  **/
-public class BitcaskRandomAccessFile<T extends Sword> implements Closeable {
+public class BitcaskRandomAccessFile<T> implements Closeable {
 
-    private SwordSerializer<T> swordSerializer;
+    private ObjectSerializer<T> swordSerializer;
 
-    private SwordDeserializer<T> swordDeserializer;
+    private ObjectDeserializer<T> swordDeserializer;
 
     private DataSeparator dataSeparator;
 
     private RandomAccessFile randomAccessFile;
 
-    public BitcaskRandomAccessFile(String name, String mode, SwordSerializer<T> swordSerializer, SwordDeserializer<T> swordDeserializer)  throws FileNotFoundException {
+    public BitcaskRandomAccessFile(String name, String mode, ObjectSerializer<T> swordSerializer, ObjectDeserializer<T> swordDeserializer)  throws FileNotFoundException {
         this(name, mode, null, swordSerializer, swordDeserializer);
     }
 
-    public BitcaskRandomAccessFile(String name, String mode, DataSeparator dataSeparator, SwordSerializer<T> swordSerializer, SwordDeserializer<T> swordDeserializer)  throws FileNotFoundException {
+    public BitcaskRandomAccessFile(String name, String mode, DataSeparator dataSeparator, ObjectSerializer<T> swordSerializer, ObjectDeserializer<T> swordDeserializer)  throws FileNotFoundException {
         this.randomAccessFile = new RandomAccessFile(name, mode);
         this.dataSeparator = dataSeparator;
         this.swordSerializer = swordSerializer;

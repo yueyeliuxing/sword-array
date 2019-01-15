@@ -1,13 +1,12 @@
 package com.zq.sword.array.zpiper.server;
 
-import com.zq.sword.array.common.event.DataEvent;
 import com.zq.sword.array.common.utils.IPUtil;
 import com.zq.sword.array.data.SwordCommand;
 import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.bridge.DataCycleDisposeBridge;
 import com.zq.sword.array.data.bridge.SwordCommandCycleDisposeBridge;
-import com.zq.sword.array.data.lqueue.LeftOrderlyQueue;
-import com.zq.sword.array.data.lqueue.bitcask.BitcaskLeftOrderlyQueue;
+import com.zq.sword.array.data.queue.DataQueue;
+import com.zq.sword.array.data.queue.StoredWrapDataQueue;
 import com.zq.sword.array.data.rqueue.RightRandomQueue;
 import com.zq.sword.array.data.rqueue.bitcask.BitcaskRightRandomQueue;
 import com.zq.sword.array.metadata.ConfigManager;
@@ -21,10 +20,6 @@ import com.zq.sword.array.redis.replicator.SlaveRedisReplicator;
 import com.zq.sword.array.redis.writer.RedisCommandWriter;
 import com.zq.sword.array.redis.writer.RedisConfig;
 import com.zq.sword.array.redis.writer.SwordRedisCommandWriter;
-import com.zq.sword.array.transfer.backup.gather.DataTransferBackupGather;
-import com.zq.sword.array.transfer.backup.gather.SwordDataTransferBackupGather;
-import com.zq.sword.array.transfer.backup.provider.DataTransferBackupProvider;
-import com.zq.sword.array.transfer.backup.provider.SwordDataTransferBackupProvider;
 import com.zq.sword.array.transfer.gather.DataTransferGather;
 import com.zq.sword.array.transfer.gather.SwordDataTransferGather;
 import com.zq.sword.array.transfer.provider.DataTransferProvider;
@@ -87,7 +82,7 @@ public class SwordServerStarter implements CommandLineRunner, EnvironmentAware {
 
         //初始化L-Queue
         String leftDataFilePath = getParam("data.left.queue.file.path");
-        LeftOrderlyQueue<SwordData> leftOrderlyQueue = new BitcaskLeftOrderlyQueue(leftDataFilePath);
+        DataQueue<SwordData> leftOrderlyQueue = new StoredWrapDataQueue(leftDataFilePath);
         leftOrderlyQueue.bindingDataCycleDisposeBridge(dataCycleDisposeBridge);
 
         //判断node 身份是 master 还是slave

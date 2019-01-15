@@ -13,6 +13,7 @@ import org.junit.Test;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.concurrent.Executors;
 
 /**
  * @program: sword-array
@@ -24,6 +25,7 @@ public class NettyTest {
 
     @Test
     public void testServer(){
+        Executors.newSingleThreadExecutor();
         TransferServer transferServer = new DefaultTransferServer(8975);
         transferServer.start();
     }

@@ -59,7 +59,7 @@
 
 		<dependency>
 			<groupId>com.zq.sword</groupId>
-			<artifactId>sword-data-lqueue</artifactId>
+			<artifactId>sword-data-queue</artifactId>
 			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>

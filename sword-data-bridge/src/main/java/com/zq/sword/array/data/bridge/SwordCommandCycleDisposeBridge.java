@@ -2,6 +2,8 @@ package com.zq.sword.array.data.bridge;
 
 
 import com.zq.sword.array.data.SwordCommand;
+import com.zq.sword.array.tasks.SingleTaskExecutor;
+import com.zq.sword.array.tasks.TaskExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,12 +23,12 @@ public class SwordCommandCycleDisposeBridge implements DataCycleDisposeBridge<Sw
 
     private Set<SwordCommand> consumedSwordDataSet;
 
-    private CycleSwordCommandBackgroundExecutor cycleSwordCommandBackgroundExecutor;
+    private TaskExecutor taskExecutor;
 
     public SwordCommandCycleDisposeBridge() {
         logger.info("SwordCommandCycleDisposeBridge 模块启动成功");
         consumedSwordDataSet = new CopyOnWriteArraySet<>();
-        cycleSwordCommandBackgroundExecutor = new CycleSwordCommandBackgroundExecutor();
+        taskExecutor = new SingleTaskExecutor();
     }
 
     public void start(){
@@ -39,7 +41,7 @@ public class SwordCommandCycleDisposeBridge implements DataCycleDisposeBridge<Sw
     private void startTasks(){
 
         //只保存两分钟的数据
-        cycleSwordCommandBackgroundExecutor.timedExecute(()->{
+        taskExecutor.timedExecute(()->{
             consumedSwordDataSet.clear();
         }, 2, TimeUnit.MINUTES);
     }

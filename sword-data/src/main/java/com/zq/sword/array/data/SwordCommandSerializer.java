@@ -1,8 +1,5 @@
 package com.zq.sword.array.data;
 
-import com.zq.sword.array.common.utils.JsonUtil;
-
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
@@ -12,7 +9,7 @@ import java.util.Map;
  * @author: zhouqi1
  * @create: 2018-10-10 15:41
  **/
-public class SwordCommandSerializer implements SwordSerializer<SwordCommand> {
+public class SwordCommandSerializer implements ObjectSerializer<SwordCommand> {
 
     @Override
     public byte[] serialize(SwordCommand commandSword) {

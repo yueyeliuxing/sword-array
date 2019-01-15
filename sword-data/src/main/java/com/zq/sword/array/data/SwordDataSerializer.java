@@ -1,8 +1,5 @@
 package com.zq.sword.array.data;
 
-import com.zq.sword.array.common.utils.JsonUtil;
-
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 
 /**
@@ -11,7 +8,7 @@ import java.nio.ByteBuffer;
  * @author: zhouqi1
  * @create: 2018-10-17 15:06
  **/
-public class SwordDataSerializer implements SwordSerializer<SwordData> {
+public class SwordDataSerializer implements ObjectSerializer<SwordData> {
 
     @Override
     public byte[] serialize(SwordData defaultSwordData) {
@@ -27,7 +24,7 @@ public class SwordDataSerializer implements SwordSerializer<SwordData> {
         SwordCommand value = defaultSwordData.getValue();
         value = value == SwordCommand.DELETE_COMMAND ? null : value;
         if (value != null) {
-            SwordSerializer<SwordCommand> swordCommandSwordSerializer = new  SwordCommandSerializer();
+            ObjectSerializer<SwordCommand> swordCommandSwordSerializer = new  SwordCommandSerializer();
             bytes = swordCommandSwordSerializer.serialize(value);
             valueLen = bytes.length;
         }

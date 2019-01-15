@@ -2,14 +2,12 @@ package com.zq.sword.array.transfer.gather;
 
 import com.zq.sword.array.common.utils.IPUtil;
 import com.zq.sword.array.data.SwordData;
-import com.zq.sword.array.data.lqueue.LeftOrderlyQueue;
-import com.zq.sword.array.data.lqueue.bitcask.BitcaskLeftOrderlyQueue;
+import com.zq.sword.array.data.queue.DataQueue;
+import com.zq.sword.array.data.queue.StoredWrapDataQueue;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-
-import static org.junit.Assert.*;
 
 public class DataTransferGatherTest {
 
@@ -17,7 +15,7 @@ public class DataTransferGatherTest {
 
     @Before
     public void setUp() throws Exception {
-        LeftOrderlyQueue<SwordData> leftOrderlyQueue = new BitcaskLeftOrderlyQueue("E:\\sword\\left\\data");
+        DataQueue<SwordData> leftOrderlyQueue = new StoredWrapDataQueue("E:\\sword\\left\\data");
         dataTransferGather = new SwordDataTransferGather(IPUtil.getServerIp(), 8990, leftOrderlyQueue);
     }
 

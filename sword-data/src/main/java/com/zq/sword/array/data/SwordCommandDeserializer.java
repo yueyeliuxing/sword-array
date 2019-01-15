@@ -1,9 +1,6 @@
 package com.zq.sword.array.data;
 
 
-import com.zq.sword.array.common.utils.JsonUtil;
-
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +11,7 @@ import java.util.Map;
  * @author: zhouqi1
  * @create: 2018-10-17 15:06
  **/
-public class SwordCommandDeserializer implements SwordDeserializer<SwordCommand> {
+public class SwordCommandDeserializer implements ObjectDeserializer<SwordCommand> {
 
     @Override
     public SwordCommand deserialize(byte[] data) {

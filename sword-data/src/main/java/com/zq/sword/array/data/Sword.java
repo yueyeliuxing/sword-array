@@ -10,4 +10,6 @@ import java.io.Serializable;
  **/
 public class Sword implements Serializable {
     private static final long serialVersionUID = -6150417416694916989L;
+
+
 }

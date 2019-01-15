@@ -2,9 +2,8 @@ package com.zq.sword.array.data.rqueue.bitcask;
 
 import com.zq.sword.array.common.utils.DateUtil;
 import com.zq.sword.array.common.utils.FileUtil;
-import com.zq.sword.array.data.SwordData;
-import com.zq.sword.array.data.SwordDeserializer;
-import com.zq.sword.array.data.SwordSerializer;
+import com.zq.sword.array.data.ObjectDeserializer;
+import com.zq.sword.array.data.ObjectSerializer;
 import com.zq.sword.array.data.stream.BitcaskRandomAccessFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,12 +82,12 @@ public class SwordIndexProcessor {
     /**
      * 数据序列化器
      */
-    private SwordSerializer<SwordIndex> swordSerializer;
+    private ObjectSerializer<SwordIndex> swordSerializer;
 
     /**
      * 数据反序列化器
      */
-    private SwordDeserializer<SwordIndex> swordDeserializer;
+    private ObjectDeserializer<SwordIndex> swordDeserializer;
 
     public SwordIndexProcessor(String indexFilePath){
         this.indexFilePath = indexFilePath;

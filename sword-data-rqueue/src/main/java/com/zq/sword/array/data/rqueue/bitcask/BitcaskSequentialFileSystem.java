@@ -1,8 +1,8 @@
 package com.zq.sword.array.data.rqueue.bitcask;
 
 import com.zq.sword.array.data.SwordData;
-import com.zq.sword.array.data.SwordDeserializer;
-import com.zq.sword.array.data.SwordSerializer;
+import com.zq.sword.array.data.ObjectDeserializer;
+import com.zq.sword.array.data.ObjectSerializer;
 import com.zq.sword.array.data.stream.BitcaskRandomAccessFile;
 
 import java.io.File;
@@ -28,12 +28,12 @@ public class BitcaskSequentialFileSystem implements BitcaskFileSystem<SwordData>
     /**
      * 数据序列化器
      */
-    private SwordSerializer<SwordData> swordSerializer;
+    private ObjectSerializer<SwordData> swordSerializer;
 
     /**
      * 数据反序列化器
      */
-    private SwordDeserializer<SwordData> swordDeserializer;
+    private ObjectDeserializer<SwordData> swordDeserializer;
 
     static {
         FILE_SEPARATOR = System.getProperty("file.separator");
@@ -41,7 +41,7 @@ public class BitcaskSequentialFileSystem implements BitcaskFileSystem<SwordData>
         MAX_FILE_SIZE = 100 * 1024 * 1000;
     }
 
-    public BitcaskSequentialFileSystem(String rootDirectory, SwordSerializer<SwordData> swordSerializer, SwordDeserializer<SwordData> swordDeserializer) {
+    public BitcaskSequentialFileSystem(String rootDirectory, ObjectSerializer<SwordData> swordSerializer, ObjectDeserializer<SwordData> swordDeserializer) {
         this.rootDirectory = rootDirectory;
         this.swordSerializer = swordSerializer;
         this.swordDeserializer = swordDeserializer;

@@ -1,9 +1,6 @@
 package com.zq.sword.array.redis.writer;
 
 
-import com.zq.sword.array.data.SwordData;
-import com.zq.sword.array.data.lqueue.LeftOrderlyQueue;
-
 /**
  * @program: sword-array
  * @description: rdis 命令写入器

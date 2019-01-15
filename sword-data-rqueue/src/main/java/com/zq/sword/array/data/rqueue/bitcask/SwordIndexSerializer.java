@@ -1,7 +1,7 @@
 package com.zq.sword.array.data.rqueue.bitcask;
 
 import com.zq.sword.array.common.utils.JsonUtil;
-import com.zq.sword.array.data.SwordSerializer;
+import com.zq.sword.array.data.ObjectSerializer;
 
 import java.io.UnsupportedEncodingException;
 
@@ -11,7 +11,7 @@ import java.io.UnsupportedEncodingException;
  * @author: zhouqi1
  * @create: 2018-10-17 15:06
  **/
-public class SwordIndexSerializer implements SwordSerializer<SwordIndex> {
+public class SwordIndexSerializer implements ObjectSerializer<SwordIndex> {
 
     @Override
     public byte[] serialize(SwordIndex swordIndex) {

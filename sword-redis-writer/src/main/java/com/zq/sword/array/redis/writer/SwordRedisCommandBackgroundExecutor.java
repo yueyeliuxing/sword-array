@@ -1,6 +1,6 @@
 package com.zq.sword.array.redis.writer;
 
-import com.zq.sword.array.common.task.AbstractTaskExecutor;
+import com.zq.sword.array.common.task.SingleTaskExecutor;
 
 /**
  * @program: sword-array
@@ -8,6 +8,6 @@ import com.zq.sword.array.common.task.AbstractTaskExecutor;
  * @author: zhouqi1
  * @create: 2018-10-17 16:17
  **/
-public class SwordRedisCommandBackgroundExecutor extends AbstractTaskExecutor {
+public class SwordRedisCommandBackgroundExecutor extends SingleTaskExecutor {
 
 }

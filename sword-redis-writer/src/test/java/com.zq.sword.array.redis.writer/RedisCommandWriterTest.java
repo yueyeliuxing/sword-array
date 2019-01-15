@@ -1,12 +1,10 @@
 package com.zq.sword.array.redis.writer;
 
 import com.zq.sword.array.data.SwordData;
-import com.zq.sword.array.data.lqueue.LeftOrderlyQueue;
-import com.zq.sword.array.data.lqueue.bitcask.BitcaskLeftOrderlyQueue;
+import com.zq.sword.array.data.queue.DataQueue;
+import com.zq.sword.array.data.queue.StoredWrapDataQueue;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class RedisCommandWriterTest {
 
@@ -14,7 +12,7 @@ public class RedisCommandWriterTest {
 
     @Before
     public void setUp() throws Exception {
-        LeftOrderlyQueue<SwordData> leftOrderlyQueue = new BitcaskLeftOrderlyQueue("E:\\sword\\left\\data");
+        DataQueue<SwordData> leftOrderlyQueue = new StoredWrapDataQueue("E:\\sword\\left\\data");
         redisCommandWriter = SwordRedisCommandWriter.SwordRedisCommandWriterBuilder.create()
                 .config(getRedisConfig())
                 .bindingDataSource(leftOrderlyQueue)

@@ -2,8 +2,8 @@ package com.zq.sword.array.data.rqueue.bitcask;
 
 import com.zq.sword.array.data.SwordDataDeserializer;
 import com.zq.sword.array.data.SwordDataSerializer;
-import com.zq.sword.array.data.SwordDeserializer;
-import com.zq.sword.array.data.SwordSerializer;
+import com.zq.sword.array.data.ObjectDeserializer;
+import com.zq.sword.array.data.ObjectSerializer;
 import lombok.Data;
 import lombok.ToString;
 
@@ -47,7 +47,7 @@ public class BitcaskConfig {
         }
 
 
-        public BitcaskConfigBuilder setSwordDataSerializer(SwordSerializer swordDataSerializer){
+        public BitcaskConfigBuilder setSwordDataSerializer(ObjectSerializer swordDataSerializer){
             bitcaskConfig.setSwordDataSerializer(swordDataSerializer);
             return this;
         }
@@ -57,7 +57,7 @@ public class BitcaskConfig {
             return this;
         }
 
-        public BitcaskConfigBuilder setSwordDataDeserializer(SwordDeserializer swordDataDeserializer){
+        public BitcaskConfigBuilder setSwordDataDeserializer(ObjectDeserializer swordDataDeserializer){
             bitcaskConfig.setSwordDataDeserializer(swordDataDeserializer);
             return this;
         }
@@ -80,10 +80,10 @@ public class BitcaskConfig {
     /**
      * 数据反序列化
      */
-    private SwordDeserializer swordDataDeserializer;
+    private ObjectDeserializer swordDataDeserializer;
 
     /**
      * 数据序列化
      */
-    private SwordSerializer swordDataSerializer;
+    private ObjectSerializer swordDataSerializer;
 }

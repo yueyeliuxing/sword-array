@@ -2,15 +2,13 @@ package com.zq.sword.array.transfer.backup.provider;
 
 import com.zq.sword.array.common.event.DataEventType;
 import com.zq.sword.array.data.SwordData;
-import com.zq.sword.array.data.lqueue.LeftOrderlyQueue;
+import com.zq.sword.array.data.queue.DataQueue;
 import com.zq.sword.array.data.rqueue.RightRandomQueue;
 import com.zq.sword.array.transfer.handler.TransferHandler;
 import com.zq.sword.array.transfer.message.Header;
 import com.zq.sword.array.transfer.message.MessageType;
 import com.zq.sword.array.transfer.message.TransferMessage;
 import io.netty.channel.ChannelHandlerContext;
-
-import java.util.List;
 
 /**
  * @program: sword-array
@@ -23,14 +21,14 @@ public class ProvideSwordDataTransferBackupHandler extends TransferHandler {
     private DataModify dataModify;
 
     private RightRandomQueue<SwordData> rightRandomQueue;
-    private LeftOrderlyQueue<SwordData> leftOrderlyQueue;
+    private DataQueue<SwordData> leftOrderlyQueue;
 
-    public ProvideSwordDataTransferBackupHandler(RightRandomQueue<SwordData> rightRandomQueue, LeftOrderlyQueue<SwordData> leftOrderlyQueue) {
+    public ProvideSwordDataTransferBackupHandler(RightRandomQueue<SwordData> rightRandomQueue, DataQueue<SwordData> leftOrderlyQueue) {
         this.rightRandomQueue = rightRandomQueue;
         this.leftOrderlyQueue = leftOrderlyQueue;
     }
 
-    private void initDataModify(RightRandomQueue<SwordData> rightRandomQueue, LeftOrderlyQueue<SwordData> leftOrderlyQueue){
+    private void initDataModify(RightRandomQueue<SwordData> rightRandomQueue, DataQueue<SwordData> leftOrderlyQueue){
         this.dataModify = new DataModify();
         rightRandomQueue.registerSwordDataListener((event)->{
             if(event.getType().equals(DataEventType.SWORD_DATA_ADD)){
