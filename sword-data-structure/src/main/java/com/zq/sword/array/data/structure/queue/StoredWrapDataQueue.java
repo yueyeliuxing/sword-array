@@ -3,7 +3,7 @@ package com.zq.sword.array.data.structure.queue;
 import com.zq.sword.array.common.event.DataEventListener;
 import com.zq.sword.array.data.ObjectDeserializer;
 import com.zq.sword.array.data.ObjectSerializer;
-import com.zq.sword.array.stream.io.ResourceStore;
+import com.zq.sword.array.stream.io.Resource;
 import com.zq.sword.array.stream.io.ex.InputStreamOpenException;
 import com.zq.sword.array.stream.io.ex.OutputStreamOpenException;
 import com.zq.sword.array.stream.io.object.ObjectResourceInputStream;
@@ -42,7 +42,7 @@ public class StoredWrapDataQueue<T> extends AbstractQueue<T> implements DataQueu
     /**
      * 资源存储器
      */
-    private ResourceStore resourceStore;
+    private Resource resourceStore;
 
     /**
      * 对象序列化器
@@ -57,11 +57,11 @@ public class StoredWrapDataQueue<T> extends AbstractQueue<T> implements DataQueu
     private static final int ADD_TYPE = 1;
     private static final int DEL_TYPE = 2;
 
-    public StoredWrapDataQueue(ResourceStore resourceStore, ObjectSerializer objectSerializer, ObjectDeserializer objectDeserializer){
+    public StoredWrapDataQueue(Resource resourceStore, ObjectSerializer objectSerializer, ObjectDeserializer objectDeserializer){
         this(new PrimitiveDataQueue<>(), resourceStore, objectSerializer, objectDeserializer);
     }
 
-    public StoredWrapDataQueue(AbstractDataQueue<T> queue, ResourceStore resourceStore, ObjectSerializer objectSerializer, ObjectDeserializer objectDeserializer){
+    public StoredWrapDataQueue(AbstractDataQueue<T> queue, Resource resourceStore, ObjectSerializer objectSerializer, ObjectDeserializer objectDeserializer){
         logger.info("BitcaskLeftOrderlyQueue init...");
         this.queue = queue;
         state(QueueState.NEW);
@@ -268,12 +268,12 @@ public class StoredWrapDataQueue<T> extends AbstractQueue<T> implements DataQueu
      * @author: zhouqi1
      * @create: 2019-01-14 10:58
      **/
-    private static class ObjectResourceStore implements ResourceStore{
+    private static class ObjectResourceStore implements Resource {
 
         /**
          * 实际的资源存储器
          */
-        private ResourceStore resourceStore;
+        private Resource resourceStore;
 
         /**
          * 对象序列化器
@@ -285,7 +285,7 @@ public class StoredWrapDataQueue<T> extends AbstractQueue<T> implements DataQueu
          */
         private ObjectDeserializer objectDeserializer;
 
-        public ObjectResourceStore(ResourceStore resourceStore, ObjectSerializer objectSerializer, ObjectDeserializer objectDeserializer) {
+        public ObjectResourceStore(Resource resourceStore, ObjectSerializer objectSerializer, ObjectDeserializer objectDeserializer) {
             this.resourceStore = resourceStore;
             this.objectSerializer = objectSerializer;
             this.objectDeserializer = objectDeserializer;

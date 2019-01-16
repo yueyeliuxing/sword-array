@@ -5,7 +5,7 @@ import com.zq.sword.array.stream.io.ResourceInputStream;
 import com.zq.sword.array.stream.io.ResourceOutputStream;
 import com.zq.sword.array.stream.io.ex.InputStreamOpenException;
 import com.zq.sword.array.stream.io.ex.OutputStreamOpenException;
-import com.zq.sword.array.stream.io.ResourceStore;
+import com.zq.sword.array.stream.io.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,17 +18,17 @@ import java.io.IOException;
  * @author: zhouqi1
  * @create: 2019-01-14 11:12
  **/
-public class FileSystemResourceStore implements ResourceStore {
+public class FileResource implements Resource {
 
-    private Logger logger = LoggerFactory.getLogger(FileSystemResourceStore.class);
+    private Logger logger = LoggerFactory.getLogger(FileResource.class);
 
     private File file;
 
-    public FileSystemResourceStore(File file) {
+    public FileResource(File file) {
         this.file = file;
     }
 
-    public FileSystemResourceStore(String filePath) {
+    public FileResource(String filePath) {
         this(filePath == null ? null : new File(filePath));
     }
 

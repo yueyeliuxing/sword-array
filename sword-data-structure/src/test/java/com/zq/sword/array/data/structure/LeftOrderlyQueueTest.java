@@ -6,7 +6,7 @@ import com.zq.sword.array.data.SwordDataDeserializer;
 import com.zq.sword.array.data.SwordDataSerializer;
 import com.zq.sword.array.data.structure.queue.DataQueue;
 import com.zq.sword.array.data.structure.queue.StoredWrapDataQueue;
-import com.zq.sword.array.stream.io.file.FileSystemResourceStore;
+import com.zq.sword.array.stream.io.file.FileResource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +21,7 @@ public class LeftOrderlyQueueTest {
 
     @Before
     public void setUp() throws Exception {
-        leftOrderlyQueue = new StoredWrapDataQueue(new FileSystemResourceStore("E:\\sword\\left\\data\\sequence.data"), new SwordDataSerializer(), new SwordDataDeserializer());
+        leftOrderlyQueue = new StoredWrapDataQueue(new FileResource("E:\\sword\\left\\data\\sequence.data"), new SwordDataSerializer(), new SwordDataDeserializer());
     }
 
     @After

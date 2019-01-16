@@ -9,7 +9,7 @@ import com.zq.sword.array.stream.io.ex.OutputStreamOpenException;
  * @author: zhouqi1
  * @create: 2019-01-14 10:20
  **/
-public interface ResourceStore {
+public interface Resource {
 
     /**
      * 得到输入流
