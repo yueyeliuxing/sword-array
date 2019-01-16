@@ -23,4 +23,9 @@ public interface Resource {
      */
     ResourceOutputStream openOutputStream() throws OutputStreamOpenException;
 
+    /**
+     * 资源重置
+     */
+    void reset();
+
 }

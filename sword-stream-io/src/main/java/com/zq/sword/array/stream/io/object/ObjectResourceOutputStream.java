@@ -32,11 +32,6 @@ public class ObjectResourceOutputStream implements ResourceOutputStream, ObjectO
     }
 
     @Override
-    public void clearStream() throws IOException {
-        this.outputStream.clearStream();
-    }
-
-    @Override
     public void skip(long offset) throws IOException {
         this.outputStream.skip(offset);
     }

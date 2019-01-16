@@ -20,5 +20,5 @@ public interface ObjectInputStream {
      * 读出数据
      * @param objs
      */
-    void read(Object[] objs) throws IOException;
+    void readObject(Object[] objs) throws IOException;
 }

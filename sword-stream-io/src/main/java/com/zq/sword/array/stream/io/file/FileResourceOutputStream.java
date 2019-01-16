@@ -43,13 +43,6 @@ public class FileResourceOutputStream implements ResourceOutputStream {
     }
 
     @Override
-    public void clearStream() throws IOException {
-        file.close();
-        targetFile.delete();
-        openStream(targetFile);
-    }
-
-    @Override
     public void skip(long offset) throws IOException {
         file.seek(offset);
     }

@@ -44,6 +44,11 @@ public class FileResourceInputStream implements ResourceInputStream {
     }
 
     @Override
+    public long offset() throws IOException {
+        return file.getFilePointer();
+    }
+
+    @Override
     public int readInt() throws IOException {
         return file.readInt();
     }

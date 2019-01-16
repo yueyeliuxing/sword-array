@@ -1,6 +1,5 @@
 package com.zq.sword.array.stream.io.file;
 
-import com.zq.sword.array.io.*;
 import com.zq.sword.array.stream.io.ResourceInputStream;
 import com.zq.sword.array.stream.io.ResourceOutputStream;
 import com.zq.sword.array.stream.io.ex.InputStreamOpenException;
@@ -48,5 +47,10 @@ public class FileResource implements Resource {
         } catch (IOException e) {
             throw new OutputStreamOpenException(e.getMessage());
         }
+    }
+
+    @Override
+    public void reset() {
+        file.delete();
     }
 }

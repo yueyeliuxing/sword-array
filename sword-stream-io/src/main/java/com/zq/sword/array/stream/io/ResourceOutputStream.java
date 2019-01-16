@@ -12,12 +12,6 @@ import java.io.IOException;
 public interface ResourceOutputStream extends Closeable {
 
     /**
-     * 清空流
-     * @throws IOException
-     */
-    void clearStream() throws IOException;
-
-    /**
      * 跳转到指定索引处
      * @param offset
      */

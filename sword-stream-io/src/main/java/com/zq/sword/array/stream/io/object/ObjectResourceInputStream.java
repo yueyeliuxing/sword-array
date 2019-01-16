@@ -46,6 +46,11 @@ public class ObjectResourceInputStream implements ResourceInputStream, ObjectInp
     }
 
     @Override
+    public long offset() throws IOException {
+        return inputStream.offset();
+    }
+
+    @Override
     public int readInt() throws IOException {
         return inputStream.readInt();
     }
@@ -78,12 +83,12 @@ public class ObjectResourceInputStream implements ResourceInputStream, ObjectInp
     @Override
     public Object readObject() throws IOException {
         Object[] objs = new Object[1];
-        read(objs);
+        readObject(objs);
         return objs[0];
     }
 
     @Override
-    public void read(Object[] objs) throws IOException{
+    public void readObject(Object[] objs) throws IOException{
         int n = 0, num = objs.length;
         while (num >0 && n < num){
             //分隔符为空 默认是长度分隔
@@ -128,4 +133,6 @@ public class ObjectResourceInputStream implements ResourceInputStream, ObjectInp
             }
         }
     }
+
+
 }

@@ -18,6 +18,12 @@ public interface ResourceInputStream extends Closeable {
     void skip(long offset) throws IOException;
 
     /**
+     * 当前偏移量
+     * @return
+     */
+    long offset() throws IOException;
+
+    /**
      * 读int
      * @return
      */

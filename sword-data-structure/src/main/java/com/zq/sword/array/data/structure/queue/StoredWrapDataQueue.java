@@ -6,6 +6,7 @@ import com.zq.sword.array.data.ObjectSerializer;
 import com.zq.sword.array.stream.io.Resource;
 import com.zq.sword.array.stream.io.ex.InputStreamOpenException;
 import com.zq.sword.array.stream.io.ex.OutputStreamOpenException;
+import com.zq.sword.array.stream.io.object.ObjectResource;
 import com.zq.sword.array.stream.io.object.ObjectResourceInputStream;
 import com.zq.sword.array.stream.io.object.ObjectResourceOutputStream;
 import com.zq.sword.array.tasks.SingleTaskExecutor;
@@ -42,32 +43,20 @@ public class StoredWrapDataQueue<T> extends AbstractQueue<T> implements DataQueu
     /**
      * 资源存储器
      */
-    private Resource resourceStore;
-
-    /**
-     * 对象序列化器
-     */
-    private ObjectSerializer objectSerializer;
-
-    /**
-     * 对象反序列化器
-     */
-    private ObjectDeserializer objectDeserializer;
+    private ObjectResource resource;
 
     private static final int ADD_TYPE = 1;
     private static final int DEL_TYPE = 2;
 
-    public StoredWrapDataQueue(Resource resourceStore, ObjectSerializer objectSerializer, ObjectDeserializer objectDeserializer){
-        this(new PrimitiveDataQueue<>(), resourceStore, objectSerializer, objectDeserializer);
+    public StoredWrapDataQueue(Resource resource, ObjectSerializer objectSerializer, ObjectDeserializer objectDeserializer){
+        this(new PrimitiveDataQueue<>(), new ObjectResource(resource, objectSerializer, objectDeserializer));
     }
 
-    public StoredWrapDataQueue(AbstractDataQueue<T> queue, Resource resourceStore, ObjectSerializer objectSerializer, ObjectDeserializer objectDeserializer){
+    public StoredWrapDataQueue(AbstractDataQueue<T> queue, ObjectResource objectResource){
         logger.info("BitcaskLeftOrderlyQueue init...");
         this.queue = queue;
         state(QueueState.NEW);
-        this.resourceStore = resourceStore;
-        this.objectSerializer = objectSerializer;
-        this.objectDeserializer = objectDeserializer;
+        this.resource = objectResource;
         this.taskExecutor = new SingleTaskExecutor();
 
         /**
@@ -106,11 +95,11 @@ public class StoredWrapDataQueue<T> extends AbstractQueue<T> implements DataQueu
             queue.state(QueueState.STOP);
 
             List<T> objectData = readAllObjectData();
-            ObjectResourceStore objectResourceStore = new ObjectResourceStore(this.resourceStore, objectSerializer, objectDeserializer);
+            ObjectResource objectResource = this.resource;
+            objectResource.reset();
             ObjectResourceOutputStream resourceOutputStream = null;
             try {
-                resourceOutputStream = objectResourceStore.openOutputStream();
-                resourceOutputStream.clearStream();
+                resourceOutputStream = objectResource.openOutputStream();
                 if(objectData != null && !objectData.isEmpty()){
                     for(T t : objectData){
                         resourceOutputStream.writeInt(ADD_TYPE);
@@ -137,7 +126,7 @@ public class StoredWrapDataQueue<T> extends AbstractQueue<T> implements DataQueu
      */
     private List<T> readAllObjectData() {
         List<T> objectData = new LinkedList<>();
-        ObjectResourceStore objectResourceStore = new ObjectResourceStore(this.resourceStore, objectSerializer, objectDeserializer);
+        ObjectResource objectResourceStore = this.resource;
         ObjectResourceInputStream resourceInputStream = null;
         try {
             resourceInputStream = objectResourceStore.openInputStream();
@@ -180,7 +169,7 @@ public class StoredWrapDataQueue<T> extends AbstractQueue<T> implements DataQueu
 
 
     private void writeResourceStore(T t, int type) {
-        ObjectResourceStore objectResourceStore = new ObjectResourceStore(this.resourceStore, objectSerializer, objectDeserializer);
+        ObjectResource objectResourceStore = this.resource;
         ObjectResourceOutputStream resourceOutputStream = null;
         try {
             resourceOutputStream = objectResourceStore.openOutputStream();
@@ -259,48 +248,6 @@ public class StoredWrapDataQueue<T> extends AbstractQueue<T> implements DataQueu
 
     public void state(QueueState state) {
         queue.state(state);
-    }
-
-
-    /**
-     * @program: sword-array
-     * @description: bitcask存储
-     * @author: zhouqi1
-     * @create: 2019-01-14 10:58
-     **/
-    private static class ObjectResourceStore implements Resource {
-
-        /**
-         * 实际的资源存储器
-         */
-        private Resource resourceStore;
-
-        /**
-         * 对象序列化器
-         */
-        private ObjectSerializer objectSerializer;
-
-        /**
-         * 对象反序列化器
-         */
-        private ObjectDeserializer objectDeserializer;
-
-        public ObjectResourceStore(Resource resourceStore, ObjectSerializer objectSerializer, ObjectDeserializer objectDeserializer) {
-            this.resourceStore = resourceStore;
-            this.objectSerializer = objectSerializer;
-            this.objectDeserializer = objectDeserializer;
-        }
-
-        @Override
-        public ObjectResourceInputStream openInputStream() throws InputStreamOpenException {
-            return new ObjectResourceInputStream(resourceStore.openInputStream(), objectDeserializer);
-        }
-
-        @Override
-        public ObjectResourceOutputStream openOutputStream() throws OutputStreamOpenException {
-            return new ObjectResourceOutputStream(resourceStore.openOutputStream(), objectSerializer);
-        }
-
     }
 
 }
