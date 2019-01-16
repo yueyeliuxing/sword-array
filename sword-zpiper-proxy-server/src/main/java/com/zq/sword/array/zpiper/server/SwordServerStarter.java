@@ -2,8 +2,8 @@ package com.zq.sword.array.zpiper.server;
 
 import com.google.common.collect.Lists;
 import com.zq.sword.array.common.utils.IPUtil;
-import com.zq.sword.array.data.swdmq.RightRandomQueue;
-import com.zq.sword.array.data.swdmq.bitcask.BitcaskRightRandomQueue;
+import com.zq.sword.array.mq.jade.RightRandomQueue;
+import com.zq.sword.array.mq.jade.bitcask.BitcaskRightRandomQueue;
 import com.zq.sword.array.metadata.ConfigManager;
 import com.zq.sword.array.metadata.DataConsumerServiceCoordinator;
 import com.zq.sword.array.metadata.MasterSlaveServiceCoordinator;

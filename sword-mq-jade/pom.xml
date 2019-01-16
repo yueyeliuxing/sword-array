@@ -44,35 +44,36 @@
 		<relativePath>../</relativePath>
 	</parent>
 
-	<artifactId>sword-transfer-backup-provider</artifactId>
+	<artifactId>sword-mq-jade</artifactId>
 	<packaging>jar</packaging>
-	<name>sword-transfer-backup-provider</name>
+	<name>sword-mq-jade</name>
 
 
 	<dependencies>
+
 		<dependency>
 			<groupId>com.zq.sword</groupId>
 			<artifactId>sword-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>com.zq.sword</groupId>
-			<artifactId>sword-data-structure</artifactId>
+			<artifactId>sword-data</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>com.zq.sword</groupId>
-			<artifactId>sword-mq-jade</artifactId>
+			<artifactId>sword-data-bridge</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>RELEASE</version>
+			<scope>provided</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>com.zq.sword</groupId>
-			<artifactId>sword-transfer</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+
 	</dependencies>
 
 </project>

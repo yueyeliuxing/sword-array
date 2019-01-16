@@ -26,7 +26,7 @@
 		<module>sword-stream-io</module>
 		<module>sword-data-bridge</module>
 		<module>sword-data-structure</module>
-		<module>sword-data-swdmq</module>
+		<module>sword-mq-jade</module>
 		<module>sword-redis-writer</module>
 		<module>sword-redis-replicator</module>
         <module>sword-network-rpc</module>

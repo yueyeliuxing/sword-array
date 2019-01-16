@@ -70,7 +70,7 @@
 
 		<dependency>
 			<groupId>com.zq.sword</groupId>
-			<artifactId>sword-data-swdmq</artifactId>
+			<artifactId>sword-mq-jade</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

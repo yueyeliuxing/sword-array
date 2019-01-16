@@ -2,8 +2,8 @@ package com.zq.sword.array.redis.replicator;
 
 
 import com.zq.sword.array.data.SwordData;
-import com.zq.sword.array.data.swdmq.RightRandomQueue;
-import com.zq.sword.array.data.swdmq.bitcask.BitcaskRightRandomQueue;
+import com.zq.sword.array.mq.jade.RightRandomQueue;
+import com.zq.sword.array.mq.jade.bitcask.BitcaskRightRandomQueue;
 import org.junit.Test;
 
 public class SlaveRedisReplicatorTest {
