@@ -11,7 +11,7 @@ import lombok.ToString;
  **/
 @Data
 @ToString
-public class SwdMsg {
+public class Message {
 
     /**
      * 消息ID

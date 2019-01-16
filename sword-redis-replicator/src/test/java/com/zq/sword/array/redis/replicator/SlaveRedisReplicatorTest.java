@@ -2,7 +2,6 @@ package com.zq.sword.array.redis.replicator;
 
 
 import com.zq.sword.array.data.SwordData;
-import com.zq.sword.array.mq.jade.RightRandomQueue;
 import com.zq.sword.array.mq.jade.bitcask.BitcaskRightRandomQueue;
 import org.junit.Test;
 

@@ -10,10 +10,10 @@ import java.nio.ByteBuffer;
  * @author: zhouqi1
  * @create: 2018-10-17 15:06
  **/
-public class SwdMsgSerializer implements ObjectSerializer<SwdMsg> {
+public class MessageSerializer implements ObjectSerializer<Message> {
 
     @Override
-    public byte[] serialize(SwdMsg swdMsg) {
+    public byte[] serialize(Message swdMsg) {
 
         long msgId = swdMsg.getMsgId();
         String topic = swdMsg.getTopic();

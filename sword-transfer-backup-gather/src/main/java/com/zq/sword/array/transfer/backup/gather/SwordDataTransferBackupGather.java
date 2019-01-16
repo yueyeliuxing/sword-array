@@ -2,7 +2,6 @@ package com.zq.sword.array.transfer.backup.gather;
 
 import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.structure.queue.DataQueue;
-import com.zq.sword.array.mq.jade.RightRandomQueue;
 import com.zq.sword.array.transfer.client.DefaultTransferClient;
 import com.zq.sword.array.transfer.client.TransferClient;
 

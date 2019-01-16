@@ -11,11 +11,11 @@ import java.nio.ByteBuffer;
  * @author: zhouqi1
  * @create: 2018-10-17 15:06
  **/
-public class SwdMsgDeserializer implements ObjectDeserializer<SwdMsg> {
+public class MessageDeserializer implements ObjectDeserializer<Message> {
 
     @Override
-    public SwdMsg deserialize(byte[] data) {
-        SwdMsg swdMsg = new SwdMsg();
+    public Message deserialize(byte[] data) {
+        Message swdMsg = new Message();
         ByteBuffer byteBuffer = ByteBuffer.wrap(data);
         Long id = byteBuffer.getLong();
         swdMsg.setMsgId(id == 0 ? null : id);

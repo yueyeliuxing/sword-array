@@ -2,7 +2,6 @@ package com.zq.sword.array.data.swdmq;
 
 import com.zq.sword.array.data.SwordCommand;
 import com.zq.sword.array.data.SwordData;
-import com.zq.sword.array.mq.jade.RightRandomQueue;
 import com.zq.sword.array.mq.jade.bitcask.BitcaskRightRandomQueue;
 import org.junit.After;
 import org.junit.Before;
