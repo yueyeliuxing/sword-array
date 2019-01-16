@@ -58,7 +58,7 @@
 
 		<dependency>
 			<groupId>com.zq.sword</groupId>
-			<artifactId>sword-data-queue</artifactId>
+			<artifactId>sword-data-structure</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

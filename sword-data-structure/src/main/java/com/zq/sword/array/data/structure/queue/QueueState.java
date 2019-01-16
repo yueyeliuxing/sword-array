@@ -1,4 +1,4 @@
-package com.zq.sword.array.data.queue;
+package com.zq.sword.array.data.structure.queue;
 
 /**
  * @program: sword-array

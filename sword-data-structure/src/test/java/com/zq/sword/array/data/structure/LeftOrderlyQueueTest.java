@@ -1,9 +1,11 @@
-package com.zq.sword.array.data.queue;
+package com.zq.sword.array.data.structure;
 
 import com.zq.sword.array.data.SwordCommand;
 import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.SwordDataDeserializer;
 import com.zq.sword.array.data.SwordDataSerializer;
+import com.zq.sword.array.data.structure.queue.DataQueue;
+import com.zq.sword.array.data.structure.queue.StoredWrapDataQueue;
 import com.zq.sword.array.stream.io.file.FileSystemResourceStore;
 import org.junit.After;
 import org.junit.Before;

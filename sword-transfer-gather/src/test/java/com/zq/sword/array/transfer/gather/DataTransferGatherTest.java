@@ -2,8 +2,8 @@ package com.zq.sword.array.transfer.gather;
 
 import com.zq.sword.array.common.utils.IPUtil;
 import com.zq.sword.array.data.SwordData;
-import com.zq.sword.array.data.queue.DataQueue;
-import com.zq.sword.array.data.queue.StoredWrapDataQueue;
+import com.zq.sword.array.data.structure.queue.DataQueue;
+import com.zq.sword.array.data.structure.queue.StoredWrapDataQueue;
 import org.junit.Before;
 import org.junit.Test;
 

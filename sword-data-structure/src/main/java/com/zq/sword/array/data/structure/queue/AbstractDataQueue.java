@@ -1,4 +1,4 @@
-package com.zq.sword.array.data.queue;
+package com.zq.sword.array.data.structure.queue;
 
 import com.zq.sword.array.common.event.DataEvent;
 import com.zq.sword.array.common.event.DataEventListener;
@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.AbstractQueue;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Queue;
 
 /**
