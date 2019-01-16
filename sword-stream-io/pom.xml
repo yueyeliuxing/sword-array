@@ -44,9 +44,9 @@
 		<relativePath>../</relativePath>
 	</parent>
 
-	<artifactId>sword-data-io</artifactId>
+	<artifactId>sword-stream-io</artifactId>
 	<packaging>jar</packaging>
-	<name>sword-data-io</name>
+	<name>sword-stream-io</name>
 
 	<properties>
 		<slf4j.version>1.7.12</slf4j.version>

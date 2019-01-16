@@ -1,7 +1,7 @@
-package com.zq.sword.array.io;
+package com.zq.sword.array.stream.io;
 
-import com.zq.sword.array.io.ex.InputStreamOpenException;
-import com.zq.sword.array.io.ex.OutputStreamOpenException;
+import com.zq.sword.array.stream.io.ex.InputStreamOpenException;
+import com.zq.sword.array.stream.io.ex.OutputStreamOpenException;
 
 /**
  * @program: sword-array

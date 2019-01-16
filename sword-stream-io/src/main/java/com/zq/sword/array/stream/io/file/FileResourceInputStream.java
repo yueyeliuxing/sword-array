@@ -1,6 +1,6 @@
-package com.zq.sword.array.io.file;
+package com.zq.sword.array.stream.io.file;
 
-import com.zq.sword.array.io.ResourceInputStream;
+import com.zq.sword.array.stream.io.ResourceInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

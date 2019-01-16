@@ -1,4 +1,4 @@
-package com.zq.sword.array.io.ex;
+package com.zq.sword.array.stream.io.ex;
 
 /**
  * @program: sword-array

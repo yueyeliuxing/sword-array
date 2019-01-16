@@ -67,7 +67,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.zq.sword</groupId>
-			<artifactId>sword-data-io</artifactId>
+			<artifactId>sword-stream-io</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

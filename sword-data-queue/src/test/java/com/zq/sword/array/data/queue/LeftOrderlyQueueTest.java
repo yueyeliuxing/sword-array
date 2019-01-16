@@ -4,7 +4,7 @@ import com.zq.sword.array.data.SwordCommand;
 import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.SwordDataDeserializer;
 import com.zq.sword.array.data.SwordDataSerializer;
-import com.zq.sword.array.io.file.FileSystemResourceStore;
+import com.zq.sword.array.stream.io.file.FileSystemResourceStore;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

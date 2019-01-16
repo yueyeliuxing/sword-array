@@ -1,6 +1,6 @@
-package com.zq.sword.array.io.file;
+package com.zq.sword.array.stream.io.file;
 
-import com.zq.sword.array.io.ResourceOutputStream;
+import com.zq.sword.array.stream.io.ResourceOutputStream;
 
 import java.io.File;
 import java.io.FileNotFoundException;

@@ -23,7 +23,7 @@
 		<module>sword-redis</module>
 		<module>sword-metadata</module>
 		<module>sword-data</module>
-		<module>sword-data-io</module>
+		<module>sword-stream-io</module>
 		<module>sword-data-bridge</module>
 		<module>sword-data-queue</module>
 		<module>sword-data-swdmq</module>

@@ -1,8 +1,11 @@
-package com.zq.sword.array.io.file;
+package com.zq.sword.array.stream.io.file;
 
 import com.zq.sword.array.io.*;
-import com.zq.sword.array.io.ex.InputStreamOpenException;
-import com.zq.sword.array.io.ex.OutputStreamOpenException;
+import com.zq.sword.array.stream.io.ResourceInputStream;
+import com.zq.sword.array.stream.io.ResourceOutputStream;
+import com.zq.sword.array.stream.io.ex.InputStreamOpenException;
+import com.zq.sword.array.stream.io.ex.OutputStreamOpenException;
+import com.zq.sword.array.stream.io.ResourceStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
