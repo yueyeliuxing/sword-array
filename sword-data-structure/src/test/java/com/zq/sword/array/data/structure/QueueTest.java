@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.Queue;
 
 
-public class LeftOrderlyQueueTest {
+public class QueueTest {
 
     private ResourceQueue<SwordData> leftOrderlyQueue;
 
