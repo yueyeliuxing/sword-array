@@ -2,8 +2,6 @@ package com.zq.sword.array.mq.jade.broker;
 
 import com.zq.sword.array.network.rpc.server.RpcServer;
 
-import java.util.List;
-
 /**
  * @program: sword-array
  * @description: 管理消息分片的容器
@@ -26,13 +24,5 @@ public interface Broker extends RpcServer, Container {
      * @return
      */
     Partition newPartition(String topic, long partId);
-
-    /**
-     * 得到指定topic下的分片
-     * @param topic
-     * @return
-     */
-    List<Partition> getPartition(String topic);
-
 
 }
