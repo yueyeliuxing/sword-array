@@ -1,5 +1,7 @@
 package com.zq.sword.array.stream.io.object;
 
+import com.zq.sword.array.stream.io.ResourceInputStream;
+
 import java.io.IOException;
 
 /**
@@ -8,7 +10,7 @@ import java.io.IOException;
  * @author: zhouqi1
  * @create: 2019-01-14 11:42
  **/
-public interface ObjectInputStream {
+public interface ObjectInputStream extends ResourceInputStream {
 
     /**
      * 读出数据

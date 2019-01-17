@@ -1,9 +1,9 @@
 package com.zq.sword.array.transfer;
 
-import com.zq.sword.array.network.rpc.client.DefaultTransferClient;
-import com.zq.sword.array.network.rpc.client.TransferClient;
-import com.zq.sword.array.network.rpc.server.DefaultTransferServer;
-import com.zq.sword.array.network.rpc.server.TransferServer;
+import com.zq.sword.array.network.rpc.client.NettyRpcClient;
+import com.zq.sword.array.network.rpc.client.RpcClient;
+import com.zq.sword.array.network.rpc.server.NettyRpcServer;
+import com.zq.sword.array.network.rpc.server.RpcServer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -26,13 +26,13 @@ public class NettyTest {
     @Test
     public void testServer(){
         Executors.newSingleThreadExecutor();
-        TransferServer transferServer = new DefaultTransferServer(8975);
+        RpcServer transferServer = new NettyRpcServer(8975);
         transferServer.start();
     }
 
     @Test
     public void testClient()throws Exception{
-        TransferClient transferClient = new DefaultTransferClient("127.0.0.1", 8975);
+        RpcClient transferClient = new NettyRpcClient("127.0.0.1", 8975);
         transferClient.connect();
         System.in.read();
     }

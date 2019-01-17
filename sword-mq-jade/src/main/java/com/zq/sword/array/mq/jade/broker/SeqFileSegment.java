@@ -8,6 +8,8 @@ import com.zq.sword.array.stream.io.ex.OutputStreamOpenException;
 import com.zq.sword.array.stream.io.file.FileResource;
 import com.zq.sword.array.stream.io.file.FileResourceInputStream;
 import com.zq.sword.array.stream.io.file.FileResourceOutputStream;
+import com.zq.sword.array.stream.io.object.ObjectInputStream;
+import com.zq.sword.array.stream.io.object.ObjectOutputStream;
 import com.zq.sword.array.stream.io.object.ObjectResourceInputStream;
 import com.zq.sword.array.stream.io.object.ObjectResourceOutputStream;
 import org.slf4j.Logger;
@@ -151,7 +153,7 @@ public class SeqFileSegment implements Segment {
     }
 
     @Override
-    public SegmentInputStream openInputStream() throws InputStreamOpenException {
+    public ObjectInputStream openInputStream() throws InputStreamOpenException {
         try {
             return new SegmentInputStream(this);
         } catch (IOException e) {
@@ -160,7 +162,7 @@ public class SeqFileSegment implements Segment {
     }
 
     @Override
-    public SegmentOutputStream openOutputStream() throws OutputStreamOpenException {
+    public ObjectOutputStream openOutputStream() throws OutputStreamOpenException {
         try {
             return new SegmentOutputStream(this);
         } catch (IOException e) {
@@ -186,7 +188,7 @@ public class SeqFileSegment implements Segment {
     /**
      * 消息输入流
      */
-    public static class SegmentInputStream extends ObjectResourceInputStream {
+    private class SegmentInputStream extends ObjectResourceInputStream {
 
         private SeqFileSegment segment;
 
@@ -195,25 +197,20 @@ public class SeqFileSegment implements Segment {
             this.segment = segment;
         }
 
-        /**
-         * 通过消息ID定位
-         * @param msgId
-         * @throws IOException
-         */
-        public boolean location(long msgId) throws IOException {
+        @Override
+        public void skip(long msgId) throws IOException {
             Long offset = segment.findOffset(msgId);
             if(offset == null){
-                return false;
+                throw new IllegalArgumentException(String.format("msgId:%s is not find in segment", msgId));
             }
-            skip(offset);
-            return true;
+            super.skip(offset);
         }
     }
 
     /**
      * 消息输出流
      */
-    public static class SegmentOutputStream extends ObjectResourceOutputStream {
+    private class SegmentOutputStream extends ObjectResourceOutputStream {
 
         public SegmentOutputStream(SeqFileSegment segment) throws IOException {
             super(new FileResourceOutputStream(segment.segmentFile), new MessageSerializer());

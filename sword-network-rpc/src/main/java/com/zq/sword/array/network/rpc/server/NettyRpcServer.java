@@ -27,9 +27,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author: zhouqi1
  * @create: 2018-07-02 19:42
  **/
-public class DefaultTransferServer implements TransferServer {
+public class NettyRpcServer implements RpcServer {
 
-    private Logger logger = LoggerFactory.getLogger(DefaultTransferServer.class);
+    private Logger logger = LoggerFactory.getLogger(NettyRpcServer.class);
 
     private int port;
 
@@ -39,13 +39,13 @@ public class DefaultTransferServer implements TransferServer {
 
     private volatile boolean started = false;
 
-    public DefaultTransferServer(int port) {
+    public NettyRpcServer(int port) {
         this.port = port;
         transferHandlers = new CopyOnWriteArrayList<>();
     }
 
     public static void main(String[] args) throws Exception{
-        new DefaultTransferServer(6440).start();
+        new NettyRpcServer(6440).start();
     }
 
     @Override
@@ -79,7 +79,7 @@ public class DefaultTransferServer implements TransferServer {
                             }
                         }
                     });
-            System.out.println("Netty server start ok :" + port);
+            logger.info("Netty server start ok :" + port);
             ChannelFuture f = bootstrap.bind(IPUtil.getServerIp(),port)
                     .addListener(new GenericFutureListener(){
 

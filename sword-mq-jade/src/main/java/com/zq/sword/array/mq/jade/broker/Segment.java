@@ -1,6 +1,12 @@
 package com.zq.sword.array.mq.jade.broker;
 
 import com.zq.sword.array.stream.io.Resource;
+import com.zq.sword.array.stream.io.ResourceInputStream;
+import com.zq.sword.array.stream.io.ResourceOutputStream;
+import com.zq.sword.array.stream.io.ex.InputStreamOpenException;
+import com.zq.sword.array.stream.io.ex.OutputStreamOpenException;
+import com.zq.sword.array.stream.io.object.ObjectInputStream;
+import com.zq.sword.array.stream.io.object.ObjectOutputStream;
 
 /**
  * @program: sword-array
@@ -57,4 +63,10 @@ public interface Segment extends Resource {
      * @return
      */
     long lastModifyTime();
+
+    @Override
+    ObjectInputStream openInputStream() throws InputStreamOpenException;
+
+    @Override
+    ObjectOutputStream openOutputStream() throws OutputStreamOpenException;
 }

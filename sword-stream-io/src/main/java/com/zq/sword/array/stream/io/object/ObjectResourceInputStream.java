@@ -1,6 +1,7 @@
 package com.zq.sword.array.stream.io.object;
 
 import com.zq.sword.array.data.ObjectDeserializer;
+import com.zq.sword.array.stream.io.AbstractResourceInputStream;
 import com.zq.sword.array.stream.io.ResourceInputStream;
 
 import java.io.EOFException;
@@ -12,7 +13,7 @@ import java.io.IOException;
  * @author: zhouqi1
  * @create: 2019-01-14 11:40
  **/
-public class ObjectResourceInputStream implements ResourceInputStream, ObjectInputStream {
+public class ObjectResourceInputStream extends AbstractResourceInputStream implements ObjectInputStream {
 
     /**
      * 具体的资源输入流

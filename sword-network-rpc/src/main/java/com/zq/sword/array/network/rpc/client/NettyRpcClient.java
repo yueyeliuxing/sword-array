@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @program: sword-array
@@ -23,9 +24,9 @@ import java.util.List;
  * @author: zhouqi1
  * @create: 2018-08-01 20:02
  **/
-public class DefaultTransferClient implements TransferClient {
+public class NettyRpcClient implements RpcClient {
 
-    private Logger logger = LoggerFactory.getLogger(DefaultTransferClient.class);
+    private Logger logger = LoggerFactory.getLogger(NettyRpcClient.class);
 
     private String host;
 
@@ -37,7 +38,7 @@ public class DefaultTransferClient implements TransferClient {
 
     private Channel channel;
 
-    public DefaultTransferClient(String host, int port) {
+    public NettyRpcClient(String host, int port) {
         this.host = host;
         this.port = port;
         transferHandlers = new ArrayList<>();
@@ -80,7 +81,7 @@ public class DefaultTransferClient implements TransferClient {
         }catch (Exception e){
             group.shutdownGracefully();
             logger.error("sync error", e);
-        }/*finally {
+        }finally {
             group.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -96,7 +97,7 @@ public class DefaultTransferClient implements TransferClient {
                     }
                 }
             });
-        }*/
+        }
     }
 
     @Override

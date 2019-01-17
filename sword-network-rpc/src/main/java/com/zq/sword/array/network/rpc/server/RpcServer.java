@@ -8,7 +8,7 @@ import com.zq.sword.array.network.rpc.handler.TransferHandler;
  * @author: zhouqi1
  * @create: 2018-08-04 10:28
  **/
-public interface TransferServer {
+public interface RpcServer {
 
 
     /**

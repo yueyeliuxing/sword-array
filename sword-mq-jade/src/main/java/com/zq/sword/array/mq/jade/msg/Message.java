@@ -3,6 +3,8 @@ package com.zq.sword.array.mq.jade.msg;
 import lombok.Data;
 import lombok.ToString;
 
+import java.io.Serializable;
+
 /**
  * @program: sword-array
  * @description: swd消息
@@ -11,8 +13,9 @@ import lombok.ToString;
  **/
 @Data
 @ToString
-public class Message {
+public class Message implements Serializable{
 
+    private static final long serialVersionUID = 2079397312819633699L;
     /**
      * 消息ID
      */

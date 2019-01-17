@@ -1,10 +1,10 @@
 package com.zq.sword.array.mq.jade.broker;
 
 import com.zq.sword.array.mq.jade.msg.Message;
-import com.zq.sword.array.stream.io.ResourceInputStream;
-import com.zq.sword.array.stream.io.ResourceOutputStream;
 import com.zq.sword.array.stream.io.ex.InputStreamOpenException;
 import com.zq.sword.array.stream.io.ex.OutputStreamOpenException;
+import com.zq.sword.array.stream.io.AbstractResourceInputStream;
+import com.zq.sword.array.stream.io.AbstractResourceOutputStream;
 import com.zq.sword.array.stream.io.object.ObjectInputStream;
 import com.zq.sword.array.stream.io.object.ObjectOutputStream;
 
@@ -24,13 +24,15 @@ public class MultiPartition implements Partition {
     /**
      * 分片文件前缀
      */
-    private static final String PARTITION_FILE_PREFIX = "partition-";
+    private static final String PARTITION_FILE_PREFIX = "part-";
 
-    private ResourceContainer container;
+    private Broker broker;
 
     private long id;
 
     private String name;
+
+    private String topic;
 
     private File partitionFile;
 
@@ -44,19 +46,22 @@ public class MultiPartition implements Partition {
      */
     private volatile boolean writing = false;
 
-    public MultiPartition(ResourceContainer container, long id) {
-        this.container = container;
+    public MultiPartition(Broker broker, String topic, long id) {
+        this.broker = broker;
+        this.topic = topic;
         this.id = id;
-        this.name = PARTITION_FILE_PREFIX + id;
-        this.partitionFile = new File(container.getResourceLocation() + File.separator + name);
+        this.name = PARTITION_FILE_PREFIX + topic + "-" + id;
+        this.partitionFile = new File(broker.getResourceLocation() + File.separator + name);
         this.segments = new ArrayList<>();
     }
 
-    public MultiPartition(ResourceContainer container, File partitionFile) {
-        this.container = container;
+    public MultiPartition(Broker broker, File partitionFile) {
+        this.broker = broker;
         this.partitionFile = partitionFile;
         this.name = partitionFile.getName();
-        this.id = Long.parseLong(partitionFile.getName().substring(PARTITION_FILE_PREFIX.length()));
+        String[] params = partitionFile.getName().split("-");
+        this.topic = params[1];
+        this.id = Long.parseLong(params[2]);
         this.segments = loadSegments();
     }
 
@@ -98,12 +103,17 @@ public class MultiPartition implements Partition {
     }
 
     @Override
-    public PartitionInputStream openInputStream() throws InputStreamOpenException {
+    public String topic() {
+        return topic;
+    }
+
+    @Override
+    public ObjectInputStream openInputStream() throws InputStreamOpenException {
         return new PartitionInputStream(this);
     }
 
     @Override
-    public PartitionOutputStream openOutputStream() throws OutputStreamOpenException {
+    public ObjectOutputStream openOutputStream() throws OutputStreamOpenException {
         if(writing){
             throw new OutputStreamOpenException("partition is writing");
         }
@@ -180,7 +190,7 @@ public class MultiPartition implements Partition {
     /**
      * 消息输入流
      */
-    public static class PartitionInputStream implements ResourceInputStream, ObjectInputStream{
+    private class PartitionInputStream extends AbstractResourceInputStream implements ObjectInputStream{
 
         private MultiPartition partition;
 
@@ -203,44 +213,6 @@ public class MultiPartition implements Partition {
             return partition.findSegment(msgId) != null;
         }
 
-        @Override
-        public void skip(long offset) throws IOException {
-        }
-
-        @Override
-        public long offset() throws IOException {
-            return 0;
-        }
-
-        @Override
-        public int readInt() throws IOException {
-            return 0;
-        }
-
-        @Override
-        public int read() throws IOException {
-            return 0;
-        }
-
-        @Override
-        public int read(byte[] data) throws IOException {
-            return 0;
-        }
-
-        @Override
-        public int read(byte[] data, int offset, int len) throws IOException {
-            return 0;
-        }
-
-        @Override
-        public long available() throws IOException {
-            return 0;
-        }
-
-        @Override
-        public void close() throws IOException {
-
-        }
 
         @Override
         public Object readObject() throws IOException {
@@ -252,17 +224,14 @@ public class MultiPartition implements Partition {
         @Override
         public void readObject(Object[] objs) throws IOException {
             int size = objs.length;
-            SeqFileSegment sequenceFileSegment = (SeqFileSegment)partition.findSegment(msgId);
+            Segment sequenceFileSegment = partition.findSegment(msgId);
             if(sequenceFileSegment == null){
                 throw new IOException("msgId is not find in partition");
             }
-            SeqFileSegment.SegmentInputStream inputStream = null;
+            ObjectInputStream inputStream = null;
             try {
                 inputStream = sequenceFileSegment.openInputStream();
-                boolean locSuccess =  inputStream.location(msgId);
-                if(!locSuccess){
-                    throw new IOException("msgId is not find in segment");
-                }
+                inputStream.skip(msgId);
                 //读当前定位到的msg
                 inputStream.readObject();
                 int i = 0;
@@ -290,42 +259,22 @@ public class MultiPartition implements Partition {
                 }
             }
         }
+
+        @Override
+        public void close() throws IOException {
+
+        }
     }
 
     /**
      * 消息输入流
      */
-    public static class PartitionOutputStream implements ResourceOutputStream, ObjectOutputStream{
+    private class PartitionOutputStream extends AbstractResourceOutputStream implements ObjectOutputStream{
 
         private MultiPartition partition;
 
         public PartitionOutputStream(MultiPartition partition) {
             this.partition = partition;
-        }
-
-        @Override
-        public void skip(long offset) throws IOException {
-
-        }
-
-        @Override
-        public void writeInt(int data) throws IOException {
-
-        }
-
-        @Override
-        public void writeBytes(byte[] data) throws IOException {
-
-        }
-
-        @Override
-        public void write(byte[] data) throws IOException {
-
-        }
-
-        @Override
-        public void write(byte[] data, int offset, int len) throws IOException {
-
         }
 
         @Override
@@ -341,13 +290,13 @@ public class MultiPartition implements Partition {
                 Object obj = objs.get(0);
                 Message message = (Message)obj;
                 long msgId = message.getMsgId();
-                SeqFileSegment sequenceFileSegment = (SeqFileSegment)partition.getWritableSegment(msgId);
-                SeqFileSegment.SegmentOutputStream outputStream = sequenceFileSegment.openOutputStream();
+                Segment segment = partition.getWritableSegment(msgId);
+                ObjectOutputStream outputStream = segment.openOutputStream();
                 for (Object o : objs){
-                    if(sequenceFileSegment.isFull()){
+                    if(segment.isFull()){
                         outputStream.close();
-                        sequenceFileSegment = (SeqFileSegment)partition.getWritableSegment(msgId);
-                        outputStream = sequenceFileSegment.openOutputStream();
+                        segment = partition.getWritableSegment(msgId);
+                        outputStream = segment.openOutputStream();
                     }
                     outputStream.writeObject(o);
                 }

@@ -17,8 +17,11 @@ public enum MessageType {
     HEARTBEAT_REQ((byte)5),
     HEARTBEAT_RESP((byte)6),
 
-    POLL_DATA_TRANSFER_REQ((byte)9),
-    PUSH_DATA_TRANSFER_RESP((byte)10),
+    SEND_MESSAGE_REQ((byte)7),
+    SEND_MESSAGE_RESP((byte)8),
+
+    RECEIVE_DATA_REQ((byte)9),
+    RECEIVE_DATA_RESP((byte)10),
 
     POLL_T_RIGHT_DATA_BACKUP_REQ((byte)11),
     POLL_T_RIGHT_DATA_BACKUP_RESP((byte)12),

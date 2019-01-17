@@ -1,6 +1,7 @@
 package com.zq.sword.array.stream.io.object;
 
 import com.zq.sword.array.data.ObjectSerializer;
+import com.zq.sword.array.stream.io.AbstractResourceOutputStream;
 import com.zq.sword.array.stream.io.ResourceOutputStream;
 
 import java.io.IOException;
@@ -13,7 +14,7 @@ import java.util.List;
  * @author: zhouqi1
  * @create: 2019-01-14 12:42
  **/
-public class ObjectResourceOutputStream implements ResourceOutputStream, ObjectOutputStream {
+public class ObjectResourceOutputStream extends AbstractResourceOutputStream implements ObjectOutputStream {
 
     private ResourceOutputStream outputStream;
 

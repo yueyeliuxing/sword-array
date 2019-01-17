@@ -20,14 +20,6 @@ public class FileResourceOutputStream implements ResourceOutputStream {
     private RandomAccessFile file;
 
     public FileResourceOutputStream(File file) throws IOException {
-        openStream(file);
-    }
-
-    public FileResourceOutputStream(String filePath) throws IOException {
-       this(filePath == null ? null : new File(filePath));
-    }
-
-    public void openStream(File file) throws IOException{
         boolean fileExists = false;
         while (!fileExists){
             try {
@@ -40,6 +32,10 @@ public class FileResourceOutputStream implements ResourceOutputStream {
                 fileExists = false;
             }
         }
+    }
+
+    public FileResourceOutputStream(String filePath) throws IOException {
+       this(filePath == null ? null : new File(filePath));
     }
 
     @Override

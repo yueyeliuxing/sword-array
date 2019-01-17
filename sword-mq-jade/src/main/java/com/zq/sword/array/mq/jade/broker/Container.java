@@ -1,6 +1,7 @@
 package com.zq.sword.array.mq.jade.broker;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @program: sword-array
