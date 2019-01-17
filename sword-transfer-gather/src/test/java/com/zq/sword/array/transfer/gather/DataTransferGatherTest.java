@@ -2,8 +2,7 @@ package com.zq.sword.array.transfer.gather;
 
 import com.zq.sword.array.common.utils.IPUtil;
 import com.zq.sword.array.data.SwordData;
-import com.zq.sword.array.data.structure.queue.DataQueue;
-import com.zq.sword.array.data.structure.queue.StoredWrapDataQueue;
+import com.zq.sword.array.data.structure.queue.ResourceQueue;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,7 +14,7 @@ public class DataTransferGatherTest {
 
     @Before
     public void setUp() throws Exception {
-        DataQueue<SwordData> leftOrderlyQueue = new StoredWrapDataQueue("E:\\sword\\left\\data");
+        ResourceQueue<SwordData> leftOrderlyQueue = new StoredWrapDataQueue("E:\\sword\\left\\data");
         dataTransferGather = new SwordDataTransferGather(IPUtil.getServerIp(), 8990, leftOrderlyQueue);
     }
 

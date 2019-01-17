@@ -5,8 +5,7 @@ import com.zq.sword.array.data.SwordCommand;
 import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.bridge.DataCycleDisposeBridge;
 import com.zq.sword.array.data.bridge.SwordCommandCycleDisposeBridge;
-import com.zq.sword.array.data.structure.queue.DataQueue;
-import com.zq.sword.array.data.structure.queue.StoredWrapDataQueue;
+import com.zq.sword.array.data.structure.queue.ResourceQueue;
 import com.zq.sword.array.mq.jade.bitcask.BitcaskRightRandomQueue;
 import com.zq.sword.array.metadata.ConfigManager;
 import com.zq.sword.array.metadata.DataConsumerServiceCoordinator;
@@ -81,7 +80,7 @@ public class SwordServerStarter implements CommandLineRunner, EnvironmentAware {
 
         //初始化L-Queue
         String leftDataFilePath = getParam("data.left.queue.file.path");
-        DataQueue<SwordData> leftOrderlyQueue = new StoredWrapDataQueue(leftDataFilePath);
+        ResourceQueue<SwordData> leftOrderlyQueue = new StoredWrapDataQueue(leftDataFilePath);
         leftOrderlyQueue.bindingDataCycleDisposeBridge(dataCycleDisposeBridge);
 
         //判断node 身份是 master 还是slave

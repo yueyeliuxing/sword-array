@@ -4,9 +4,8 @@ import com.zq.sword.array.data.SwordCommand;
 import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.SwordDataDeserializer;
 import com.zq.sword.array.data.SwordDataSerializer;
-import com.zq.sword.array.data.structure.queue.DataQueue;
-import com.zq.sword.array.data.structure.queue.StoredWrapDataQueue;
-import com.zq.sword.array.stream.io.file.FileResource;
+import com.zq.sword.array.data.structure.queue.FileResourceQueue;
+import com.zq.sword.array.data.structure.queue.ResourceQueue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,11 +16,11 @@ import java.util.Queue;
 
 public class LeftOrderlyQueueTest {
 
-    private DataQueue<SwordData> leftOrderlyQueue;
+    private ResourceQueue<SwordData> leftOrderlyQueue;
 
     @Before
     public void setUp() throws Exception {
-        leftOrderlyQueue = new StoredWrapDataQueue(new FileResource("E:\\sword\\left\\data\\sequence.data"), new SwordDataSerializer(), new SwordDataDeserializer());
+        leftOrderlyQueue = new FileResourceQueue("E:\\sword\\left\\data\\sequence.data", new SwordDataSerializer(), new SwordDataDeserializer());
     }
 
     @After
@@ -53,12 +52,12 @@ public class LeftOrderlyQueueTest {
                 }
             }
 
-            /*SwordData swordData = null;
+            SwordData swordData = null;
             while (swordData == null){
                 swordData = leftOrderlyQueue.poll();
             }
 
-            System.out.println(swordData);*/
+            System.out.println(swordData);
         }
 
         System.in.read();

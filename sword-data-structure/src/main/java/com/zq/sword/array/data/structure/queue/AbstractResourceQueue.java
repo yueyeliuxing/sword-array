@@ -1,9 +1,9 @@
 package com.zq.sword.array.data.structure.queue;
 
+import com.zq.sword.array.common.event.DefaultHotspotEventEmitter;
+import com.zq.sword.array.common.event.HotspotEvent;
 import com.zq.sword.array.common.event.HotspotEventListener;
-import com.zq.sword.array.data.ObjectDeserializer;
-import com.zq.sword.array.data.ObjectSerializer;
-import com.zq.sword.array.stream.io.Resource;
+import com.zq.sword.array.common.event.HotspotEventType;
 import com.zq.sword.array.stream.io.ex.InputStreamOpenException;
 import com.zq.sword.array.stream.io.ex.OutputStreamOpenException;
 import com.zq.sword.array.stream.io.object.ObjectResource;
@@ -23,18 +23,23 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @program: sword-array
- * @description: bitcask类型队列
+ * @description: 对列抽象
  * @author: zhouqi1
- * @create: 2018-10-17 19:12
+ * @create: 2018-12-25 14:58
  **/
-public class StoredWrapDataQueue<T> extends AbstractQueue<T> implements DataQueue<T> {
+public abstract class AbstractResourceQueue<T> extends AbstractQueue<T> implements ResourceQueue<T> {
 
-    private Logger logger = LoggerFactory.getLogger(StoredWrapDataQueue.class);
+    private Logger logger = LoggerFactory.getLogger(AbstractResourceQueue.class);
+
+    /***
+     * 队列的状态
+     */
+    protected volatile QueueState state;
 
     /**
-     * 实际存储的队列
+     * 内存队列
      */
-    private AbstractDataQueue<T> queue;
+    protected Queue<T> queue;
 
     private TaskExecutor taskExecutor;
 
@@ -48,12 +53,15 @@ public class StoredWrapDataQueue<T> extends AbstractQueue<T> implements DataQueu
     private static final int ADD_TYPE = 1;
     private static final int DEL_TYPE = 2;
 
-    public StoredWrapDataQueue(Resource resource, ObjectSerializer objectSerializer, ObjectDeserializer objectDeserializer){
-        this(new PrimitiveDataQueue<>(), new ObjectResource(resource, objectSerializer, objectDeserializer));
-    }
+    /**
+     * 事件发射器
+     */
+    protected DefaultHotspotEventEmitter dataEventEmitter;
 
-    public StoredWrapDataQueue(AbstractDataQueue<T> queue, ObjectResource objectResource){
-        logger.info("BitcaskLeftOrderlyQueue init...");
+    public AbstractResourceQueue(Queue<T> queue, ObjectResource objectResource) {
+        this.queue = queue;
+        dataEventEmitter = new DefaultHotspotEventEmitter();
+        logger.info("AbstractResourceQueue init...");
         this.queue = queue;
         state(QueueState.NEW);
         this.resource = objectResource;
@@ -71,7 +79,7 @@ public class StoredWrapDataQueue<T> extends AbstractQueue<T> implements DataQueu
 
 
         state(QueueState.START);
-        logger.info("BitcaskLeftOrderlyQueue end...");
+        logger.info("AbstractResourceQueue end...");
     }
 
     /*
@@ -80,7 +88,7 @@ public class StoredWrapDataQueue<T> extends AbstractQueue<T> implements DataQueu
     private void initData(){
         List<T> objectData = readAllObjectData();
         if(objectData != null){
-            objectData.forEach(c->queue.doPush(c));
+            objectData.forEach(c->queue.offer(c));
         }
     }
 
@@ -92,7 +100,7 @@ public class StoredWrapDataQueue<T> extends AbstractQueue<T> implements DataQueu
         //每隔一天重新合并数据文件
         taskExecutor.timedExecute(()->{
             logger.info("定时合并文件数据开始---");
-            queue.state(QueueState.STOP);
+            state(QueueState.STOP);
 
             List<T> objectData = readAllObjectData();
             ObjectResource objectResource = this.resource;
@@ -115,7 +123,7 @@ public class StoredWrapDataQueue<T> extends AbstractQueue<T> implements DataQueu
                     e.printStackTrace();
                 }
             }
-            queue.state(QueueState.START);
+            state(QueueState.START);
             logger.info("定时合并文件数据结束---");
         }, 1, TimeUnit.DAYS);
     }
@@ -156,7 +164,7 @@ public class StoredWrapDataQueue<T> extends AbstractQueue<T> implements DataQueu
             }while (type != 0);
 
         } catch (InputStreamOpenException | IOException e) {
-           logger.error("队列从存储中读数据错误", e);
+            logger.error("队列从存储中读数据错误", e);
         }finally {
             try {
                 resourceInputStream.close();
@@ -167,7 +175,11 @@ public class StoredWrapDataQueue<T> extends AbstractQueue<T> implements DataQueu
         return objectData;
     }
 
-
+    /**
+     * 把数据写入输出流中
+     * @param t 数据
+     * @param type 操作类型
+     */
     private void writeResourceStore(T t, int type) {
         ObjectResource objectResourceStore = this.resource;
         ObjectResourceOutputStream resourceOutputStream = null;
@@ -187,13 +199,55 @@ public class StoredWrapDataQueue<T> extends AbstractQueue<T> implements DataQueu
     }
 
     @Override
-    public void registerEventListener(HotspotEventListener dataEventListener) {
-        queue.registerEventListener(dataEventListener);
+    public boolean offer(T t) {
+        if(state() != QueueState.START){
+            logger.warn("队列状态是：{}，不能添加", state.name());
+            return false;
+        }
+
+        boolean v = false;
+        Lock lock = this.pushLock;
+        lock.lock();
+        try{
+            v = queue.offer(t);
+            writeResourceStore(t, ADD_TYPE);
+        }finally {
+            lock.unlock();
+        }
+
+        //数据添加通知监听器
+        HotspotEvent<T> dataEvent = new HotspotEvent<>();
+        dataEvent.setType(HotspotEventType.SWORD_DATA_ADD);
+        dataEvent.setData(t);
+        dataEventEmitter.emitter(dataEvent);
+        return v;
     }
 
     @Override
-    public void removeEventListener(HotspotEventListener dataEventListener) {
-        queue.registerEventListener(dataEventListener);
+    public T poll() {
+        if(state() != QueueState.START){
+            logger.info("队列状态是：{}，不能获取数据", state().name());
+            return null;
+        }
+
+        T t = null;
+        Lock lock = this.pollLock;
+        lock.lock();
+        try{
+            t = queue.poll();
+            if(t != null){
+                writeResourceStore(t, DEL_TYPE);
+            }
+        }finally {
+            lock.unlock();
+        }
+
+        //数据添加通知监听器
+        HotspotEvent<T> dataEvent = new HotspotEvent<>();
+        dataEvent.setType(HotspotEventType.SWORD_DATA_DEL);
+        dataEvent.setData(t);
+        dataEventEmitter.emitter(dataEvent);
+        return t;
     }
 
     @Override
@@ -207,47 +261,27 @@ public class StoredWrapDataQueue<T> extends AbstractQueue<T> implements DataQueu
     }
 
     @Override
-    public boolean offer(T t) {
-        boolean v = false;
-        Lock lock = this.pushLock;
-        lock.lock();
-        try{
-            v = queue.offer(t);
-            writeResourceStore(t, ADD_TYPE);
-        }finally {
-            lock.unlock();
-        }
-        return v;
-    }
-
-    @Override
-    public T poll() {
-        T t = null;
-        Lock lock = this.pollLock;
-        lock.lock();
-        try{
-            t = queue.poll();
-            if(t != null){
-                writeResourceStore(t, DEL_TYPE);
-            }
-        }finally {
-            lock.unlock();
-        }
-        return t;
-    }
-
-    @Override
     public T peek() {
         return queue.peek();
     }
 
+
+    @Override
+    public void registerEventListener(HotspotEventListener dataEventListener) {
+        dataEventEmitter.registerEventListener(dataEventListener);
+    }
+
+    @Override
+    public void removeEventListener(HotspotEventListener dataEventListener) {
+        dataEventEmitter.removeEventListener(dataEventListener);
+    }
+
     @Override
     public QueueState state() {
-        return queue.state();
+        return state;
     }
 
     public void state(QueueState state) {
-        queue.state(state);
+        this.state = state;
     }
-
 }

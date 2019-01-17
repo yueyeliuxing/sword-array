@@ -1,7 +1,7 @@
 package com.zq.sword.array.transfer.backup.gather;
 
 import com.zq.sword.array.data.SwordData;
-import com.zq.sword.array.data.structure.queue.DataQueue;
+import com.zq.sword.array.data.structure.queue.ResourceQueue;
 import com.zq.sword.array.transfer.client.DefaultTransferClient;
 import com.zq.sword.array.transfer.client.TransferClient;
 
@@ -15,12 +15,12 @@ public class SwordDataTransferBackupGather implements DataTransferBackupGather {
 
     private TransferClient transferClient;
 
-    private SwordDataTransferBackupGather(String host, int poryt, DataQueue<SwordData> leftOrderlyQueue, RightRandomQueue<SwordData> rightRandomQueue){
+    private SwordDataTransferBackupGather(String host, int poryt, ResourceQueue<SwordData> leftOrderlyQueue, RightRandomQueue<SwordData> rightRandomQueue){
         this.transferClient = getTransferClient(host, poryt, leftOrderlyQueue, rightRandomQueue);
     }
 
     private TransferClient getTransferClient(String host, int port,
-                                             DataQueue<SwordData> leftOrderlyQueue,
+                                             ResourceQueue<SwordData> leftOrderlyQueue,
                                              RightRandomQueue<SwordData> rightRandomQueue){
         TransferClient transferClient = new DefaultTransferClient(host, port);
         transferClient.registerTransferHandler(new GatherSwordDataTransferBackupHandler(rightRandomQueue, leftOrderlyQueue));
@@ -33,7 +33,7 @@ public class SwordDataTransferBackupGather implements DataTransferBackupGather {
 
         private int port;
 
-        private DataQueue<SwordData> leftOrderlyQueue;
+        private ResourceQueue<SwordData> leftOrderlyQueue;
 
         private RightRandomQueue<SwordData> rightRandomQueue;
 
@@ -46,7 +46,7 @@ public class SwordDataTransferBackupGather implements DataTransferBackupGather {
             this.port = port;
             return this;
         }
-        public SwordDataTransferBackupGatherBuilder bindingTargetDataSource(DataQueue<SwordData> leftOrderlyQueue, RightRandomQueue<SwordData> rightRandomQueue){
+        public SwordDataTransferBackupGatherBuilder bindingTargetDataSource(ResourceQueue<SwordData> leftOrderlyQueue, RightRandomQueue<SwordData> rightRandomQueue){
             this.leftOrderlyQueue = leftOrderlyQueue;
             this.rightRandomQueue = rightRandomQueue;
             return this;
