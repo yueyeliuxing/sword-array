@@ -10,6 +10,7 @@ import com.zq.sword.array.stream.io.object.ObjectInputStream;
 import com.zq.sword.array.stream.io.object.ObjectOutputStream;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,7 +37,14 @@ public class DuplicatePartitionResource implements Resource {
 
     @Override
     public ObjectOutputStream openOutputStream() throws OutputStreamOpenException {
-        return null;
+        List<ObjectOutputStream> outputStreamList = new ArrayList<>();
+        outputStreamList.add(master.openOutputStream());
+        if(slaves != null && !slaves.isEmpty()){
+            for (Partition slave : slaves){
+                outputStreamList.add(slave.openOutputStream());
+            }
+        }
+        return new DuplicatePartitionOutputStream(outputStreamList);
     }
 
     @Override
