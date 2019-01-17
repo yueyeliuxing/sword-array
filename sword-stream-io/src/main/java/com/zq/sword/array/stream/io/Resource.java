@@ -26,6 +26,6 @@ public interface Resource {
     /**
      * 资源重置
      */
-    void reset();
+    void close();
 
 }

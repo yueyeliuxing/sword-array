@@ -9,29 +9,29 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author: zhouqi1
  * @create: 2019-01-14 09:57
  **/
-public class DefaultDataEventEmitter implements DataEventEmitter {
+public class DefaultHotspotEventEmitter implements HotspotEventEmitter {
 
     /**
      * 事件监听器集合
      */
-    private List<DataEventListener> dataEventListeners;
+    private List<HotspotEventListener> dataEventListeners;
 
-    public DefaultDataEventEmitter() {
+    public DefaultHotspotEventEmitter() {
         this.dataEventListeners = new CopyOnWriteArrayList<>();
     }
 
     @Override
-    public void registerEventListener(DataEventListener dataEventListener) {
+    public void registerEventListener(HotspotEventListener dataEventListener) {
         this.dataEventListeners.add(dataEventListener);
     }
 
     @Override
-    public void removeEventListener(DataEventListener dataEventListener) {
+    public void removeEventListener(HotspotEventListener dataEventListener) {
         this.dataEventListeners.remove(dataEventListener);
     }
 
 
-    public void emitter(DataEvent dataEvent) {
+    public void emitter(HotspotEvent dataEvent) {
         if(dataEventListeners != null && !dataEventListeners.isEmpty()){
             dataEventListeners.forEach(c->c.listen(dataEvent));
         }

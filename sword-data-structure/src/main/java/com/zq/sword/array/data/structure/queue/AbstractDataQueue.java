@@ -1,9 +1,9 @@
 package com.zq.sword.array.data.structure.queue;
 
-import com.zq.sword.array.common.event.DataEvent;
-import com.zq.sword.array.common.event.DataEventListener;
-import com.zq.sword.array.common.event.DataEventType;
-import com.zq.sword.array.common.event.DefaultDataEventEmitter;
+import com.zq.sword.array.common.event.HotspotEvent;
+import com.zq.sword.array.common.event.HotspotEventListener;
+import com.zq.sword.array.common.event.HotspotEventType;
+import com.zq.sword.array.common.event.DefaultHotspotEventEmitter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,11 +34,11 @@ public abstract class AbstractDataQueue<T> extends AbstractQueue<T> implements D
     /**
      * 事件发射器
      */
-    protected DefaultDataEventEmitter dataEventEmitter;
+    protected DefaultHotspotEventEmitter dataEventEmitter;
 
     public AbstractDataQueue(Queue<T> queue) {
         this.queue = queue;
-        dataEventEmitter = new DefaultDataEventEmitter();
+        dataEventEmitter = new DefaultHotspotEventEmitter();
     }
 
     @Override
@@ -51,8 +51,8 @@ public abstract class AbstractDataQueue<T> extends AbstractQueue<T> implements D
         doPush(t);
 
         //数据添加通知监听器
-        DataEvent<T> dataEvent = new DataEvent<>();
-        dataEvent.setType(DataEventType.SWORD_DATA_ADD);
+        HotspotEvent<T> dataEvent = new HotspotEvent<>();
+        dataEvent.setType(HotspotEventType.SWORD_DATA_ADD);
         dataEvent.setData(t);
         dataEventEmitter.emitter(dataEvent);
         return true;
@@ -74,8 +74,8 @@ public abstract class AbstractDataQueue<T> extends AbstractQueue<T> implements D
         T swordData = doPoll();
 
         //数据添加通知监听器
-        DataEvent<T> dataEvent = new DataEvent<>();
-        dataEvent.setType(DataEventType.SWORD_DATA_DEL);
+        HotspotEvent<T> dataEvent = new HotspotEvent<>();
+        dataEvent.setType(HotspotEventType.SWORD_DATA_DEL);
         dataEvent.setData(swordData);
         dataEventEmitter.emitter(dataEvent);
         return swordData;
@@ -105,12 +105,12 @@ public abstract class AbstractDataQueue<T> extends AbstractQueue<T> implements D
 
 
     @Override
-    public void registerEventListener(DataEventListener dataEventListener) {
+    public void registerEventListener(HotspotEventListener dataEventListener) {
         dataEventEmitter.registerEventListener(dataEventListener);
     }
 
     @Override
-    public void removeEventListener(DataEventListener dataEventListener) {
+    public void removeEventListener(HotspotEventListener dataEventListener) {
         dataEventEmitter.removeEventListener(dataEventListener);
     }
 

@@ -1,6 +1,6 @@
 package com.zq.sword.array.data.structure.queue;
 
-import com.zq.sword.array.common.event.DataEventListener;
+import com.zq.sword.array.common.event.HotspotEventListener;
 import com.zq.sword.array.data.ObjectDeserializer;
 import com.zq.sword.array.data.ObjectSerializer;
 import com.zq.sword.array.stream.io.Resource;
@@ -96,7 +96,7 @@ public class StoredWrapDataQueue<T> extends AbstractQueue<T> implements DataQueu
 
             List<T> objectData = readAllObjectData();
             ObjectResource objectResource = this.resource;
-            objectResource.reset();
+            objectResource.close();
             ObjectResourceOutputStream resourceOutputStream = null;
             try {
                 resourceOutputStream = objectResource.openOutputStream();
@@ -187,12 +187,12 @@ public class StoredWrapDataQueue<T> extends AbstractQueue<T> implements DataQueu
     }
 
     @Override
-    public void registerEventListener(DataEventListener dataEventListener) {
+    public void registerEventListener(HotspotEventListener dataEventListener) {
         queue.registerEventListener(dataEventListener);
     }
 
     @Override
-    public void removeEventListener(DataEventListener dataEventListener) {
+    public void removeEventListener(HotspotEventListener dataEventListener) {
         queue.registerEventListener(dataEventListener);
     }
 

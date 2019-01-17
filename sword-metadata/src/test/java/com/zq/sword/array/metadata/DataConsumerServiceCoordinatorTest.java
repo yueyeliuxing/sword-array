@@ -1,14 +1,12 @@
 package com.zq.sword.array.metadata;
 
-import com.zq.sword.array.common.event.DataEvent;
-import com.zq.sword.array.common.event.DataEventListener;
+import com.zq.sword.array.common.event.HotspotEvent;
+import com.zq.sword.array.common.event.HotspotEventListener;
 import com.zq.sword.array.metadata.data.*;
 import com.zq.sword.array.metadata.impl.ZkMatedataCenter;
 import org.junit.Test;
 
 import java.util.Map;
-
-import static org.junit.Assert.*;
 
 public class DataConsumerServiceCoordinatorTest {
 
@@ -28,9 +26,9 @@ public class DataConsumerServiceCoordinatorTest {
         DataConsumerServiceCoordinator dataConsumerServiceCoordinator = metadataCenter.getDataConsumerServiceCoordinator(nodeId);
         // NodeId coNodeId = new NodeId(NodeType.DC_UNIT_PIPER, "hz", "units", "unit2", "piperName");
         // dataConsumerServiceCoordinator.commitConsumedDataInfo(coNodeId, new ConsumedDataInfo(22222L));
-        Map<NodeId, NodeNamingInfo> consumedDataInfoMap =  dataConsumerServiceCoordinator.getNeedToConsumeNodeNamingInfo(new DataEventListener<Map<NodeId, NodeNamingInfo>>() {
+        Map<NodeId, NodeNamingInfo> consumedDataInfoMap =  dataConsumerServiceCoordinator.getNeedToConsumeNodeNamingInfo(new HotspotEventListener<Map<NodeId, NodeNamingInfo>>() {
             @Override
-            public void listen(DataEvent<Map<NodeId, NodeNamingInfo>> dataEvent) {
+            public void listen(HotspotEvent<Map<NodeId, NodeNamingInfo>> dataEvent) {
                 System.out.println(dataEvent);
             }
         });

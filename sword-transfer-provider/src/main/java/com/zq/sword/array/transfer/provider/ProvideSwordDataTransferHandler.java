@@ -1,14 +1,11 @@
 package com.zq.sword.array.transfer.provider;
 
-import com.zq.sword.array.common.event.DataEvent;
-import com.zq.sword.array.common.event.DataEventListener;
 import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.DataQueue;
 import com.zq.sword.array.transfer.handler.TransferHandler;
 import com.zq.sword.array.transfer.message.Header;
 import com.zq.sword.array.transfer.message.MessageType;
 import com.zq.sword.array.transfer.message.TransferMessage;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 
 import java.util.List;

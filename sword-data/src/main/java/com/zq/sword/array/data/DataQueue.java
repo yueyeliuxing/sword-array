@@ -1,6 +1,6 @@
 package com.zq.sword.array.data;
 
-import com.zq.sword.array.common.event.DataEventListener;
+import com.zq.sword.array.common.event.HotspotEventListener;
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ public interface DataQueue<T> {
      * 注册数据变化监听器
      * @param dataEventListener
      */
-    void registerSwordDataListener(DataEventListener<T> dataEventListener);
+    void registerSwordDataListener(HotspotEventListener<T> dataEventListener);
 
     /**
      * 获取最新的id

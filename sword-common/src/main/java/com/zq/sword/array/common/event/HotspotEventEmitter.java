@@ -6,17 +6,17 @@ package com.zq.sword.array.common.event;
  * @author: zhouqi1
  * @create: 2019-01-14 09:52
  **/
-public interface DataEventEmitter {
+public interface HotspotEventEmitter {
 
     /**
      * 注册事件监听器
      * @param dataEventListener
      */
-    void registerEventListener(DataEventListener dataEventListener);
+    void registerEventListener(HotspotEventListener dataEventListener);
 
     /**
      * 去除指定的事件监听器
      * @param dataEventListener
      */
-    void removeEventListener(DataEventListener dataEventListener);
+    void removeEventListener(HotspotEventListener dataEventListener);
 }

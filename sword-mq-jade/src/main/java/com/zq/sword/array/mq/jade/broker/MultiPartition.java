@@ -122,9 +122,9 @@ public class MultiPartition implements Partition {
     }
 
     @Override
-    public void reset() {
+    public void close() {
         for (Segment segment : segments){
-            segment.reset();
+            segment.close();
         }
         segments.clear();
     }

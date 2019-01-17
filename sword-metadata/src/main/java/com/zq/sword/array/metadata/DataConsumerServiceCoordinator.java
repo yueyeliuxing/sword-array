@@ -1,9 +1,8 @@
 package com.zq.sword.array.metadata;
 
-import com.zq.sword.array.common.event.DataEventListener;
+import com.zq.sword.array.common.event.HotspotEventListener;
 import com.zq.sword.array.metadata.data.ConsumedDataInfo;
 import com.zq.sword.array.metadata.data.NodeId;
-import com.zq.sword.array.metadata.data.NodeInfo;
 import com.zq.sword.array.metadata.data.NodeNamingInfo;
 
 import java.util.Map;
@@ -22,7 +21,7 @@ public interface DataConsumerServiceCoordinator {
      * @param nodeNamingInfoDataEventListener
      * @return
      */
-    Map<NodeId, NodeNamingInfo> getNeedToConsumeNodeNamingInfo(DataEventListener<Map<NodeId, NodeNamingInfo>> nodeNamingInfoDataEventListener);
+    Map<NodeId, NodeNamingInfo> getNeedToConsumeNodeNamingInfo(HotspotEventListener<Map<NodeId, NodeNamingInfo>> nodeNamingInfoDataEventListener);
 
     /**
      * 获取消费的节点数据

@@ -1,7 +1,7 @@
 package com.zq.sword.array.transfer.gather;
 
 import com.google.common.collect.Lists;
-import com.zq.sword.array.common.event.DataEvent;
+import com.zq.sword.array.common.event.HotspotEvent;
 import com.zq.sword.array.data.DataQueue;
 import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.metadata.DataConsumerServiceCoordinator;
@@ -12,7 +12,6 @@ import com.zq.sword.array.transfer.client.TransferClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,7 +43,7 @@ public class SwordDataTransferGather implements DataTransferGather {
         this.transferClients = new ConcurrentHashMap<>();
         if(dataConsumerServiceCoordinators != null && !dataConsumerServiceCoordinators.isEmpty()){
             for(DataConsumerServiceCoordinator dataConsumerServiceCoordinator : dataConsumerServiceCoordinators){
-                Map<NodeId, NodeNamingInfo> nodeNamingInfosOfNodeId = dataConsumerServiceCoordinator.getNeedToConsumeNodeNamingInfo((DataEvent<Map<NodeId, NodeNamingInfo>> dataEvent)->{
+                Map<NodeId, NodeNamingInfo> nodeNamingInfosOfNodeId = dataConsumerServiceCoordinator.getNeedToConsumeNodeNamingInfo((HotspotEvent<Map<NodeId, NodeNamingInfo>> dataEvent)->{
                     Map<NodeId, NodeNamingInfo> nodeNamingInfoOfNodeId = dataEvent.getData();
                     if(nodeNamingInfoOfNodeId == null || nodeNamingInfoOfNodeId.isEmpty()){
                         return;

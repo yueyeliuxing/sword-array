@@ -11,9 +11,9 @@ import lombok.ToString;
  **/
 @Data
 @ToString
-public class DataEvent<T> {
+public class HotspotEvent<T> {
 
-    private DataEventType type;
+    private HotspotEventType type;
 
     private T data;
 

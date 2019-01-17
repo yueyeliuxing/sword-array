@@ -6,7 +6,7 @@ package com.zq.sword.array.common.event;
  * @author: zhouqi1
  * @create: 2018-07-23 17:24
  **/
-public enum DataEventType {
+public enum HotspotEventType {
 
     /**
      * 节点配置数据修改
@@ -47,6 +47,16 @@ public enum DataEventType {
      * 数据删除
      */
     SWORD_DATA_DEL,
+
+    /**
+     * 分片节点增加
+     */
+    PARTITION_NODE_ADD,
+
+    /**
+     * 分片节点删除
+     */
+    PARTITION_NODE_DEL,
 
     ;
 }

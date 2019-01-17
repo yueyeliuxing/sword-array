@@ -1,17 +1,14 @@
 package com.zq.sword.array.metadata;
 
-import com.zq.sword.array.common.event.DataEvent;
-import com.zq.sword.array.common.event.DataEventListener;
+import com.zq.sword.array.common.event.HotspotEvent;
+import com.zq.sword.array.common.event.HotspotEventListener;
 import com.zq.sword.array.metadata.data.NodeId;
 import com.zq.sword.array.metadata.data.NodeNamingInfo;
 import com.zq.sword.array.metadata.data.NodeType;
-import com.zq.sword.array.metadata.data.SwordConfig;
 import com.zq.sword.array.metadata.impl.ZkMatedataCenter;
 import org.junit.Test;
 
 import java.io.IOException;
-
-import static org.junit.Assert.*;
 
 public class MasterSlaveServiceCoordinatorTest {
 
@@ -51,9 +48,9 @@ public class MasterSlaveServiceCoordinatorTest {
         NodeId nodeId = new NodeId(NodeType.DC_UNIT_PIPER, "hz", "units", "unit1", "piperName");
         MetadataCenter metadataCenter = new ZkMatedataCenter(connectAddr, timeout);
         MasterSlaveServiceCoordinator masterSlaveServiceCoordinator = metadataCenter.getMasterSlaveServiceCoordinator(nodeId);
-        NodeNamingInfo nodeNamingInfo = masterSlaveServiceCoordinator.getMasterNodeNamingInfo(new DataEventListener<NodeNamingInfo>() {
+        NodeNamingInfo nodeNamingInfo = masterSlaveServiceCoordinator.getMasterNodeNamingInfo(new HotspotEventListener<NodeNamingInfo>() {
             @Override
-            public void listen(DataEvent<NodeNamingInfo> dataEvent) {
+            public void listen(HotspotEvent<NodeNamingInfo> dataEvent) {
                 System.out.println(dataEvent);
             }
         });

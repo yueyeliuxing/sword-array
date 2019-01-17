@@ -46,8 +46,8 @@ public class ObjectResource implements Resource {
     }
 
     @Override
-    public void reset() {
-        resource.reset();
+    public void close() {
+        resource.close();
     }
 
 }

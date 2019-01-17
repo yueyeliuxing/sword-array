@@ -1,6 +1,6 @@
 package com.zq.sword.array.transfer.backup.provider;
 
-import com.zq.sword.array.common.event.DataEventType;
+import com.zq.sword.array.common.event.HotspotEventType;
 import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.structure.queue.DataQueue;
 import com.zq.sword.array.transfer.handler.TransferHandler;
@@ -30,14 +30,14 @@ public class ProvideSwordDataTransferBackupHandler extends TransferHandler {
     private void initDataModify(RightRandomQueue<SwordData> rightRandomQueue, DataQueue<SwordData> leftOrderlyQueue){
         this.dataModify = new DataModify();
         rightRandomQueue.registerSwordDataListener((event)->{
-            if(event.getType().equals(DataEventType.SWORD_DATA_ADD)){
+            if(event.getType().equals(HotspotEventType.SWORD_DATA_ADD)){
                 dataModify.addRightAddData(event.getData());
             }
         });
         leftOrderlyQueue.registerSwordDataListener((event)->{
-            if(event.getType().equals(DataEventType.SWORD_DATA_ADD)){
+            if(event.getType().equals(HotspotEventType.SWORD_DATA_ADD)){
                 dataModify.addLeftAddData(event.getData());
-            }else if(event.getType().equals(DataEventType.SWORD_DATA_DEL)){
+            }else if(event.getType().equals(HotspotEventType.SWORD_DATA_DEL)){
                 dataModify.addLeftDelData(event.getData());
             }
         });

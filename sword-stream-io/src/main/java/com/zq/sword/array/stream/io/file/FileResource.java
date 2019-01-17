@@ -50,7 +50,7 @@ public class FileResource implements Resource {
     }
 
     @Override
-    public void reset() {
+    public void close() {
         file.delete();
     }
 }

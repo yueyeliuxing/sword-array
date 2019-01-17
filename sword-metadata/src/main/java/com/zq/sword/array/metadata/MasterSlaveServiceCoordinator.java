@@ -1,8 +1,7 @@
 package com.zq.sword.array.metadata;
 
-import com.zq.sword.array.common.event.DataEventListener;
+import com.zq.sword.array.common.event.HotspotEventListener;
 import com.zq.sword.array.metadata.data.MasterStaterState;
-import com.zq.sword.array.metadata.data.NodeId;
 import com.zq.sword.array.metadata.data.NodeInfo;
 import com.zq.sword.array.metadata.data.NodeNamingInfo;
 
@@ -31,7 +30,7 @@ public interface MasterSlaveServiceCoordinator {
      * @param nodeNamingInfoDataEventListener 主节点数据变化监听器
      * @return
      */
-    NodeNamingInfo getMasterNodeNamingInfo(DataEventListener<NodeNamingInfo> nodeNamingInfoDataEventListener);
+    NodeNamingInfo getMasterNodeNamingInfo(HotspotEventListener<NodeNamingInfo> nodeNamingInfoDataEventListener);
 
 
 

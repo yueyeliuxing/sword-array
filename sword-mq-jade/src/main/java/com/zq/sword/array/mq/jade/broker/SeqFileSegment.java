@@ -171,7 +171,7 @@ public class SeqFileSegment implements Segment {
     }
 
     @Override
-    public void reset() {
+    public void close() {
         messageOffsets.clear();
         segmentFile.delete();
     }

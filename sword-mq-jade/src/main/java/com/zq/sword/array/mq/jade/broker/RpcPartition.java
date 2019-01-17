@@ -1,6 +1,5 @@
 package com.zq.sword.array.mq.jade.broker;
 
-import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.mq.jade.msg.Message;
 import com.zq.sword.array.network.rpc.client.NettyRpcClient;
 import com.zq.sword.array.network.rpc.client.RpcClient;
@@ -10,21 +9,16 @@ import com.zq.sword.array.network.rpc.message.MessageType;
 import com.zq.sword.array.network.rpc.message.TransferMessage;
 import com.zq.sword.array.stream.io.AbstractResourceInputStream;
 import com.zq.sword.array.stream.io.AbstractResourceOutputStream;
-import com.zq.sword.array.stream.io.ResourceInputStream;
-import com.zq.sword.array.stream.io.ResourceOutputStream;
 import com.zq.sword.array.stream.io.ex.InputStreamOpenException;
 import com.zq.sword.array.stream.io.ex.OutputStreamOpenException;
 import com.zq.sword.array.stream.io.object.ObjectInputStream;
 import com.zq.sword.array.stream.io.object.ObjectOutputStream;
-import com.zq.sword.array.stream.io.object.ObjectResourceInputStream;
-import com.zq.sword.array.stream.io.object.ObjectResourceOutputStream;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -42,7 +36,7 @@ public class RpcPartition implements Partition {
     private long id;
 
     //ip:port
-    private String name;
+    private String location;
 
     private String topic;
 
@@ -58,11 +52,11 @@ public class RpcPartition implements Partition {
 
     private RpcClient client;
 
-    public RpcPartition(long id, String name, String topic) {
+    public RpcPartition(long id, String location, String topic) {
         this.id = id;
-        this.name = name;
+        this.location = location;
         this.topic = topic;
-        String[] ps = name.split(":");
+        String[] ps = location.split(":");
         this.sendMsgQueue = new LinkedBlockingQueue<>();
         this.receiveMsgQueue = new LinkedBlockingQueue<>();
         client = new NettyRpcClient(ps[0], Integer.parseInt(ps[1]));
@@ -77,7 +71,7 @@ public class RpcPartition implements Partition {
 
     @Override
     public String name() {
-        return name;
+        return location;
     }
 
     @Override
@@ -92,7 +86,7 @@ public class RpcPartition implements Partition {
 
     @Override
     public ObjectInputStream openInputStream() throws InputStreamOpenException {
-        return null;
+        return new RpcPartitionInputStream(sendMsgQueue, receiveMsgQueue);
     }
 
     @Override
@@ -101,8 +95,8 @@ public class RpcPartition implements Partition {
     }
 
     @Override
-    public void reset() {
-
+    public void close() {
+        client.disconnect();
     }
 
     /**

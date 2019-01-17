@@ -1,8 +1,8 @@
 package com.zq.sword.array.metadata.impl;
 
-import com.zq.sword.array.common.event.DataEvent;
-import com.zq.sword.array.common.event.DataEventListener;
-import com.zq.sword.array.common.event.DataEventType;
+import com.zq.sword.array.common.event.HotspotEvent;
+import com.zq.sword.array.common.event.HotspotEventListener;
+import com.zq.sword.array.common.event.HotspotEventType;
 import com.zq.sword.array.metadata.MasterSlaveServiceCoordinator;
 import com.zq.sword.array.metadata.data.*;
 import org.I0Itec.zkclient.IZkDataListener;
@@ -82,23 +82,23 @@ public class SwordMasterSlaveServiceCoordinator implements MasterSlaveServiceCoo
     }
 
     @Override
-    public NodeNamingInfo getMasterNodeNamingInfo(DataEventListener<NodeNamingInfo> nodeNamingInfoDataEventListener) {
+    public NodeNamingInfo getMasterNodeNamingInfo(HotspotEventListener<NodeNamingInfo> nodeNamingInfoDataEventListener) {
         String masterRunningPath = ZkTreePathBuilder.buildNodeServerMasterRunningPath(nodeId);
         zkClient.subscribeDataChanges(masterRunningPath, new IZkDataListener(){
 
             @Override
             public void handleDataChange(String dataPath, Object data) throws Exception {
 
-                DataEvent<NodeNamingInfo> dataEvent = new DataEvent<>();
-                dataEvent.setType(DataEventType.NODE_CONFIG_DATA_CHANGE);
+                HotspotEvent<NodeNamingInfo> dataEvent = new HotspotEvent<>();
+                dataEvent.setType(HotspotEventType.NODE_CONFIG_DATA_CHANGE);
                 dataEvent.setData(NodeNamingInfoBuilder.buildNodeNamingInfo(data.toString()));
                 nodeNamingInfoDataEventListener.listen(dataEvent);
             }
 
             @Override
             public void handleDataDeleted(String dataPath) throws Exception {
-                DataEvent<NodeNamingInfo> dataEvent = new DataEvent();
-                dataEvent.setType(DataEventType.NODE_CONFIG_DATA_DELETE);
+                HotspotEvent<NodeNamingInfo> dataEvent = new HotspotEvent();
+                dataEvent.setType(HotspotEventType.NODE_CONFIG_DATA_DELETE);
                 nodeNamingInfoDataEventListener.listen(dataEvent);
             }
         });

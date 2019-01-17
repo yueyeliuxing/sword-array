@@ -1,8 +1,8 @@
 package com.zq.sword.array.metadata.impl;
 
-import com.zq.sword.array.common.event.DataEvent;
-import com.zq.sword.array.common.event.DataEventListener;
-import com.zq.sword.array.common.event.DataEventType;
+import com.zq.sword.array.common.event.HotspotEvent;
+import com.zq.sword.array.common.event.HotspotEventListener;
+import com.zq.sword.array.common.event.HotspotEventType;
 import com.zq.sword.array.metadata.DataConsumerServiceCoordinator;
 import com.zq.sword.array.metadata.data.*;
 import org.I0Itec.zkclient.IZkChildListener;
@@ -51,7 +51,7 @@ public class SwordDataConsumerServiceCoordinator implements DataConsumerServiceC
 
 
     @Override
-    public Map<NodeId, NodeNamingInfo> getNeedToConsumeNodeNamingInfo(DataEventListener<Map<NodeId, NodeNamingInfo>> nodeNamingInfoDataEventListener) {
+    public Map<NodeId, NodeNamingInfo> getNeedToConsumeNodeNamingInfo(HotspotEventListener<Map<NodeId, NodeNamingInfo>> nodeNamingInfoDataEventListener) {
         Map<NodeId, NodeNamingInfo> nodeNamingInfoOfNodeIds = new HashMap<>();
         List<String> dcPaths = zkClient.getChildren(ZkTreePathBuilder.ZK_ROOT);
         if(dcPaths != null && !dcPaths.isEmpty()){
@@ -113,8 +113,8 @@ public class SwordDataConsumerServiceCoordinator implements DataConsumerServiceC
                                                                                 @Override
                                                                                 public void handleDataChange(String dataPath, Object data) throws Exception {
 
-                                                                                    DataEvent<Map<NodeId, NodeNamingInfo>> dataEvent = new DataEvent<>();
-                                                                                    dataEvent.setType(DataEventType.NODE_MASTER_DATA_CHANGE);
+                                                                                    HotspotEvent<Map<NodeId, NodeNamingInfo>> dataEvent = new HotspotEvent<>();
+                                                                                    dataEvent.setType(HotspotEventType.NODE_MASTER_DATA_CHANGE);
                                                                                     Map<NodeId, NodeNamingInfo> nodeNamingInfosOfNodeId = new HashMap<>();
                                                                                     nodeNamingInfosOfNodeId.put(consumedNodeId, NodeNamingInfoBuilder.buildNodeNamingInfo(data.toString()));
                                                                                     dataEvent.setData(nodeNamingInfosOfNodeId);
@@ -123,8 +123,8 @@ public class SwordDataConsumerServiceCoordinator implements DataConsumerServiceC
 
                                                                                 @Override
                                                                                 public void handleDataDeleted(String dataPath) throws Exception {
-                                                                                    DataEvent<Map<NodeId, NodeNamingInfo>> dataEvent = new DataEvent();
-                                                                                    dataEvent.setType(DataEventType.NODE_MASTER_DATA_DELETE);
+                                                                                    HotspotEvent<Map<NodeId, NodeNamingInfo>> dataEvent = new HotspotEvent();
+                                                                                    dataEvent.setType(HotspotEventType.NODE_MASTER_DATA_DELETE);
                                                                                     Map<NodeId, NodeNamingInfo> nodeNamingInfosOfNodeId = new HashMap<>();
                                                                                     nodeNamingInfosOfNodeId.put(consumedNodeId, nodeNamingInfo);
                                                                                     dataEvent.setData(nodeNamingInfosOfNodeId);
@@ -140,8 +140,8 @@ public class SwordDataConsumerServiceCoordinator implements DataConsumerServiceC
 
                                                                                     MasterStaterState masterStaterState = MasterStaterState.valueOf(data.toString());
                                                                                     if(masterStaterState.equals(MasterStaterState.STARTED)){
-                                                                                        DataEvent<Map<NodeId, NodeNamingInfo>> dataEvent = new DataEvent<>();
-                                                                                        dataEvent.setType(DataEventType.NODE_MASTER_STATED);
+                                                                                        HotspotEvent<Map<NodeId, NodeNamingInfo>> dataEvent = new HotspotEvent<>();
+                                                                                        dataEvent.setType(HotspotEventType.NODE_MASTER_STATED);
                                                                                         Map<NodeId, NodeNamingInfo> nodeNamingInfosOfNodeId = new HashMap<>();
                                                                                         nodeNamingInfosOfNodeId.put(consumedNodeId, new NodeNamingInfo());
                                                                                         dataEvent.setData(nodeNamingInfosOfNodeId);
@@ -167,8 +167,8 @@ public class SwordDataConsumerServiceCoordinator implements DataConsumerServiceC
                                                                                     String masterInfo = zkClient.readData(masterRunningPath);
                                                                                     NodeNamingInfo nodeNamingInfo = NodeNamingInfoBuilder.buildNodeNamingInfo(masterInfo);
 
-                                                                                    DataEvent<Map<NodeId, NodeNamingInfo>> dataEvent = new DataEvent();
-                                                                                    dataEvent.setType(DataEventType.NODE_MASTER_DATA_CHANGE);
+                                                                                    HotspotEvent<Map<NodeId, NodeNamingInfo>> dataEvent = new HotspotEvent();
+                                                                                    dataEvent.setType(HotspotEventType.NODE_MASTER_DATA_CHANGE);
                                                                                     Map<NodeId, NodeNamingInfo> nodeNamingInfosOfNodeId = new HashMap<>();
                                                                                     nodeNamingInfosOfNodeId.put(consumedNodeId, nodeNamingInfo);
                                                                                     dataEvent.setData(nodeNamingInfosOfNodeId);

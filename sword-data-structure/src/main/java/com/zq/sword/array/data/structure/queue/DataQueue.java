@@ -1,7 +1,7 @@
 package com.zq.sword.array.data.structure.queue;
 
 
-import com.zq.sword.array.common.event.DataEventEmitter;
+import com.zq.sword.array.common.event.HotspotEventEmitter;
 
 import java.util.Queue;
 
@@ -11,7 +11,7 @@ import java.util.Queue;
  * @author: zhouqi1
  * @create: 2018-08-01 11:47
  **/
-public interface DataQueue<T> extends Queue<T>, DataEventEmitter {
+public interface DataQueue<T> extends Queue<T>, HotspotEventEmitter {
 
     /**
      * 返回队列状态
