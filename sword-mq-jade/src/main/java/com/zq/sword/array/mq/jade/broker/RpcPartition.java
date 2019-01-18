@@ -1,6 +1,8 @@
 package com.zq.sword.array.mq.jade.broker;
 
+import com.zq.sword.array.mq.jade.msg.LocatedMessage;
 import com.zq.sword.array.mq.jade.msg.Message;
+import com.zq.sword.array.mq.jade.msg.MsgReq;
 import com.zq.sword.array.network.rpc.client.NettyRpcClient;
 import com.zq.sword.array.network.rpc.client.RpcClient;
 import com.zq.sword.array.network.rpc.handler.TransferHandler;
@@ -124,7 +126,7 @@ public class RpcPartition implements Partition {
 
         @Override
         public Object readObject() throws IOException {
-            sendMsgQueue.offer(String.format("%s,%s", msgId, 1));
+            sendMsgQueue.offer(new MsgReq(id, msgId, 1));
             Object obj =  receiveMsgQueue.poll();
             if(obj instanceof Message){
                 return obj;
@@ -134,7 +136,7 @@ public class RpcPartition implements Partition {
 
         @Override
         public void readObject(Object[] objs) throws IOException {
-            sendMsgQueue.offer(String.format("%s,%s", msgId, objs.length));
+            sendMsgQueue.offer(new MsgReq(id, msgId, objs.length));
 
         }
 
@@ -239,9 +241,9 @@ public class RpcPartition implements Partition {
                 if(obj != null){
                     TransferMessage transferMessage = null;
                     if(obj instanceof Message){
-                        transferMessage = buildSendMessageReq((Message) obj);
-                    }else if(obj instanceof String){
-                        transferMessage = buildReceiveMessageReq((String) obj);
+                        transferMessage = buildSendMessageReq(new LocatedMessage(id, (Message)obj));
+                    }else if(obj instanceof MsgReq){
+                        transferMessage = buildReceiveMessageReq((MsgReq) obj);
                     }else {
                         return;
                     }
@@ -252,15 +254,15 @@ public class RpcPartition implements Partition {
 
             /**
              * 构建接收消息请求
-             * @param idParam
+             * @param msgReq
              * @return
              */
-            private TransferMessage buildReceiveMessageReq(String idParam) {
+            private TransferMessage buildReceiveMessageReq(MsgReq msgReq) {
                 TransferMessage message = new TransferMessage();
                 Header header = new Header();
                 header.setType(MessageType.RECEIVE_DATA_REQ.value());
                 message.setHeader(header);
-                message.setBody(idParam);
+                message.setBody(msgReq);
                 return message;
 
             }
@@ -270,7 +272,7 @@ public class RpcPartition implements Partition {
              * @param msg
              * @return
              */
-            private TransferMessage buildSendMessageReq(Message msg) {
+            private TransferMessage buildSendMessageReq(LocatedMessage msg) {
                 TransferMessage message = new TransferMessage();
                 Header header = new Header();
                 header.setType(MessageType.SEND_MESSAGE_REQ.value());

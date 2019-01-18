@@ -48,7 +48,6 @@ public class NettyRpcServer implements RpcServer {
         new NettyRpcServer(6440).start();
     }
 
-    @Override
     public void registerTransferHandler(TransferHandler transferHandler) {
         transferHandlers.add(transferHandler);
     }
@@ -98,11 +97,6 @@ public class NettyRpcServer implements RpcServer {
     @Override
     public void shutdown() {
 
-    }
-
-    @Override
-    public void restart() {
-        start();
     }
 
     @Override

@@ -13,11 +13,11 @@ public abstract class AbstractConfigurableBroker implements Broker {
 
     private String resourceLocation;
 
-    private ConfigurableContainer container;
+    protected ConfigurableContainer container;
 
-    public AbstractConfigurableBroker(String resourceLocation) {
+    public AbstractConfigurableBroker(long id, String resourceLocation) {
         this.resourceLocation = resourceLocation;
-        this.container = new DefaultConfigurableContainer();
+        this.container = createConfigurableContainer(id);
         loadResources(resourceLocation);
     }
 
@@ -42,6 +42,14 @@ public abstract class AbstractConfigurableBroker implements Broker {
         return partition;
     }
 
+    /**
+     * 获取容器
+     * @return
+     */
+    public ConfigurableContainer createConfigurableContainer(long id){
+        return new DefaultConfigurableContainer(id);
+    }
+
     @Override
     public long id() {
         return container.id();
@@ -60,5 +68,10 @@ public abstract class AbstractConfigurableBroker implements Broker {
     @Override
     public String getResourceLocation(){
         return resourceLocation;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return container.isEmpty();
     }
 }

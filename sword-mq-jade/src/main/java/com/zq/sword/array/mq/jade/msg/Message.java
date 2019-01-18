@@ -1,6 +1,7 @@
 package com.zq.sword.array.mq.jade.msg;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.io.Serializable;
@@ -13,6 +14,7 @@ import java.io.Serializable;
  **/
 @Data
 @ToString
+@NoArgsConstructor
 public class Message implements Serializable{
 
     private static final long serialVersionUID = 2079397312819633699L;

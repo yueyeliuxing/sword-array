@@ -1,7 +1,6 @@
 package com.zq.sword.array.mq.jade.broker;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -17,7 +16,8 @@ public class DefaultConfigurableContainer implements ConfigurableContainer{
 
     private Map<Long, Partition> partitionOfIds;
 
-    public DefaultConfigurableContainer() {
+    public DefaultConfigurableContainer(long id) {
+        this.id = id;
         partitionOfIds = new ConcurrentHashMap<>();
     }
 
@@ -34,6 +34,11 @@ public class DefaultConfigurableContainer implements ConfigurableContainer{
     @Override
     public long id() {
         return id;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return partitionOfIds.isEmpty();
     }
 
     @Override

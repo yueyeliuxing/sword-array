@@ -203,16 +203,10 @@ public class MultiPartition implements Partition {
             this.partition = partition;
         }
 
-        /**
-         * 定位
-         * @param msgId
-         * @return
-         */
-        public boolean location(long msgId){
+        @Override
+        public void skip(long msgId) throws IOException {
             this.msgId = msgId;
-            return partition.findSegment(msgId) != null;
         }
-
 
         @Override
         public Object readObject() throws IOException {

@@ -1,7 +1,6 @@
 package com.zq.sword.array.mq.jade.broker;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * @program: sword-array
@@ -16,6 +15,12 @@ public interface Container {
      * @return
      */
     long id();
+
+    /**
+     * 是否是空容器
+     * @return
+     */
+    boolean isEmpty();
 
     /**
      * 得到指定ID的分片数据

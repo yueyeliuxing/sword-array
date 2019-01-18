@@ -31,16 +31,6 @@ public class BrokerProduceDispatcher extends AbstractProduceDispatcher implement
     }
 
     @Override
-    public void start() {
-
-    }
-
-    @Override
-    public void stop() {
-
-    }
-
-    @Override
     protected PartitionSelectStrategy createPartitionSelectStrategy() {
         return new PartitionSelectStrategy() {
             @Override
