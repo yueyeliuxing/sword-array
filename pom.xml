@@ -22,7 +22,6 @@
 		<module>sword-id-generator</module>
 		<module>sword-redis</module>
 		<module>sword-metadata</module>
-		<module>sword-data</module>
 		<module>sword-stream-io</module>
 		<module>sword-data-bridge</module>
 		<module>sword-data-structure</module>

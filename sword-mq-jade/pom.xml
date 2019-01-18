@@ -68,11 +68,6 @@
 		</dependency>
 		<dependency>
 			<groupId>com.zq.sword</groupId>
-			<artifactId>sword-data</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.zq.sword</groupId>
 			<artifactId>sword-tasks</artifactId>
 			<version>${project.version}</version>
 		</dependency>
