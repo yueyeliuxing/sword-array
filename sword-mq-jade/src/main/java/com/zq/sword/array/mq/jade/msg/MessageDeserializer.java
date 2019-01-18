@@ -1,7 +1,7 @@
 package com.zq.sword.array.mq.jade.msg;
 
 
-import com.zq.sword.array.data.ObjectDeserializer;
+import com.zq.sword.array.stream.io.object.ObjectDeserializer;
 
 import java.nio.ByteBuffer;
 

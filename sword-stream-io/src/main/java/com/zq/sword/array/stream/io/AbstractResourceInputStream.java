@@ -1,10 +1,7 @@
 package com.zq.sword.array.stream.io;
 
-import com.zq.sword.array.data.ObjectDeserializer;
-import com.zq.sword.array.stream.io.ResourceInputStream;
 import com.zq.sword.array.stream.io.object.ObjectInputStream;
 
-import java.io.EOFException;
 import java.io.IOException;
 
 /**

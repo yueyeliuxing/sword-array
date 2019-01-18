@@ -1,6 +1,5 @@
 package com.zq.sword.array.transfer.backup.provider;
 
-import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.structure.queue.ResourceQueue;
 import com.zq.sword.array.transfer.server.DefaultTransferServer;
 import com.zq.sword.array.transfer.server.TransferServer;

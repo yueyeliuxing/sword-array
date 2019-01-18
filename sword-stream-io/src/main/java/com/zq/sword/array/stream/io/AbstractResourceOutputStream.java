@@ -1,12 +1,8 @@
 package com.zq.sword.array.stream.io;
 
-import com.zq.sword.array.data.ObjectSerializer;
-import com.zq.sword.array.stream.io.ResourceOutputStream;
 import com.zq.sword.array.stream.io.object.ObjectOutputStream;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @program: sword-array

@@ -1,7 +1,6 @@
 package com.zq.sword.array.transfer.gather;
 
 import com.zq.sword.array.common.utils.IPUtil;
-import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.structure.queue.ResourceQueue;
 import org.junit.Before;
 import org.junit.Test;

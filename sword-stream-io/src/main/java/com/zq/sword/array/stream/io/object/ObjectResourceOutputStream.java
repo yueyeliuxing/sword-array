@@ -1,6 +1,5 @@
 package com.zq.sword.array.stream.io.object;
 
-import com.zq.sword.array.data.ObjectSerializer;
 import com.zq.sword.array.stream.io.AbstractResourceOutputStream;
 import com.zq.sword.array.stream.io.ResourceOutputStream;
 

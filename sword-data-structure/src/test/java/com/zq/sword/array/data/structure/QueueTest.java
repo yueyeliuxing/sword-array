@@ -1,10 +1,5 @@
 package com.zq.sword.array.data.structure;
 
-import com.zq.sword.array.data.SwordCommand;
-import com.zq.sword.array.data.SwordData;
-import com.zq.sword.array.data.SwordDataDeserializer;
-import com.zq.sword.array.data.SwordDataSerializer;
-import com.zq.sword.array.data.structure.queue.FileResourceQueue;
 import com.zq.sword.array.data.structure.queue.ResourceQueue;
 import org.junit.After;
 import org.junit.Before;
@@ -16,11 +11,11 @@ import java.util.Queue;
 
 public class QueueTest {
 
-    private ResourceQueue<SwordData> leftOrderlyQueue;
+    private ResourceQueue<String> leftOrderlyQueue;
 
     @Before
     public void setUp() throws Exception {
-        leftOrderlyQueue = new FileResourceQueue("E:\\sword\\left\\data\\sequence.data", new SwordDataSerializer(), new SwordDataDeserializer());
+        //leftOrderlyQueue = new FileResourceQueue("E:\\sword\\left\\data\\sequence.data", new SwordDataSerializer(), new SwordDataDeserializer());
     }
 
     @After
@@ -34,7 +29,7 @@ public class QueueTest {
 
     @Test
     public void push() throws IOException {
-        for(int i = 1; i< 10; i++){
+      /*  for(int i = 1; i< 10; i++){
             SwordData orderSwordData = new SwordData();
             orderSwordData.setId(Long.valueOf(i));
             SwordCommand swordCommand = new SwordCommand();
@@ -60,21 +55,21 @@ public class QueueTest {
             System.out.println(swordData);
         }
 
-        System.in.read();
+        System.in.read();*/
 
     }
 
     @Test
     public void poll() throws IOException {
-        SwordData swordData = null;
-        do{
-            swordData = leftOrderlyQueue.poll();
-            if(swordData != null){
-                System.out.println(swordData);
-            }
-        }while (swordData != null);
-
-        System.in.read();
+//        SwordData swordData = null;
+//        do{
+//            swordData = leftOrderlyQueue.poll();
+//            if(swordData != null){
+//                System.out.println(swordData);
+//            }
+//        }while (swordData != null);
+//
+//        System.in.read();
 
     }
 

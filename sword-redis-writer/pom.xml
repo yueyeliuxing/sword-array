@@ -62,7 +62,17 @@
 		</dependency>
 		<dependency>
 			<groupId>com.zq.sword</groupId>
+			<artifactId>sword-stream-io</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.zq.sword</groupId>
 			<artifactId>sword-data-structure</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.zq.sword</groupId>
+			<artifactId>sword-mq-jade</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/redis.clients/jedis -->

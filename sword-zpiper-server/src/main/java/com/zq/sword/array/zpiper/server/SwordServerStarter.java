@@ -2,7 +2,6 @@ package com.zq.sword.array.zpiper.server;
 
 import com.zq.sword.array.common.utils.IPUtil;
 import com.zq.sword.array.redis.command.RedisCommand;
-import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.bridge.DataCycleDisposeBridge;
 import com.zq.sword.array.data.bridge.SwordCommandCycleDisposeBridge;
 import com.zq.sword.array.data.structure.queue.ResourceQueue;
@@ -15,9 +14,9 @@ import com.zq.sword.array.metadata.data.*;
 import com.zq.sword.array.metadata.impl.ZkMatedataCenter;
 import com.zq.sword.array.redis.replicator.EmbeddedSlaveRedisReplicator;
 import com.zq.sword.array.redis.replicator.SlaveRedisReplicator;
-import com.zq.sword.array.redis.writer.RedisCommandWriter;
+import com.zq.sword.array.redis.writer.RedisWriter;
 import com.zq.sword.array.redis.writer.RedisConfig;
-import com.zq.sword.array.redis.writer.SwordRedisCommandWriter;
+import com.zq.sword.array.redis.writer.EmbeddedRedisWriter;
 import com.zq.sword.array.transfer.gather.DataTransferGather;
 import com.zq.sword.array.transfer.gather.SwordDataTransferGather;
 import com.zq.sword.array.transfer.provider.DataTransferProvider;
@@ -104,7 +103,7 @@ public class SwordServerStarter implements CommandLineRunner, EnvironmentAware {
             dataTransferGather.start();
 
             //初始化 redis 写入者
-            RedisCommandWriter redisCommandWriter = SwordRedisCommandWriter.SwordRedisCommandWriterBuilder.create()
+            RedisWriter redisCommandWriter = EmbeddedRedisWriter.SwordRedisCommandWriterBuilder.create()
                     .config(getRedisConfig())
                     .bindingDataSource(leftOrderlyQueue)
                     .build();

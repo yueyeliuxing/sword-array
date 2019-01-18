@@ -60,6 +60,11 @@
 			<artifactId>sword-data</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>com.zq.sword</groupId>
+            <artifactId>sword-stream-io</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+    </dependencies>
 
 </project>

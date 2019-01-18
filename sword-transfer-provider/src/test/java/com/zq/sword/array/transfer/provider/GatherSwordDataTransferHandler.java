@@ -1,6 +1,5 @@
 package com.zq.sword.array.transfer.provider;
 
-import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.transfer.handler.TransferHandler;
 import com.zq.sword.array.transfer.message.Header;
 import com.zq.sword.array.transfer.message.MessageType;

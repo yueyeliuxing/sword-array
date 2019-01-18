@@ -1,7 +1,5 @@
 package com.zq.sword.array.transfer.gather;
 
-import com.zq.sword.array.data.DataQueue;
-import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.metadata.DataConsumerServiceCoordinator;
 import com.zq.sword.array.metadata.data.ConsumedDataInfo;
 import com.zq.sword.array.metadata.data.NodeId;

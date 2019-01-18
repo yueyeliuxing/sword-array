@@ -1,7 +1,7 @@
 package com.zq.sword.array.redis.writer;
 
-import com.zq.sword.array.data.SwordCommand;
-import com.zq.sword.array.redis.CommandType;
+import com.zq.sword.array.redis.command.CommandType;
+import com.zq.sword.array.redis.command.RedisCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
  * @author: zhouqi1
  * @create: 2018-10-18 20:53
  **/
-public class SwordRedisClient implements RedisClient<SwordCommand> {
+public class SwordRedisClient implements RedisClient<RedisCommand> {
     private Logger logger = LoggerFactory.getLogger(SwordRedisClient.class);
 
     private JedisClient jedisClient;
@@ -22,7 +22,7 @@ public class SwordRedisClient implements RedisClient<SwordCommand> {
     }
 
     @Override
-    public boolean write(SwordCommand data) {
+    public boolean write(RedisCommand data) {
         try {
             CommandType type = CommandType.toEnum(data.getType());
             switch (type){

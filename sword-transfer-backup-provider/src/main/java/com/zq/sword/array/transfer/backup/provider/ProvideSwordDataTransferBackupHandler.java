@@ -1,7 +1,6 @@
 package com.zq.sword.array.transfer.backup.provider;
 
 import com.zq.sword.array.common.event.HotspotEventType;
-import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.structure.queue.ResourceQueue;
 import com.zq.sword.array.transfer.handler.TransferHandler;
 import com.zq.sword.array.transfer.message.Header;

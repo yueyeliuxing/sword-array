@@ -1,7 +1,5 @@
 package com.zq.sword.array.transfer.provider;
 
-import com.zq.sword.array.data.SwordData;
-import com.zq.sword.array.data.DataQueue;
 import com.zq.sword.array.transfer.server.DefaultTransferServer;
 import com.zq.sword.array.transfer.server.TransferServer;
 import org.slf4j.Logger;

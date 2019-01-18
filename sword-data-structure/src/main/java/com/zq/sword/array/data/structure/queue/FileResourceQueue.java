@@ -1,7 +1,7 @@
 package com.zq.sword.array.data.structure.queue;
 
-import com.zq.sword.array.data.ObjectDeserializer;
-import com.zq.sword.array.data.ObjectSerializer;
+import com.zq.sword.array.stream.io.object.ObjectDeserializer;
+import com.zq.sword.array.stream.io.object.ObjectSerializer;
 import com.zq.sword.array.stream.io.file.FileResource;
 import com.zq.sword.array.stream.io.object.ObjectResource;
 

@@ -2,8 +2,6 @@ package com.zq.sword.array.transfer.gather;
 
 import com.google.common.collect.Lists;
 import com.zq.sword.array.common.event.HotspotEvent;
-import com.zq.sword.array.data.DataQueue;
-import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.metadata.DataConsumerServiceCoordinator;
 import com.zq.sword.array.metadata.data.NodeId;
 import com.zq.sword.array.metadata.data.NodeNamingInfo;

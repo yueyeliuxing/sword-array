@@ -1,7 +1,7 @@
 package com.zq.sword.array.data.bridge;
 
 
-import com.zq.sword.array.data.Sword;
+import java.io.Serializable;
 
 /**
  * @program: sword-array
@@ -9,7 +9,7 @@ import com.zq.sword.array.data.Sword;
  * @author: zhouqi1
  * @create: 2018-10-22 15:53
  **/
-public interface DataCycleDisposeBridge<T extends Sword> {
+public interface DataCycleDisposeBridge<T extends Serializable> {
 
     /**
      * 是否是循环数据

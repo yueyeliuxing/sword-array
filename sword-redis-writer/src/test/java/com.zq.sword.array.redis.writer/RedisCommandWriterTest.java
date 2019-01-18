@@ -1,18 +1,17 @@
 package com.zq.sword.array.redis.writer;
 
-import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.structure.queue.ResourceQueue;
 import org.junit.Before;
 import org.junit.Test;
 
 public class RedisCommandWriterTest {
 
-    private RedisCommandWriter redisCommandWriter;
+    private RedisWriter redisCommandWriter;
 
     @Before
     public void setUp() throws Exception {
         ResourceQueue<SwordData> leftOrderlyQueue = new StoredWrapDataQueue("E:\\sword\\left\\data");
-        redisCommandWriter = SwordRedisCommandWriter.SwordRedisCommandWriterBuilder.create()
+        redisCommandWriter = EmbeddedRedisWriter.SwordRedisCommandWriterBuilder.create()
                 .config(getRedisConfig())
                 .bindingDataSource(leftOrderlyQueue)
                 .build();

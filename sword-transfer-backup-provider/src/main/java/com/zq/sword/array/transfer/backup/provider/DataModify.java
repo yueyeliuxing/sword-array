@@ -1,10 +1,7 @@
 package com.zq.sword.array.transfer.backup.provider;
 
-import com.zq.sword.array.data.SwordData;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @program: sword-array

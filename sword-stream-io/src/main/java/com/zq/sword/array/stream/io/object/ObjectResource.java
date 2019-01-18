@@ -1,7 +1,5 @@
 package com.zq.sword.array.stream.io.object;
 
-import com.zq.sword.array.data.ObjectDeserializer;
-import com.zq.sword.array.data.ObjectSerializer;
 import com.zq.sword.array.stream.io.Resource;
 import com.zq.sword.array.stream.io.ex.InputStreamOpenException;
 import com.zq.sword.array.stream.io.ex.OutputStreamOpenException;
