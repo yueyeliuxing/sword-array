@@ -1,10 +1,8 @@
 package com.zq.sword.array.mq.jade.producer;
 
-import com.zq.sword.array.common.event.HotspotEvent;
-import com.zq.sword.array.common.event.HotspotEventListener;
-import com.zq.sword.array.common.event.HotspotEventType;
-import com.zq.sword.array.mq.jade.coordinator.DuplicateNamePartition;
+import com.zq.sword.array.common.event.*;
 import com.zq.sword.array.mq.jade.coordinator.NameCoordinator;
+import com.zq.sword.array.mq.jade.coordinator.NameDuplicatePartition;
 import com.zq.sword.array.mq.jade.coordinator.NamePartition;
 import com.zq.sword.array.tasks.Actuator;
 
@@ -14,13 +12,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.zq.sword.array.common.event.HotspotEventType.PARTITION_NODE_DEL;
+
 /**
  * @program: sword-array
  * @description: 分片映射器
  * @author: zhouqi1
  * @create: 2019-01-17 14:37
  **/
-public class PartitionMapper implements Actuator {
+public class PartitionMapper extends AbstractHotspotEventEmitter implements Actuator, HotspotEventEmitter {
 
     private NameCoordinator nameCoordinator;
 
@@ -29,7 +29,7 @@ public class PartitionMapper implements Actuator {
     /**
      * top 分片映射
      */
-    private Map<String, List<DuplicateNamePartition>> partitionsOfTopic;
+    private Map<String, List<NameDuplicatePartition>> partitionsOfTopic;
 
     public PartitionMapper(NameCoordinator nameCoordinator) {
         this.nameCoordinator = nameCoordinator;
@@ -44,10 +44,10 @@ public class PartitionMapper implements Actuator {
     public void start() {
         if(topics != null && topics.length > 0){
             for (String topic : topics){
-                List<DuplicateNamePartition> partitions = new ArrayList<>();
-                List<DuplicateNamePartition> duplicatePartitions = nameCoordinator.gainDuplicatePartition(topic, new NamePartitionHotspotEventListener());
+                List<NameDuplicatePartition> partitions = new ArrayList<>();
+                List<NameDuplicatePartition> duplicatePartitions = nameCoordinator.gainDuplicatePartition(topic, new NamePartitionHotspotEventListener(topic));
                 if(duplicatePartitions != null && !duplicatePartitions.isEmpty()){
-                    for(DuplicateNamePartition duplicatePartition : duplicatePartitions){
+                    for(NameDuplicatePartition duplicatePartition : duplicatePartitions){
                         partitions.add(duplicatePartition);
                     }
                 }
@@ -61,7 +61,7 @@ public class PartitionMapper implements Actuator {
      * @param topic
      * @return
      */
-    public List<DuplicateNamePartition> findPartition(String topic){
+    public List<NameDuplicatePartition> findPartition(String topic){
         return partitionsOfTopic.get(topic);
     }
 
@@ -73,27 +73,38 @@ public class PartitionMapper implements Actuator {
     /**
      * 分片变动监听器
      */
-    private class NamePartitionHotspotEventListener implements HotspotEventListener<DuplicateNamePartition> {
+    private class NamePartitionHotspotEventListener implements HotspotEventListener<List<NameDuplicatePartition>> {
+
+        private String topic;
+
+        public NamePartitionHotspotEventListener(String topic) {
+            this.topic = topic;
+        }
+
         @Override
-        public void listen(HotspotEvent<DuplicateNamePartition> dataEvent) {
+        public void listen(HotspotEvent<List<NameDuplicatePartition>> dataEvent) {
             HotspotEventType type = dataEvent.getType();
-            DuplicateNamePartition namePart = dataEvent.getData();
-            String topic = namePart.getTopic();
-            List<DuplicateNamePartition> writableParts = partitionsOfTopic.get(topic);
+            List<NameDuplicatePartition> nameParts = dataEvent.getData();
+            List<NameDuplicatePartition> writableParts = partitionsOfTopic.get(topic);
             switch (type){
-                case PARTITION_NODE_ADD:
+                case PARTITION_NODE_CHANGE:
                     if(writableParts == null){
                         writableParts = new ArrayList<>();
+                        writableParts.addAll(nameParts);
+                        return;
                     }
-                    writableParts.add(namePart);
+                    writableParts.clear();
+                    writableParts.addAll(nameParts);
                     break;
                 case PARTITION_NODE_DEL:
                     if(writableParts != null){
-                        Iterator<DuplicateNamePartition> partitionIterator = writableParts.iterator();
+                        NameDuplicatePartition namePart = nameParts.get(0);
+                        Iterator<NameDuplicatePartition> partitionIterator = writableParts.iterator();
                         while (partitionIterator.hasNext()){
                             NamePartition namePartition = partitionIterator.next();
                             if(namePartition.getId() == namePart.getId()){
                                 partitionIterator.remove();
+                                emitter(new HotspotEvent(PARTITION_NODE_DEL, namePartition.getId()));
                                 break;
                             }
                         }
@@ -104,4 +115,6 @@ public class PartitionMapper implements Actuator {
             }
         }
     }
+
+
 }

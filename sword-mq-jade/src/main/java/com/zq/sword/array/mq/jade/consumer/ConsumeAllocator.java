@@ -1,6 +1,6 @@
 package com.zq.sword.array.mq.jade.consumer;
 
-import com.zq.sword.array.tasks.Task;
+import com.zq.sword.array.tasks.Actuator;
 
 /**
  * @program: sword-array
@@ -8,18 +8,18 @@ import com.zq.sword.array.tasks.Task;
  * @author: zhouqi1
  * @create: 2019-01-18 10:14
  **/
-public interface ConsumeAllocator extends Task {
+public interface ConsumeAllocator extends Actuator {
 
     /**
-     * 设置指定的topic 集合
-     * @param topics
+     *
+     * @param group
      */
-    void topics(String... topics);
-
+    void group(String group);
 
     /**
-     * 重新分配消费的分片信息
+     * 设置指定的topic
+     * @param topic
      */
-    void reallocateConsumePartition();
+    void topic(String topic);
 
 }

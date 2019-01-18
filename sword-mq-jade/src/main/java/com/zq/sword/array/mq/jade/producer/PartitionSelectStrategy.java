@@ -1,6 +1,6 @@
 package com.zq.sword.array.mq.jade.producer;
 
-import com.zq.sword.array.mq.jade.coordinator.DuplicateNamePartition;
+import com.zq.sword.array.mq.jade.coordinator.NameDuplicatePartition;
 
 import java.util.List;
 
@@ -17,5 +17,5 @@ public interface PartitionSelectStrategy {
      * @param partitions
      * @return
      */
-    PartitionResource select(List<DuplicateNamePartition> partitions);
+    PartitionResource select(List<NameDuplicatePartition> partitions);
 }

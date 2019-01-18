@@ -4,13 +4,14 @@ import com.zq.sword.array.common.event.HotspotEventType;
 import com.zq.sword.array.id.SnowFlakeIdGenerator;
 import com.zq.sword.array.mq.jade.broker.Partition;
 import com.zq.sword.array.mq.jade.broker.RpcPartition;
-import com.zq.sword.array.mq.jade.coordinator.DuplicateNamePartition;
+import com.zq.sword.array.mq.jade.coordinator.NameDuplicatePartition;
 import com.zq.sword.array.mq.jade.coordinator.NameConsumer;
 import com.zq.sword.array.mq.jade.coordinator.NameCoordinator;
 import com.zq.sword.array.mq.jade.coordinator.NamePartition;
 import com.zq.sword.array.mq.jade.msg.Message;
 import com.zq.sword.array.stream.io.ex.InputStreamOpenException;
 import com.zq.sword.array.stream.io.object.ObjectInputStream;
+import com.zq.sword.array.tasks.AbstractThreadActuator;
 import com.zq.sword.array.tasks.Actuator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,14 +108,14 @@ public abstract class AbstractConsumer implements Consumer {
         coordinator.registerConsumer(consumer);
 
         //获取可以消费的分片信息
-        List<DuplicateNamePartition> duplicateNamePartitions = coordinator.gainConsumeDuplicatePartition(consumer, (dataEvent)->{
-            List<DuplicateNamePartition> duplicateNameParts = dataEvent.getData();
+        List<NameDuplicatePartition> duplicateNamePartitions = coordinator.gainConsumeDuplicatePartition(consumer, (dataEvent)->{
+            List<NameDuplicatePartition> duplicateNameParts = dataEvent.getData();
             if(duplicateNameParts != null && !duplicateNameParts.isEmpty()){
                 HotspotEventType type = dataEvent.getType();
                 switch (type){
                     case CONSUME_PARTITION_DATA_CHANGE:
                         Map<Long, PartitionMessageConsumer> tempMessageConsumers = new HashMap<>();
-                        for(DuplicateNamePartition duplicateNamePart : duplicateNameParts){
+                        for(NameDuplicatePartition duplicateNamePart : duplicateNameParts){
                             long partId = duplicateNamePart.getId();
                             if(messageConsumers.containsKey(partId)){
                                 tempMessageConsumers.put(partId, messageConsumers.get(partId));
@@ -142,7 +143,7 @@ public abstract class AbstractConsumer implements Consumer {
 
         //对于每个分片创建对应的消费者
         if(duplicateNamePartitions != null && !duplicateNamePartitions.isEmpty()){
-            for(DuplicateNamePartition duplicateNamePartition : duplicateNamePartitions){
+            for(NameDuplicatePartition duplicateNamePartition : duplicateNamePartitions){
                 Partition partition = createRpcPartition(duplicateNamePartition);
                 if(partition != null){
                     PartitionMessageConsumer messageConsumer = new PartitionMessageConsumer(partition);
@@ -159,7 +160,7 @@ public abstract class AbstractConsumer implements Consumer {
      * @param duplicateNamePartition
      * @return
      */
-    protected Partition createRpcPartition(DuplicateNamePartition duplicateNamePartition){
+    protected Partition createRpcPartition(NameDuplicatePartition duplicateNamePartition){
         return new RpcPartition(duplicateNamePartition.getId(), duplicateNamePartition.getTopic(), duplicateNamePartition.getLocation());
     }
 
@@ -171,69 +172,56 @@ public abstract class AbstractConsumer implements Consumer {
     /**
      * 消息消费者
      */
-    private class PartitionMessageConsumer implements Actuator {
+    private class PartitionMessageConsumer extends AbstractThreadActuator implements Actuator {
 
         private Logger logger = LoggerFactory.getLogger(PartitionMessageConsumer.class);
 
-        private Thread thread;
-
         private Partition partition;
-
-        private volatile boolean isClose = false;
 
         public PartitionMessageConsumer(Partition partition) {
             this.partition = partition;
         }
 
         @Override
-        public void start() {
-            thread = new Thread(()->{
-                ObjectInputStream inputStream = null;
-                try {
-                    Message lastConsumeFailMessage = null;
-                    inputStream = partition.openInputStream();
-                    while (!isClose && !Thread.currentThread().isInterrupted()){
-                        Message message = null;
-                        if(lastConsumeFailMessage != null){
-                            message = lastConsumeFailMessage;
-                        }else {
-                            long msgId = getConsumeMsgId(new NamePartition(partition.id()));
-                            inputStream.skip(msgId);
-                            message = (Message) inputStream.readObject();
-                        }
-
-                        ConsumeStatus consumeStatus = messageListener.consume(message);
-                        switch (consumeStatus){
-                            case CONSUME_SUCCESS:
-                                coordinator.recordConsumeMsgId(new NameConsumer(id, group, topics), new NamePartition(partition.id()), message.getMsgId());
-                                break;
-                            case CONSUME_FAIL:
-                                lastConsumeFailMessage = message;
-                                break;
-                            default:
-                                break;
-                        }
+        public void run() {
+            ObjectInputStream inputStream = null;
+            try {
+                Message lastConsumeFailMessage = null;
+                inputStream = partition.openInputStream();
+                while (!isClose && !Thread.currentThread().isInterrupted()) {
+                    Message message = null;
+                    if (lastConsumeFailMessage != null) {
+                        message = lastConsumeFailMessage;
+                    } else {
+                        long msgId = getConsumeMsgId(new NamePartition(partition.id()));
+                        inputStream.skip(msgId);
+                        message = (Message) inputStream.readObject();
                     }
-                } catch (InputStreamOpenException e) {
-                    logger.error("打开分片输入流失败", e);
-                } catch (IOException e) {
-                    logger.error("读取数据出现异常", e);
-                } finally {
-                    try {
-                        inputStream.close();
-                        partition.close();
-                    } catch (IOException e) {
-                        logger.error("关闭输入流失败", e);
+
+                    ConsumeStatus consumeStatus = messageListener.consume(message);
+                    switch (consumeStatus) {
+                        case CONSUME_SUCCESS:
+                            coordinator.recordConsumeMsgId(new NameConsumer(id, group, topics), new NamePartition(partition.id()), message.getMsgId());
+                            break;
+                        case CONSUME_FAIL:
+                            lastConsumeFailMessage = message;
+                            break;
+                        default:
+                            break;
                     }
                 }
-
-            });
-            thread.start();
-        }
-
-        @Override
-        public void stop() {
-            isClose = true;
+            } catch (InputStreamOpenException e) {
+                logger.error("打开分片输入流失败", e);
+            } catch (IOException e) {
+                logger.error("读取数据出现异常", e);
+            } finally {
+                try {
+                    inputStream.close();
+                    partition.close();
+                } catch (IOException e) {
+                    logger.error("关闭输入流失败", e);
+                }
+            }
         }
     }
 }

@@ -1,13 +1,15 @@
 package com.zq.sword.array.mq.jade.producer;
 
 import com.zq.sword.array.mq.jade.broker.Partition;
-import com.zq.sword.array.mq.jade.coordinator.DuplicateNamePartition;
 import com.zq.sword.array.mq.jade.coordinator.NameCoordinator;
+import com.zq.sword.array.mq.jade.coordinator.NameDuplicatePartition;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.zq.sword.array.common.event.HotspotEventType.PARTITION_NODE_DEL;
 
 /**
  * @program: sword-array
@@ -17,21 +19,29 @@ import java.util.concurrent.ConcurrentHashMap;
  **/
 public abstract class AbstractProduceDispatcher implements ProduceDispatcher{
 
-    private String[] topics;
-
     protected PartitionMapper partitionMapper;
-
-    private NameCoordinator coordinator;
 
     private PartitionSelectStrategy selectStrategy;
 
     private Map<Long, Partition> partitionsOfId;
 
     public AbstractProduceDispatcher(NameCoordinator coordinator) {
-        this.coordinator = coordinator;
         this.partitionMapper = new PartitionMapper(coordinator);
         this.selectStrategy = createPartitionSelectStrategy();
         this.partitionsOfId = new ConcurrentHashMap<>();
+
+
+        //监听分片删除事件 关闭删除分片 清空缓存
+        this.partitionMapper.registerEventListener(dataEvent -> {
+            if(dataEvent.getType().equals(PARTITION_NODE_DEL)){
+                long partId = (Long) dataEvent.getData();
+                Partition partition = partitionsOfId.get(partId);
+                if(partition != null){
+                    partition.close();
+                    partitionsOfId.remove(partId);
+                }
+            }
+        });
     }
 
     /**
@@ -42,7 +52,7 @@ public abstract class AbstractProduceDispatcher implements ProduceDispatcher{
 
     @Override
     public PartitionResource allotPartition(String topic) {
-        List<DuplicateNamePartition> partitions =  partitionMapper.findPartition(topic);
+        List<NameDuplicatePartition> partitions =  partitionMapper.findPartition(topic);
         return selectStrategy.select(partitions);
     }
 
@@ -53,7 +63,6 @@ public abstract class AbstractProduceDispatcher implements ProduceDispatcher{
 
     @Override
     public void assignTopic(String... topics) {
-        this.topics = topics;
         this.partitionMapper.topics(topics);
     }
 

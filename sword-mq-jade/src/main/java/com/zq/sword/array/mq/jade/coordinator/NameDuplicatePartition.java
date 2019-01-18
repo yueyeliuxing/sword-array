@@ -13,18 +13,18 @@ import java.util.List;
  **/
 @Data
 @ToString
-public class DuplicateNamePartition extends NamePartition {
+public class NameDuplicatePartition extends NamePartition {
 
     /**
      * 备份分片
      */
     private List<NamePartition> slaves;
 
-    public DuplicateNamePartition(long id) {
+    public NameDuplicatePartition(long id) {
         super(id);
     }
 
-    public DuplicateNamePartition(long id, String topic, String location) {
+    public NameDuplicatePartition(long id, String topic, String location) {
         super(id, topic, location);
     }
 }

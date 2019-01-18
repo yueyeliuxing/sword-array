@@ -3,7 +3,7 @@ package com.zq.sword.array.mq.jade.producer;
 import com.zq.sword.array.mq.jade.broker.Broker;
 import com.zq.sword.array.mq.jade.broker.Partition;
 import com.zq.sword.array.mq.jade.broker.RpcPartition;
-import com.zq.sword.array.mq.jade.coordinator.DuplicateNamePartition;
+import com.zq.sword.array.mq.jade.coordinator.NameDuplicatePartition;
 import com.zq.sword.array.mq.jade.coordinator.NameCoordinator;
 import com.zq.sword.array.mq.jade.coordinator.NamePartition;
 
@@ -29,9 +29,9 @@ public class BrokerProduceDispatcher extends AbstractProduceDispatcher implement
     protected PartitionSelectStrategy createPartitionSelectStrategy() {
         return new PartitionSelectStrategy() {
             @Override
-            public DuplicatePartitionResource select(List<DuplicateNamePartition> partitions) {
+            public DuplicatePartitionResource select(List<NameDuplicatePartition> partitions) {
                 if(partitions != null && !partitions.isEmpty()){
-                    for (DuplicateNamePartition partition : partitions){
+                    for (NameDuplicatePartition partition : partitions){
                         Partition part = broker.getPartition(partition.getId());
                         if( part != null){
                             List<Partition> slavePartitions = new ArrayList<>();

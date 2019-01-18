@@ -49,9 +49,14 @@ public enum HotspotEventType {
     SWORD_DATA_DEL,
 
     /**
-     * 分片节点增加
+     * 消费者节点改变
      */
-    PARTITION_NODE_ADD,
+    CONSUMER_NODE_CHANGE,
+
+    /**
+     * 分片节点改变
+     */
+    PARTITION_NODE_CHANGE,
 
     /**
      * 分片节点删除
@@ -62,6 +67,11 @@ public enum HotspotEventType {
      * 消费者要消费的分片信息发生改变
      */
     CONSUME_PARTITION_DATA_CHANGE,
+
+    /**
+     * 消费分配节点删除
+     */
+    CONSUME_ALLOCATOR_NODE_DEL,
 
     ;
 }

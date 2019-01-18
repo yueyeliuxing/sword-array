@@ -2,7 +2,7 @@ package com.zq.sword.array.mq.jade.consumer;
 
 import com.zq.sword.array.mq.jade.broker.Broker;
 import com.zq.sword.array.mq.jade.broker.Partition;
-import com.zq.sword.array.mq.jade.coordinator.DuplicateNamePartition;
+import com.zq.sword.array.mq.jade.coordinator.NameDuplicatePartition;
 import com.zq.sword.array.mq.jade.coordinator.NameCoordinator;
 
 /**
@@ -21,7 +21,7 @@ public class BrokerConsumer extends AbstractConsumer implements Consumer {
     }
 
     @Override
-    protected Partition createRpcPartition(DuplicateNamePartition duplicateNamePartition) {
+    protected Partition createRpcPartition(NameDuplicatePartition duplicateNamePartition) {
         if(broker.contains(duplicateNamePartition.getId())){
             return null;
         }

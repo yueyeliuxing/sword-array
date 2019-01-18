@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @program: sword-array
@@ -52,17 +53,17 @@ public class ZkNameCoordinator implements NameCoordinator {
     }
 
     @Override
-    public DuplicateNamePartition gainDuplicatePartition(NamePartition partition, HotspotEventListener<DuplicateNamePartition> partitionEventListener) {
+    public NameDuplicatePartition gainDuplicatePartition(NamePartition partition, HotspotEventListener<NameDuplicatePartition> partitionEventListener) {
         return null;
     }
 
     @Override
-    public List<DuplicateNamePartition> gainDuplicatePartition(String topic, HotspotEventListener<DuplicateNamePartition> partitionEventListener) {
+    public List<NameDuplicatePartition> gainDuplicatePartition(String topic, HotspotEventListener<List<NameDuplicatePartition>> partitionEventListener) {
         return null;
     }
 
     @Override
-    public List<DuplicateNamePartition> gainDuplicatePartition(String topic, List<NamePartition> excludePartitions, HotspotEventListener<DuplicateNamePartition> partitionEventListener) {
+    public List<NameDuplicatePartition> gainDuplicatePartition(String topic, List<NamePartition> excludePartitions, HotspotEventListener<NameDuplicatePartition> partitionEventListener) {
         return null;
     }
 
@@ -72,7 +73,12 @@ public class ZkNameCoordinator implements NameCoordinator {
     }
 
     @Override
-    public List<DuplicateNamePartition> gainConsumeDuplicatePartition(NameConsumer consumer, HotspotEventListener<List<DuplicateNamePartition>> partitionEventListener) {
+    public List<NameConsumer> gainConsumers(String topic, String group, HotspotEventListener<List<NameConsumer>> eventListener) {
+        return null;
+    }
+
+    @Override
+    public List<NameDuplicatePartition> gainConsumeDuplicatePartition(NameConsumer consumer, HotspotEventListener<List<NameDuplicatePartition>> partitionEventListener) {
         return null;
     }
 
@@ -82,8 +88,18 @@ public class ZkNameCoordinator implements NameCoordinator {
     }
 
     @Override
+    public void editConsumePartitions(String topic, String group, Map<NameConsumer, List<NameDuplicatePartition>> consumerPartitions) {
+
+    }
+
+    @Override
     public void recordConsumeMsgId(NameConsumer consumer, NamePartition partition, long msgId) {
 
+    }
+
+    @Override
+    public boolean registerConsumeAllocator(NameConsumeAllocator consumeAllocator, HotspotEventListener<Long> eventListener) {
+        return false;
     }
 
 }

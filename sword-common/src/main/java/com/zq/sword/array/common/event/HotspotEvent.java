@@ -1,6 +1,7 @@
 package com.zq.sword.array.common.event;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
@@ -11,10 +12,15 @@ import lombok.ToString;
  **/
 @Data
 @ToString
+@NoArgsConstructor
 public class HotspotEvent<T> {
 
     private HotspotEventType type;
 
     private T data;
 
+    public HotspotEvent(HotspotEventType type, T data) {
+        this.type = type;
+        this.data = data;
+    }
 }
