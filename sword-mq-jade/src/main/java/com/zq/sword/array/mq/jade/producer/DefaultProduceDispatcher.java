@@ -16,8 +16,8 @@ import java.util.concurrent.ThreadLocalRandom;
  **/
 public class DefaultProduceDispatcher extends AbstractProduceDispatcher implements ProduceDispatcher{
 
-    public DefaultProduceDispatcher(String connectAddr, int sessionTimeOut) {
-        super(new ZkNameCoordinator(connectAddr, sessionTimeOut));
+    public DefaultProduceDispatcher(String connectAddr) {
+        super(new ZkNameCoordinator(connectAddr));
     }
 
     @Override

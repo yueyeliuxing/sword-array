@@ -1,4 +1,4 @@
-package com.zq.sword.array.redis;
+package com.zq.sword.array.redis.command;
 
 /**
  * @program: sword-array

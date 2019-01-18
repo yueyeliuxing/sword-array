@@ -27,9 +27,9 @@ public class ZkNameCoordinator implements NameCoordinator {
         this.client = client;
     }
 
-    public ZkNameCoordinator(String connectAddr, int sessionTimeOut) {
+    public ZkNameCoordinator(String connectAddr) {
         logger.info("ZkNameCoordinator module starting...");
-        client = new ZkClient(new ZkConnection(connectAddr), sessionTimeOut, new ZkSerializer() {
+        client = new ZkClient(new ZkConnection(connectAddr), 500, new ZkSerializer() {
             @Override
             public byte[] serialize(Object data) throws ZkMarshallingError {
                 return (data.toString()).getBytes();

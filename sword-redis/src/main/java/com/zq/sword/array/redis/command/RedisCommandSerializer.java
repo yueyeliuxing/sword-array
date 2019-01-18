@@ -1,4 +1,6 @@
-package com.zq.sword.array.data;
+package com.zq.sword.array.redis.command;
+
+import com.zq.sword.array.data.ObjectSerializer;
 
 import java.nio.ByteBuffer;
 import java.util.Map;
@@ -9,11 +11,11 @@ import java.util.Map;
  * @author: zhouqi1
  * @create: 2018-10-10 15:41
  **/
-public class SwordCommandSerializer implements ObjectSerializer<SwordCommand> {
+public class RedisCommandSerializer implements ObjectSerializer<RedisCommand> {
 
     @Override
-    public byte[] serialize(SwordCommand commandSword) {
-        if(commandSword == SwordCommand.DELETE_COMMAND){
+    public byte[] serialize(RedisCommand commandSword) {
+        if(commandSword == RedisCommand.DELETE_COMMAND){
             return new byte[]{0};
         }
 

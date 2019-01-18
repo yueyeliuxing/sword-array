@@ -2,8 +2,8 @@ package com.zq.sword.array.redis.replicator;
 
 import com.moilioncircle.redis.replicator.cmd.Command;
 import com.moilioncircle.redis.replicator.cmd.impl.*;
-import com.zq.sword.array.data.SwordCommand;
-import com.zq.sword.array.redis.CommandType;
+import com.zq.sword.array.redis.command.CommandType;
+import com.zq.sword.array.redis.command.RedisCommand;
 
 /**
  * @program: sword-array
@@ -11,15 +11,15 @@ import com.zq.sword.array.redis.CommandType;
  * @author: zhouqi1
  * @create: 2018-10-18 20:39
  **/
-public class SwordCommandBuilder {
+public class RedisCommandBuilder {
 
     /**
      * 解析redis命令
      * @param command
      * @return
      */
-    public static SwordCommand buildSwordCommand(Command command){
-        SwordCommand swordCommand = new SwordCommand();
+    public static RedisCommand buildSwordCommand(Command command){
+        RedisCommand swordCommand = new RedisCommand();
         if(command instanceof SetCommand){
             SetCommand setCommand = (SetCommand) command;
             swordCommand.setType(CommandType.SET.getValue());

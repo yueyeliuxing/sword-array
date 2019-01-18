@@ -1,7 +1,7 @@
 package com.zq.sword.array.zpiper.server;
 
 import com.zq.sword.array.common.utils.IPUtil;
-import com.zq.sword.array.data.SwordCommand;
+import com.zq.sword.array.redis.command.RedisCommand;
 import com.zq.sword.array.data.SwordData;
 import com.zq.sword.array.data.bridge.DataCycleDisposeBridge;
 import com.zq.sword.array.data.bridge.SwordCommandCycleDisposeBridge;
@@ -13,7 +13,7 @@ import com.zq.sword.array.metadata.MasterSlaveServiceCoordinator;
 import com.zq.sword.array.metadata.MetadataCenter;
 import com.zq.sword.array.metadata.data.*;
 import com.zq.sword.array.metadata.impl.ZkMatedataCenter;
-import com.zq.sword.array.redis.replicator.SwordSlaveRedisReplicator;
+import com.zq.sword.array.redis.replicator.EmbeddedSlaveRedisReplicator;
 import com.zq.sword.array.redis.replicator.SlaveRedisReplicator;
 import com.zq.sword.array.redis.writer.RedisCommandWriter;
 import com.zq.sword.array.redis.writer.RedisConfig;
@@ -70,7 +70,7 @@ public class SwordServerStarter implements CommandLineRunner, EnvironmentAware {
         logger.info("metadata 设置服务为启动中");
 
         //初始化data-birdge
-        DataCycleDisposeBridge<SwordCommand> dataCycleDisposeBridge = new SwordCommandCycleDisposeBridge();
+        DataCycleDisposeBridge<RedisCommand> dataCycleDisposeBridge = new SwordCommandCycleDisposeBridge();
 
         //初始化R-queue
         String rightDataFilePath = getParam("data.right.queue.file.path");
@@ -121,7 +121,7 @@ public class SwordServerStarter implements CommandLineRunner, EnvironmentAware {
             long workId = getParam("redis.replicator.work.id", Long.class);
             long datacenterId = getParam("redis.replicator.datacenter.id", Long.class);
             String redisUri = getParam("redis.replicator.redis.uri");
-            SlaveRedisReplicator slaveRedisReplicator = SwordSlaveRedisReplicator.SwordSlaveRedisReplicatorBuilder.create()
+            SlaveRedisReplicator slaveRedisReplicator = EmbeddedSlaveRedisReplicator.SwordSlaveRedisReplicatorBuilder.create()
                     .idGenerat(workId, datacenterId)
                     .bindingDataSource(rightRandomQueue)
                     .listen(redisUri)

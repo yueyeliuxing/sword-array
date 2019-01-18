@@ -1,5 +1,7 @@
-package com.zq.sword.array.data;
+package com.zq.sword.array.redis.command;
 
+
+import com.zq.sword.array.data.ObjectDeserializer;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -11,15 +13,15 @@ import java.util.Map;
  * @author: zhouqi1
  * @create: 2018-10-17 15:06
  **/
-public class SwordCommandDeserializer implements ObjectDeserializer<SwordCommand> {
+public class RedisCommandDeserializer implements ObjectDeserializer<RedisCommand> {
 
     @Override
-    public SwordCommand deserialize(byte[] data) {
+    public RedisCommand deserialize(byte[] data) {
         if(data.length == 1 && data[0] == 0){
-            return SwordCommand.DELETE_COMMAND;
+            return RedisCommand.DELETE_COMMAND;
         }
 
-        SwordCommand swordCommand = new SwordCommand();
+        RedisCommand swordCommand = new RedisCommand();
         ByteBuffer byteBuffer = ByteBuffer.wrap(data);
         Byte type = byteBuffer.get();
         swordCommand.setType(type == 0 ? null : type);

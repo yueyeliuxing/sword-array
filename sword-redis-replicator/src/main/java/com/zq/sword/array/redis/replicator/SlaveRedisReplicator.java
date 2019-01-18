@@ -1,7 +1,7 @@
 package com.zq.sword.array.redis.replicator;
 
 
-import com.zq.sword.array.data.Sword;
+import com.zq.sword.array.tasks.Actuator;
 
 /**
  * @program: sword-array
@@ -9,17 +9,7 @@ import com.zq.sword.array.data.Sword;
  * @author: zhouqi1
  * @create: 2018-10-10 14:51
  **/
-public interface SlaveRedisReplicator<T extends Sword> {
-
-    /**
-     * 开启
-     */
-    void start();
-
-    /**
-     * 关闭
-     */
-    void stop();
+public interface SlaveRedisReplicator extends Actuator {
 
 
 }
