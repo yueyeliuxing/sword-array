@@ -17,5 +17,5 @@ public interface PartitionSelectStrategy {
      * @param partitions
      * @return
      */
-    DuplicatePartitionResource select(List<DuplicateNamePartition> partitions);
+    PartitionResource select(List<DuplicateNamePartition> partitions);
 }

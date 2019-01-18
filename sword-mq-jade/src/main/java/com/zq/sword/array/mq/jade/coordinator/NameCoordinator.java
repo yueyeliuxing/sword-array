@@ -49,4 +49,33 @@ public interface NameCoordinator {
     List<DuplicateNamePartition> gainDuplicatePartition(String topic, List<NamePartition> excludePartitions, HotspotEventListener<DuplicateNamePartition> partitionEventListener);
 
 
+    /**
+     * 注册消费者
+     * @param consumer
+     */
+    void registerConsumer(NameConsumer consumer);
+
+    /**
+     * 获取指定消费者要消费的分片信息
+     * @param consumer
+     * @param partitionEventListener
+     * @return
+     */
+    List<DuplicateNamePartition> gainConsumeDuplicatePartition(NameConsumer consumer, HotspotEventListener<List<DuplicateNamePartition>> partitionEventListener);
+
+    /**
+     * 获区指定消费者消费指定分片的消息ID
+     * @param consumer 消费者
+     * @param partition 分片
+     * @return 指定分片上消费的消息ID
+     */
+    Long gainConsumeMsgId(NameConsumer consumer, NamePartition partition);
+
+    /**
+     * 记录已经消费的消息ID
+     * @param consumer 消费者
+     * @param partition 分片
+     * @param msgId 消息ID
+     */
+    void recordConsumeMsgId(NameConsumer consumer, NamePartition partition, long msgId);
 }

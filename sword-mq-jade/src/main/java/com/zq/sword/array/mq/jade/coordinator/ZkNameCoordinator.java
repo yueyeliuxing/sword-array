@@ -66,4 +66,24 @@ public class ZkNameCoordinator implements NameCoordinator {
         return null;
     }
 
+    @Override
+    public void registerConsumer(NameConsumer consumer) {
+
+    }
+
+    @Override
+    public List<DuplicateNamePartition> gainConsumeDuplicatePartition(NameConsumer consumer, HotspotEventListener<List<DuplicateNamePartition>> partitionEventListener) {
+        return null;
+    }
+
+    @Override
+    public Long gainConsumeMsgId(NameConsumer consumer, NamePartition partition) {
+        return null;
+    }
+
+    @Override
+    public void recordConsumeMsgId(NameConsumer consumer, NamePartition partition, long msgId) {
+
+    }
+
 }

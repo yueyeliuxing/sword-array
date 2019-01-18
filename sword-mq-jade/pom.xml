@@ -73,7 +73,12 @@
 		</dependency>
 		<dependency>
 			<groupId>com.zq.sword</groupId>
-			<artifactId>sword-data-bridge</artifactId>
+			<artifactId>sword-tasks</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.zq.sword</groupId>
+			<artifactId>sword-id-generator</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -98,6 +103,6 @@
 		</dependency>
 
 
-	</dependencies>
+    </dependencies>
 
 </project>

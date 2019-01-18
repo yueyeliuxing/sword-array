@@ -23,6 +23,13 @@ public interface Container {
     boolean isEmpty();
 
     /**
+     * 包含指定的分片
+     * @param partId
+     * @return
+     */
+    boolean contains(long partId);
+
+    /**
      * 得到指定ID的分片数据
      * @param partId
      * @return

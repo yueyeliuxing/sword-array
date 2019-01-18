@@ -19,26 +19,24 @@ import java.util.List;
  * @author: zhouqi1
  * @create: 2019-01-17 16:57
  **/
-public class DuplicatePartitionResource implements Resource {
-
-    private Partition master;
+public class DuplicatePartitionResource extends PartitionResource  implements Resource {
 
     private List<Partition> slaves;
 
     public DuplicatePartitionResource(Partition master, List<Partition> slaves) {
-        this.master = master;
+        super(master);
         this.slaves = slaves;
     }
 
     @Override
     public ObjectInputStream openInputStream() throws InputStreamOpenException {
-        return new DuplicatePartitionInputStream(master.openInputStream());
+        return new DuplicatePartitionInputStream(super.openInputStream());
     }
 
     @Override
     public ObjectOutputStream openOutputStream() throws OutputStreamOpenException {
         List<ObjectOutputStream> outputStreamList = new ArrayList<>();
-        outputStreamList.add(master.openOutputStream());
+        outputStreamList.add(super.openOutputStream());
         if(slaves != null && !slaves.isEmpty()){
             for (Partition slave : slaves){
                 outputStreamList.add(slave.openOutputStream());

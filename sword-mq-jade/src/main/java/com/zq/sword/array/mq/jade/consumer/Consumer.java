@@ -1,5 +1,6 @@
 package com.zq.sword.array.mq.jade.consumer;
 
+
 import com.zq.sword.array.tasks.Actuator;
 
 /**
@@ -12,9 +13,9 @@ public interface Consumer extends Actuator {
 
     /**
      * 设置分组
-     * @param groupName
+     * @param group
      */
-    void group(String groupName);
+    void group(String group);
 
     /**
      * 监听的 topic
@@ -23,9 +24,9 @@ public interface Consumer extends Actuator {
     void listenTopic(String... topics);
 
     /**
-     * 注册事件监听器
+     * 绑定事件监听器
      * @param messageListener
      */
-    void register(MessageListener messageListener);
+    void bindingMessageListener(MessageListener messageListener);
 
 }

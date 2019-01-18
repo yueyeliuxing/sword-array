@@ -21,7 +21,7 @@ public interface ProduceDispatcher extends Actuator {
      * @param topic
      * @return
      */
-    DuplicatePartitionResource allotPartition(String topic);
+    PartitionResource allotPartition(String topic);
 
     /**
      * 创建生产者

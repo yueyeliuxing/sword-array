@@ -41,9 +41,14 @@ public abstract class AbstractProduceDispatcher implements ProduceDispatcher{
     protected abstract PartitionSelectStrategy createPartitionSelectStrategy();
 
     @Override
-    public DuplicatePartitionResource allotPartition(String topic) {
+    public PartitionResource allotPartition(String topic) {
         List<DuplicateNamePartition> partitions =  partitionMapper.findPartition(topic);
         return selectStrategy.select(partitions);
+    }
+
+    @Override
+    public Producer createProducer() {
+        return new GeneralProducer(this);
     }
 
     @Override

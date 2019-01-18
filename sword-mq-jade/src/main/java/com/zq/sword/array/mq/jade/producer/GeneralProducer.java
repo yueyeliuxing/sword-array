@@ -1,6 +1,7 @@
 package com.zq.sword.array.mq.jade.producer;
 
 import com.zq.sword.array.mq.jade.msg.Message;
+import com.zq.sword.array.stream.io.Resource;
 import com.zq.sword.array.stream.io.ex.OutputStreamOpenException;
 import com.zq.sword.array.stream.io.object.ObjectOutputStream;
 import org.slf4j.Logger;
@@ -14,19 +15,18 @@ import java.io.IOException;
  * @author: zhouqi1
  * @create: 2019-01-17 16:10
  **/
-public class BrokerProducer implements Producer {
+public class GeneralProducer implements Producer {
 
-    private Logger logger = LoggerFactory.getLogger(BrokerProducer.class);
+    private Logger logger = LoggerFactory.getLogger(GeneralProducer.class);
 
-    private BrokerProduceDispatcher dispatcher;
+    private ProduceDispatcher dispatcher;
 
-    public BrokerProducer(BrokerProduceDispatcher dispatcher) {
+    public GeneralProducer(ProduceDispatcher dispatcher) {
         this.dispatcher = dispatcher;
     }
 
     @Override
     public void start() {
-
     }
 
     @Override
@@ -37,7 +37,7 @@ public class BrokerProducer implements Producer {
     @Override
     public boolean sendMsg(Message message) {
         String topic = message.getTopic();
-        DuplicatePartitionResource partitionResource = dispatcher.allotPartition(topic);
+        PartitionResource partitionResource = dispatcher.allotPartition(topic);
         if(partitionResource != null){
             try {
                 ObjectOutputStream outputStream = partitionResource.openOutputStream();
