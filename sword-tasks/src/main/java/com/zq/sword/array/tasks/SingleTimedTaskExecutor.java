@@ -11,13 +11,13 @@ import java.util.concurrent.TimeUnit;
  * @author: zhouqi1
  * @create: 2018-07-23 19:25
  **/
-public class SingleTaskExecutor implements TaskExecutor {
+public class SingleTimedTaskExecutor implements TimedTaskExecutor {
 
     private ExecutorService executor;
 
     private ScheduledExecutorService tomedExecutor;
 
-    public SingleTaskExecutor() {
+    public SingleTimedTaskExecutor() {
         executor = Executors.newFixedThreadPool(1);
         tomedExecutor = Executors.newScheduledThreadPool(1);
     }

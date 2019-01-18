@@ -9,8 +9,8 @@ import com.zq.sword.array.stream.io.ex.OutputStreamOpenException;
 import com.zq.sword.array.stream.io.object.ObjectResource;
 import com.zq.sword.array.stream.io.object.ObjectResourceInputStream;
 import com.zq.sword.array.stream.io.object.ObjectResourceOutputStream;
-import com.zq.sword.array.tasks.SingleTaskExecutor;
-import com.zq.sword.array.tasks.TaskExecutor;
+import com.zq.sword.array.tasks.SingleTimedTaskExecutor;
+import com.zq.sword.array.tasks.TimedTaskExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +41,7 @@ public abstract class AbstractResourceQueue<T> extends AbstractQueue<T> implemen
      */
     protected Queue<T> queue;
 
-    private TaskExecutor taskExecutor;
+    private TimedTaskExecutor taskExecutor;
 
     private Lock pushLock = new ReentrantLock();
     private Lock pollLock = new ReentrantLock();
@@ -65,7 +65,7 @@ public abstract class AbstractResourceQueue<T> extends AbstractQueue<T> implemen
         this.queue = queue;
         state(QueueState.NEW);
         this.resource = objectResource;
-        this.taskExecutor = new SingleTaskExecutor();
+        this.taskExecutor = new SingleTimedTaskExecutor();
 
         /**
          * 初始化数据

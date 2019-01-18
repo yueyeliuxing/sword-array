@@ -1,5 +1,7 @@
 package com.zq.sword.array.id;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 public class SnowFlakeIdGenerator implements IdGenerator {
     // ==============================Fields===========================================
     /** 开始时间截 (2015-01-01) */
@@ -45,6 +47,13 @@ public class SnowFlakeIdGenerator implements IdGenerator {
     private long lastTimestamp = -1L;
 
     //==============================Constructors=====================================
+
+    /**
+     * 构造函数
+     */
+    public SnowFlakeIdGenerator() {
+        this(ThreadLocalRandom.current().nextInt(0, 31), ThreadLocalRandom.current().nextInt(0, 31));
+    }
     /**
      * 构造函数
      * @param workerId 工作ID (0~31)

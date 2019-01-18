@@ -58,5 +58,10 @@ public enum HotspotEventType {
      */
     PARTITION_NODE_DEL,
 
+    /**
+     * 消费者要消费的分片信息发生改变
+     */
+    CONSUME_PARTITION_DATA_CHANGE,
+
     ;
 }
