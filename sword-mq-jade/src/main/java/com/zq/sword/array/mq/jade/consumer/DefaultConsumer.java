@@ -1,5 +1,6 @@
 package com.zq.sword.array.mq.jade.consumer;
 
+import com.zq.sword.array.mq.jade.coordinator.NameCoordinator;
 import com.zq.sword.array.mq.jade.coordinator.ZkNameCoordinator;
 
 /**
@@ -11,7 +12,15 @@ import com.zq.sword.array.mq.jade.coordinator.ZkNameCoordinator;
 public class DefaultConsumer extends AbstractConsumer implements Consumer {
 
 
-    public DefaultConsumer(String connectAddr, int sessionTimeOut) {
-        super(new ZkNameCoordinator(connectAddr, sessionTimeOut));
+    public DefaultConsumer(String connectAddr) {
+        super(new ZkNameCoordinator(connectAddr));
+    }
+
+    public DefaultConsumer(NameCoordinator coordinator) {
+        super(coordinator);
+    }
+
+    public DefaultConsumer(NameCoordinator coordinator, String[] topics, String group) {
+        super(coordinator);
     }
 }

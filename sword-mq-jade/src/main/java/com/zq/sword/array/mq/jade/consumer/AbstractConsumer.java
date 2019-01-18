@@ -56,6 +56,12 @@ public abstract class AbstractConsumer implements Consumer {
      */
     private Map<Long, Long> consumeMsgIds;
 
+    public AbstractConsumer(NameCoordinator coordinator, String[] topics, String group) {
+        this(coordinator);
+        this.topics = topics;
+        this.group = group;
+    }
+
     public AbstractConsumer(NameCoordinator coordinator) {
         this.id = generateConsumerId();
         this.coordinator = coordinator;

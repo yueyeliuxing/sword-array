@@ -15,6 +15,11 @@ public class BrokerConsumer extends AbstractConsumer implements Consumer {
 
     private Broker broker;
 
+    public BrokerConsumer(Broker broker, NameCoordinator coordinator, String[] topics, String group) {
+        super(coordinator, topics, group);
+        this.broker = broker;
+    }
+
     public BrokerConsumer(Broker broker, NameCoordinator coordinator) {
         super(coordinator);
         this.broker = broker;
