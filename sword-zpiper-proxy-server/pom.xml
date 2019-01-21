@@ -75,12 +75,6 @@
 
 		<dependency>
 			<groupId>com.zq.sword</groupId>
-			<artifactId>sword-metadata</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.zq.sword</groupId>
 			<artifactId>sword-data-bridge</artifactId>
 			<version>${project.version}</version>
 		</dependency>

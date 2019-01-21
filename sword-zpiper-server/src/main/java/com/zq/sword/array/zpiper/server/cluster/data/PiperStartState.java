@@ -1,4 +1,4 @@
-package com.zq.sword.array.metadata.data;
+package com.zq.sword.array.zpiper.server.cluster.data;
 
 /**
  * @program: sword-array
@@ -6,7 +6,7 @@ package com.zq.sword.array.metadata.data;
  * @author: zhouqi1
  * @create: 2018-07-24 17:05
  **/
-public enum MasterStaterState {
+public enum PiperStartState {
     STARTING,
     STARTED,
     ;

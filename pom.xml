@@ -21,7 +21,6 @@
 		<module>sword-tasks</module>
 		<module>sword-id-generator</module>
 		<module>sword-redis</module>
-		<module>sword-metadata</module>
 		<module>sword-config-lemna</module>
 		<module>sword-stream-io</module>
 		<module>sword-data-bridge</module>

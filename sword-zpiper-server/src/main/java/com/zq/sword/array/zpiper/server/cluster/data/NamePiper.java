@@ -1,21 +1,25 @@
-package com.zq.sword.array.metadata.data;
+package com.zq.sword.array.zpiper.server.cluster.data;
 
+import com.zq.sword.array.metadata.data.NodeType;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
  * @program: sword-array
- * @description: 节点服务ID
+ * @description: 节点信息
  * @author: zhouqi1
- * @create: 2018-07-23 16:50
+ * @create: 2018-10-22 20:47
  **/
 @Data
 @ToString
 @NoArgsConstructor
-@EqualsAndHashCode
-public class NodeId {
+public class NamePiper {
+
+    /**
+     * id
+     */
+    private long id;
 
     /**
      * 类型
@@ -42,11 +46,18 @@ public class NodeId {
      */
     private String group;
 
-    public NodeId(NodeType type, String dc, String unitCategory, String unit, String group) {
+    /**
+     * ip:port
+     */
+    private String location;
+
+    public NamePiper(long id, NodeType type, String dc, String unitCategory, String unit, String group, String location) {
+        this.id = id;
         this.type = type;
         this.dc = dc;
         this.unitCategory = unitCategory;
         this.unit = unit;
         this.group = group;
+        this.location = location;
     }
 }
