@@ -2,7 +2,7 @@ package com.zq.sword.array.mq.jade.consumer;
 
 import com.zq.sword.array.mq.jade.broker.Broker;
 import com.zq.sword.array.mq.jade.broker.Partition;
-import com.zq.sword.array.mq.jade.coordinator.NameDuplicatePartition;
+import com.zq.sword.array.mq.jade.coordinator.data.NameDuplicatePartition;
 import com.zq.sword.array.mq.jade.coordinator.NameCoordinator;
 
 /**

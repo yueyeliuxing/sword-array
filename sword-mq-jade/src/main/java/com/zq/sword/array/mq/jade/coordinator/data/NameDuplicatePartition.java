@@ -1,8 +1,9 @@
-package com.zq.sword.array.mq.jade.coordinator;
+package com.zq.sword.array.mq.jade.coordinator.data;
 
 import lombok.Data;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,9 +23,15 @@ public class NameDuplicatePartition extends NamePartition {
 
     public NameDuplicatePartition(long id) {
         super(id);
+        this.slaves = new ArrayList<>();
     }
 
     public NameDuplicatePartition(long id, String topic, String location) {
         super(id, topic, location);
+        this.slaves = new ArrayList<>();
+    }
+
+    public void addSlave(NamePartition slave){
+        this.slaves.add(slave);
     }
 }

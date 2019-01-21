@@ -1,4 +1,4 @@
-package com.zq.sword.array.mq.jade.coordinator;
+package com.zq.sword.array.mq.jade.coordinator.data;
 
 import lombok.Getter;
 import lombok.ToString;
@@ -33,6 +33,11 @@ public class NamePartition {
 
     public NamePartition(long id) {
         this.id = id;
+    }
+
+    public NamePartition(long id, String topic) {
+        this.id = id;
+        this.topic = topic;
     }
 
     public NamePartition(long id, String topic, String location) {

@@ -2,7 +2,7 @@ package com.zq.sword.array.mq.jade.producer;
 
 import com.zq.sword.array.mq.jade.broker.Partition;
 import com.zq.sword.array.mq.jade.broker.RpcPartition;
-import com.zq.sword.array.mq.jade.coordinator.NameDuplicatePartition;
+import com.zq.sword.array.mq.jade.coordinator.data.NameDuplicatePartition;
 import com.zq.sword.array.mq.jade.coordinator.ZkNameCoordinator;
 
 import java.util.List;

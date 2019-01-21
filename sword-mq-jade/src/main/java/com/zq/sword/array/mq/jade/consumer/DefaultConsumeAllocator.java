@@ -2,10 +2,10 @@ package com.zq.sword.array.mq.jade.consumer;
 
 import com.zq.sword.array.common.event.HotspotEventType;
 import com.zq.sword.array.id.SnowFlakeIdGenerator;
-import com.zq.sword.array.mq.jade.coordinator.NameConsumeAllocator;
-import com.zq.sword.array.mq.jade.coordinator.NameConsumer;
+import com.zq.sword.array.mq.jade.coordinator.data.NameConsumeAllocator;
+import com.zq.sword.array.mq.jade.coordinator.data.NameConsumer;
 import com.zq.sword.array.mq.jade.coordinator.NameCoordinator;
-import com.zq.sword.array.mq.jade.coordinator.NameDuplicatePartition;
+import com.zq.sword.array.mq.jade.coordinator.data.NameDuplicatePartition;
 import com.zq.sword.array.tasks.AbstractThreadActuator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,7 +99,7 @@ public class DefaultConsumeAllocator extends AbstractThreadActuator implements C
                 }
                 logger.info("分配器：{}注册成功", id);
 
-                List<NameConsumer> nameConsumers = coordinator.gainConsumers(topic, group, dataEvent -> {
+                List<NameConsumer> nameConsumers = coordinator.gainConsumers(group, dataEvent -> {
                     if(CONSUMER_NODE_CHANGE.equals(dataEvent.getType())){
                         this.consumers.clear();
                         this.consumers.addAll(dataEvent.getData());

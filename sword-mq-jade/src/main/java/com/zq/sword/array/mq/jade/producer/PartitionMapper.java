@@ -2,8 +2,8 @@ package com.zq.sword.array.mq.jade.producer;
 
 import com.zq.sword.array.common.event.*;
 import com.zq.sword.array.mq.jade.coordinator.NameCoordinator;
-import com.zq.sword.array.mq.jade.coordinator.NameDuplicatePartition;
-import com.zq.sword.array.mq.jade.coordinator.NamePartition;
+import com.zq.sword.array.mq.jade.coordinator.data.NameDuplicatePartition;
+import com.zq.sword.array.mq.jade.coordinator.data.NamePartition;
 import com.zq.sword.array.tasks.Actuator;
 
 import java.util.ArrayList;

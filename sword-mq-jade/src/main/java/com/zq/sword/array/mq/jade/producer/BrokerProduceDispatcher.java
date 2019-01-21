@@ -3,9 +3,9 @@ package com.zq.sword.array.mq.jade.producer;
 import com.zq.sword.array.mq.jade.broker.Broker;
 import com.zq.sword.array.mq.jade.broker.Partition;
 import com.zq.sword.array.mq.jade.broker.RpcPartition;
-import com.zq.sword.array.mq.jade.coordinator.NameDuplicatePartition;
+import com.zq.sword.array.mq.jade.coordinator.data.NameDuplicatePartition;
 import com.zq.sword.array.mq.jade.coordinator.NameCoordinator;
-import com.zq.sword.array.mq.jade.coordinator.NamePartition;
+import com.zq.sword.array.mq.jade.coordinator.data.NamePartition;
 
 import java.util.ArrayList;
 import java.util.List;

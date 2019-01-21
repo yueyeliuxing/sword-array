@@ -1,6 +1,7 @@
 package com.zq.sword.array.mq.jade.coordinator;
 
 import com.zq.sword.array.common.event.HotspotEventListener;
+import com.zq.sword.array.mq.jade.coordinator.data.*;
 
 import java.util.List;
 import java.util.Map;
@@ -17,20 +18,13 @@ public interface NameCoordinator {
      * broker 注册
      * @param broker broker容器
      */
-    void registerBroker(NameBroker broker);
+    boolean registerBroker(NameBroker broker);
 
     /**
      * partition 注册
      * @param partition 分片
      */
-    void registerPartition(NamePartition partition);
-
-    /**
-     * 获取指定分片的备份分片
-     * @param partition
-     * @return
-     */
-    NameDuplicatePartition gainDuplicatePartition(NamePartition partition, HotspotEventListener<NameDuplicatePartition> partitionEventListener);
+    boolean registerPartition(NamePartition partition);
 
     /**
      * 获取备份分片
@@ -41,29 +35,18 @@ public interface NameCoordinator {
     List<NameDuplicatePartition> gainDuplicatePartition(String topic, HotspotEventListener<List<NameDuplicatePartition>> partitionEventListener);
 
     /**
-     * 获取备份分片
-     * @param topic 主题
-     * @param excludePartitions 排除的分片
-     * @param partitionEventListener  监听分片的变动
-     * @return 分片集合
-     */
-    List<NameDuplicatePartition> gainDuplicatePartition(String topic, List<NamePartition> excludePartitions, HotspotEventListener<NameDuplicatePartition> partitionEventListener);
-
-
-    /**
      * 注册消费者
      * @param consumer
      */
-    void registerConsumer(NameConsumer consumer);
+    boolean registerConsumer(NameConsumer consumer);
 
     /**
-     * 获取指定topic group下的所有消费者
-     * @param topic
+     * 获取指定group下的所有消费者
      * @param group
      * @param eventListener
      * @return
      */
-    List<NameConsumer> gainConsumers(String topic, String group, HotspotEventListener<List<NameConsumer>> eventListener);
+    List<NameConsumer> gainConsumers(String group, HotspotEventListener<List<NameConsumer>> eventListener);
 
     /**
      * 获取指定消费者要消费的分片信息

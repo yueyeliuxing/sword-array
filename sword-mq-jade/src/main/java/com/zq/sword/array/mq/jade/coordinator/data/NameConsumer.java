@@ -1,4 +1,4 @@
-package com.zq.sword.array.mq.jade.coordinator;
+package com.zq.sword.array.mq.jade.coordinator.data;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

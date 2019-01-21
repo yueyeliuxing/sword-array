@@ -1,8 +1,8 @@
 package com.zq.sword.array.mq.jade.broker;
 
-import com.zq.sword.array.mq.jade.coordinator.NameBroker;
+import com.zq.sword.array.mq.jade.coordinator.data.NameBroker;
 import com.zq.sword.array.mq.jade.coordinator.NameCoordinator;
-import com.zq.sword.array.mq.jade.coordinator.NamePartition;
+import com.zq.sword.array.mq.jade.coordinator.data.NamePartition;
 
 import java.util.Collection;
 
