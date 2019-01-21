@@ -13,8 +13,8 @@
 	<packaging>pom</packaging>
 	<name>sword-array</name>
 	<version>0.0.1</version>
-	<description>SequoiaDB Driver Library</description>
-	<url>https://github.com/SequoiaDB/SequoiaDB</url>
+	<description>yueyeiuxing03 Driver Library</description>
+	<url>https://github.com/yueyeiuxing03/sword-array</url>
 
 	<modules>
 		<module>sword-common</module>
