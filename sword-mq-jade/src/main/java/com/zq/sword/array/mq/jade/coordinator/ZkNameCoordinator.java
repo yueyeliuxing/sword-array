@@ -3,7 +3,7 @@ package com.zq.sword.array.mq.jade.coordinator;
 import com.zq.sword.array.common.event.HotspotEvent;
 import com.zq.sword.array.common.event.HotspotEventListener;
 import com.zq.sword.array.mq.jade.coordinator.data.*;
-import com.zq.sword.array.mq.jade.coordinator.util.ZkTreePathBuilder;
+import com.zq.sword.array.mq.jade.coordinator.util.ZkMqPathBuilder;
 import org.I0Itec.zkclient.IZkDataListener;
 import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.zq.sword.array.common.event.HotspotEventType.*;
-import static com.zq.sword.array.mq.jade.coordinator.util.ZkTreePathBuilder.*;
+import static com.zq.sword.array.mq.jade.coordinator.util.ZkMqPathBuilder.*;
 
 /**
  * @program: sword-array
@@ -53,7 +53,7 @@ public class ZkNameCoordinator implements NameCoordinator {
 
     @Override
     public boolean registerBroker(NameBroker broker) {
-        String brokerRegisterPath = ZkTreePathBuilder.buildBrokerRegisterPath(broker);
+        String brokerRegisterPath = ZkMqPathBuilder.buildBrokerRegisterPath(broker);
         if(client.exists(brokerRegisterPath)){
             String data = client.readData(brokerRegisterPath);
             if(data.equals(broker.getLocation())){
@@ -70,7 +70,7 @@ public class ZkNameCoordinator implements NameCoordinator {
         //创建分片父节点
         createPartitionParentNode(partition.getTopic());
 
-        String partitionRegisterPath = ZkTreePathBuilder.buildPartitionRegisterPath(partition);
+        String partitionRegisterPath = ZkMqPathBuilder.buildPartitionRegisterPath(partition);
         if(client.exists(partitionRegisterPath)){
             String data = client.readData(partitionRegisterPath);
             DuplicatePartitionInfo duplicatePartitionInfo = new DuplicatePartitionInfo();
@@ -295,7 +295,7 @@ public class ZkNameCoordinator implements NameCoordinator {
 
     @Override
     public boolean registerConsumeAllocator(NameConsumeAllocator consumeAllocator, HotspotEventListener<Long> eventListener) {
-        String consumerAllocatorRegisterPath = ZkTreePathBuilder.buildConsumerAllocatorRegisterPath(consumeAllocator);
+        String consumerAllocatorRegisterPath = ZkMqPathBuilder.buildConsumerAllocatorRegisterPath(consumeAllocator);
         if(client.exists(consumerAllocatorRegisterPath)){
             String data = client.readData(consumerAllocatorRegisterPath);
             if(data.equals(consumeAllocator.getId())){

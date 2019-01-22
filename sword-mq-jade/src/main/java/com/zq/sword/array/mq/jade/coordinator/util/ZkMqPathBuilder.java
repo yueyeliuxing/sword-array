@@ -11,7 +11,7 @@ import com.zq.sword.array.mq.jade.coordinator.data.NamePartition;
  * @author: zhouqi1
  * @create: 2018-07-24 15:10
  **/
-public class ZkTreePathBuilder {
+public class ZkMqPathBuilder {
 
     public static final String ZK_ROOT = "/p-piper";
 
@@ -29,7 +29,7 @@ public class ZkTreePathBuilder {
 
     public static final String ZK_MQ_TOPICS_TOPIC_PARTS_ID_FORMAT = ZK_MQ_TOPICS_TOPIC_PARTS_FORMAT + "/%s";
 
-    public static final String ZK_MQ_CUSTOMERS = ZK_ROOT + "/customers";
+    public static final String ZK_MQ_CUSTOMERS = ZK_ROOT + "/consumers";
 
     public static final String ZK_MQ_CUSTOMERS_GROUP_FORMAT = ZK_MQ_CUSTOMERS + "/%s";
 
