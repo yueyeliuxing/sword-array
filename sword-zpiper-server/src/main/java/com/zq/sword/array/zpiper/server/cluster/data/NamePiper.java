@@ -1,6 +1,5 @@
 package com.zq.sword.array.zpiper.server.cluster.data;
 
-import com.zq.sword.array.metadata.data.NodeType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -24,7 +23,7 @@ public class NamePiper {
     /**
      * 类型
      */
-    private NodeType type;
+    private PiperType type;
 
     /**
      * 机房名称
@@ -51,7 +50,7 @@ public class NamePiper {
      */
     private String location;
 
-    public NamePiper(long id, NodeType type, String dc, String unitCategory, String unit, String group, String location) {
+    public NamePiper(long id, PiperType type, String dc, String unitCategory, String unit, String group, String location) {
         this.id = id;
         this.type = type;
         this.dc = dc;
