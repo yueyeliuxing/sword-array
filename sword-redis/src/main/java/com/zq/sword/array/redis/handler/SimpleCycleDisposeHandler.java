@@ -1,7 +1,7 @@
-package com.zq.sword.array.data.bridge;
+package com.zq.sword.array.redis.handler;
 
 
-import com.zq.sword.array.data.SwordCommand;
+import com.zq.sword.array.redis.command.RedisCommand;
 import com.zq.sword.array.tasks.SingleTimedTaskExecutor;
 import com.zq.sword.array.tasks.TimedTaskExecutor;
 import org.slf4j.Logger;
@@ -17,15 +17,15 @@ import java.util.concurrent.TimeUnit;
  * @author: zhouqi1
  * @create: 2018-10-22 16:27
  **/
-public class SwordCommandCycleDisposeBridge implements DataCycleDisposeBridge<SwordCommand> {
+public class SimpleCycleDisposeHandler implements CycleDisposeHandler<RedisCommand> {
 
-    private Logger logger = LoggerFactory.getLogger(SwordCommandCycleDisposeBridge.class);
+    private Logger logger = LoggerFactory.getLogger(SimpleCycleDisposeHandler.class);
 
-    private Set<SwordCommand> consumedSwordDataSet;
+    private Set<RedisCommand> consumedSwordDataSet;
 
     private TimedTaskExecutor taskExecutor;
 
-    public SwordCommandCycleDisposeBridge() {
+    public SimpleCycleDisposeHandler() {
         logger.info("SwordCommandCycleDisposeBridge 模块启动成功");
         consumedSwordDataSet = new CopyOnWriteArraySet<>();
         taskExecutor = new SingleTimedTaskExecutor();
@@ -48,12 +48,12 @@ public class SwordCommandCycleDisposeBridge implements DataCycleDisposeBridge<Sw
 
 
     @Override
-    public boolean isCycleData(SwordCommand command) {
+    public boolean isCycleData(RedisCommand command) {
         return consumedSwordDataSet.contains(command);
     }
 
     @Override
-    public boolean addCycleData(SwordCommand command) {
+    public boolean addCycleData(RedisCommand command) {
         return consumedSwordDataSet.add(command);
     }
 }

@@ -13,6 +13,7 @@ import com.zq.sword.array.mq.jade.producer.ProduceDispatcher;
 import com.zq.sword.array.mq.jade.producer.Producer;
 import com.zq.sword.array.redis.command.RedisCommand;
 import com.zq.sword.array.redis.command.RedisCommandSerializer;
+import com.zq.sword.array.redis.handler.CycleDisposeHandler;
 import com.zq.sword.array.tasks.AbstractThreadActuator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,9 @@ public class AbstractSlaveRedisReplicator extends AbstractThreadActuator impleme
 
     private String topic;
 
-    public AbstractSlaveRedisReplicator(String uri, String topic, ProduceDispatcher produceDispatcher) {
+    private CycleDisposeHandler<RedisCommand> cycleDisposeHandler;
+
+    public AbstractSlaveRedisReplicator(String uri, String topic, ProduceDispatcher produceDispatcher, CycleDisposeHandler<RedisCommand> cycleDisposeHandler) {
         try {
             replicator = new RedisReplicator(uri);
             replicator.addEventListener(new RedisReplicatorEventListener());
@@ -54,6 +57,7 @@ public class AbstractSlaveRedisReplicator extends AbstractThreadActuator impleme
         this.redisCommandSerializer = new RedisCommandSerializer();
         this.produceDispatcher = produceDispatcher;
         this.idGenerator = new SnowFlakeIdGenerator();
+        this.topic = topic;
     }
 
     @Override
@@ -87,6 +91,10 @@ public class AbstractSlaveRedisReplicator extends AbstractThreadActuator impleme
             if(event instanceof Command){
                 Command command = (Command) event;
                 RedisCommand redisCommand = RedisCommandBuilder.buildSwordCommand(command);
+                //如果是循环数据就不写入
+                if(cycleDisposeHandler.isCycleData(redisCommand)){
+                    return;
+                }
                 Message message = new Message();
                 message.setMsgId(idGenerator.nextId());
                 message.setTopic(topic);
