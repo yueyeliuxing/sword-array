@@ -58,6 +58,7 @@ public class AbstractSlaveRedisReplicator extends AbstractThreadActuator impleme
         this.produceDispatcher = produceDispatcher;
         this.idGenerator = new SnowFlakeIdGenerator();
         this.topic = topic;
+        this.cycleDisposeHandler = cycleDisposeHandler;
     }
 
     @Override
