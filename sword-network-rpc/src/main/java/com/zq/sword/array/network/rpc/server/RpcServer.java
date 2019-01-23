@@ -9,6 +9,18 @@ package com.zq.sword.array.network.rpc.server;
 public interface RpcServer {
 
     /**
+     *  地址
+     * @return
+     */
+    String host();
+
+    /**
+     * 端口
+     * @return
+     */
+    int port();
+
+    /**
      * 开启
      */
     void start();

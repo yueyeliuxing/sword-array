@@ -32,7 +32,14 @@ public interface NameCoordinator {
      * @param partitionEventListener  监听分片的变动
      * @return 分片集合
      */
-    List<NameDuplicatePartition> gainDuplicatePartition(String topic, HotspotEventListener<List<NameDuplicatePartition>> partitionEventListener);
+    List<NameDuplicatePartition> gainDuplicatePartition(String topic, HotspotEventListener<Map<String, List<NameDuplicatePartition>>> partitionEventListener);
+
+    /**
+     * 获取备份分片
+     * @param partitionEventListener  监听分片的变动
+     * @return 分片集合
+     */
+    Map<String, List<NameDuplicatePartition>> gainDuplicatePartition(HotspotEventListener<Map<String, List<NameDuplicatePartition>>> partitionEventListener);
 
     /**
      * 注册消费者

@@ -3,13 +3,12 @@ package com.zq.sword.array.mq.jade.producer;
 import com.zq.sword.array.mq.jade.broker.Partition;
 import com.zq.sword.array.mq.jade.coordinator.NameCoordinator;
 import com.zq.sword.array.mq.jade.coordinator.data.NameDuplicatePartition;
+import com.zq.sword.array.tasks.SingleTimedTaskExecutor;
+import com.zq.sword.array.tasks.TimedTaskExecutor;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static com.zq.sword.array.common.event.HotspotEventType.PARTITION_NODE_DEL;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @program: sword-array
@@ -25,23 +24,13 @@ public abstract class AbstractProduceDispatcher implements ProduceDispatcher{
 
     private Map<Long, Partition> partitionsOfId;
 
+    private TimedTaskExecutor timedTaskExecutor;
+
     public AbstractProduceDispatcher(NameCoordinator coordinator) {
         this.partitionMapper = new PartitionMapper(coordinator);
         this.selectStrategy = createPartitionSelectStrategy();
         this.partitionsOfId = new ConcurrentHashMap<>();
-
-
-        //监听分片删除事件 关闭删除分片 清空缓存
-        this.partitionMapper.registerEventListener(dataEvent -> {
-            if(dataEvent.getType().equals(PARTITION_NODE_DEL)){
-                long partId = (Long) dataEvent.getData();
-                Partition partition = partitionsOfId.get(partId);
-                if(partition != null){
-                    partition.close();
-                    partitionsOfId.remove(partId);
-                }
-            }
-        });
+        this.timedTaskExecutor = new SingleTimedTaskExecutor();
     }
 
     /**
@@ -55,15 +44,9 @@ public abstract class AbstractProduceDispatcher implements ProduceDispatcher{
         List<NameDuplicatePartition> partitions =  partitionMapper.findPartition(topic);
         return selectStrategy.select(partitions);
     }
-
     @Override
     public Producer createProducer() {
         return new GeneralProducer(this);
-    }
-
-    @Override
-    public void assignTopic(String... topics) {
-        this.partitionMapper.topics(topics);
     }
 
     public void addPartition(Partition partition){
@@ -77,6 +60,23 @@ public abstract class AbstractProduceDispatcher implements ProduceDispatcher{
     @Override
     public void start() {
         partitionMapper.start();
+
+        //定时清除已被删除分片的缓存
+        timedTaskExecutor.timedExecute(()->{
+            Set<Long> delPartIds = new HashSet<>();
+            for(Long partId : partitionsOfId.keySet()){
+                Partition partition = partitionsOfId.get(partId);
+                if(partitionMapper.findPartition(partId) == null){
+                    partition.close();
+                    delPartIds.add(partId);
+                }
+            }
+            if(!delPartIds.isEmpty()){
+                for(Long delPartId : delPartIds){
+                    partitionsOfId.remove(delPartId);
+                }
+            }
+        }, 10, TimeUnit.MINUTES);
     }
 
     @Override

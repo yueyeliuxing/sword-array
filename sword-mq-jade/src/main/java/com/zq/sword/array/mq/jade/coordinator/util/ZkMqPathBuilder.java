@@ -63,6 +63,14 @@ public class ZkMqPathBuilder {
     }
 
     /**
+     * 获取所有topic 的父节点
+     * @return
+     */
+    public static String buildTopicParentPath(){
+        return ZK_MQ_TOPICS;
+    }
+
+    /**
      * 获取partition注册地址
      * @param topic
      * @return

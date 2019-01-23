@@ -11,20 +11,8 @@ import com.zq.sword.array.tasks.Actuator;
 public interface ConsumeDispatcher extends Actuator{
 
     /**
-     * 配置group
-     * @param group
-     */
-    void group(String group);
-
-    /**
-     * 指定 topic
-     * @param topics
-     */
-    void listenTopics(String... topics);
-
-    /**
      * 创建消费者
      * @return
      */
-    Consumer createConsumer();
+    Consumer createConsumer(String[] topics, String group);
 }

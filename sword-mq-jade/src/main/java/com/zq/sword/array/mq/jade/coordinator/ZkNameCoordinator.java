@@ -12,10 +12,7 @@ import org.I0Itec.zkclient.serialize.ZkSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.zq.sword.array.common.event.HotspotEventType.*;
 import static com.zq.sword.array.mq.jade.coordinator.util.ZkMqPathBuilder.*;
@@ -100,7 +97,7 @@ public class ZkNameCoordinator implements NameCoordinator {
     }
 
     @Override
-    public List<NameDuplicatePartition> gainDuplicatePartition(String topic, HotspotEventListener<List<NameDuplicatePartition>> partitionEventListener) {
+    public List<NameDuplicatePartition> gainDuplicatePartition(String topic, HotspotEventListener<Map<String, List<NameDuplicatePartition>>> partitionEventListener) {
         List<NameDuplicatePartition> duplicatePartitions = new ArrayList<>();
         //创建分片父节点
         String partitionParentPath = createPartitionParentNode(topic);
@@ -108,14 +105,32 @@ public class ZkNameCoordinator implements NameCoordinator {
         //准换节点数据到duplicatePartitions
         assignmentDuplicatePartitions(topic, duplicatePartitions, partIds);
         client.subscribeChildChanges(partitionParentPath, (parentPath, currentChilds)->{
+            Map<String, List<NameDuplicatePartition>> duplicatePartMap = new HashMap<>();
             List<NameDuplicatePartition> duplicateParts = new ArrayList<>();
-            HotspotEvent<List<NameDuplicatePartition>> event = new HotspotEvent<>();
+            HotspotEvent< Map<String, List<NameDuplicatePartition>>> event = new HotspotEvent<>();
             event.setType(PARTITION_NODE_CHANGE);
             //准换节点数据到duplicatePartitions
             assignmentDuplicatePartitions(topic, duplicateParts, currentChilds);
-            event.setData(duplicateParts);
+            duplicatePartMap.put(topic, duplicateParts);
+            event.setData(duplicatePartMap);
             partitionEventListener.listen(event);
         });
+        return duplicatePartitions;
+    }
+
+    @Override
+    public Map<String, List<NameDuplicatePartition>> gainDuplicatePartition(HotspotEventListener<Map<String, List<NameDuplicatePartition>>> partitionEventListener) {
+        Map<String, List<NameDuplicatePartition>> duplicatePartitions = new HashMap<>();
+        String topicParentPath = buildTopicParentPath();
+        if(client.exists(topicParentPath)){
+            List<String> topics = client.getChildren(topicParentPath);
+            if(topics != null && !topics.isEmpty()){
+                for(String topic : topics){
+                    List<NameDuplicatePartition> duplicateParts = gainDuplicatePartition(topic, partitionEventListener);
+                    duplicatePartitions.put(topic, duplicateParts);
+                }
+            }
+        }
         return duplicatePartitions;
     }
 

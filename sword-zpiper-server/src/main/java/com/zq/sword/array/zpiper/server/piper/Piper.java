@@ -1,10 +1,13 @@
 package com.zq.sword.array.zpiper.server.piper;
 
+import com.zq.sword.array.mq.jade.broker.Broker;
+
 /**
  * @program: sword-array
  * @description: piper
  * @author: zhouqi1
  * @create: 2019-01-21 21:07
  **/
-public interface Piper {
+public interface Piper extends Broker {
+
 }

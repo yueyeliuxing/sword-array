@@ -31,6 +31,8 @@ public class NettyRpcServer implements RpcServer {
 
     private Logger logger = LoggerFactory.getLogger(NettyRpcServer.class);
 
+    private String host;
+
     private int port;
 
     private List<TransferHandler> transferHandlers;
@@ -44,12 +46,28 @@ public class NettyRpcServer implements RpcServer {
         transferHandlers = new CopyOnWriteArrayList<>();
     }
 
+    public NettyRpcServer(String host, int port) {
+        this(port);
+        this.host = host;
+
+    }
+
     public static void main(String[] args) throws Exception{
         new NettyRpcServer(6440).start();
     }
 
     public void registerTransferHandler(TransferHandler transferHandler) {
         transferHandlers.add(transferHandler);
+    }
+
+    @Override
+    public String host() {
+        return host;
+    }
+
+    @Override
+    public int port() {
+        return port;
     }
 
     @Override

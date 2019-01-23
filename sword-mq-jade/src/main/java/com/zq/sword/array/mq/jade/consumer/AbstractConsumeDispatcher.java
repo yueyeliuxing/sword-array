@@ -14,16 +14,6 @@ import java.util.Map;
 public abstract class AbstractConsumeDispatcher implements ConsumeDispatcher {
 
     /**
-     * 消费者组
-     */
-    protected String group;
-
-    /**
-     * 监听的topic
-     */
-    protected String[] topics;
-
-    /**
      * 协调器
      */
     protected NameCoordinator coordinator;
@@ -39,29 +29,9 @@ public abstract class AbstractConsumeDispatcher implements ConsumeDispatcher {
     }
 
     @Override
-    public void group(String group) {
-        this.group = group;
-    }
-
-    @Override
-    public void listenTopics(String... topics) {
-        this.topics = topics;
-    }
-
-
-    @Override
     public void start() {
-        if(topics == null || topics.length == 0){
-            throw new NullPointerException("topics is null");
-        }
 
-        if(group == null){
-            throw  new NullPointerException("group is null");
-        }
-        //创建启动对应的分配器
-        createAndStartConsumeAllocator(topics, group);
     }
-
 
     /**
      * 获取
@@ -81,6 +51,14 @@ public abstract class AbstractConsumeDispatcher implements ConsumeDispatcher {
             }
         }
     }
+
+    @Override
+    public Consumer createConsumer(String[] topics, String group) {
+        createAndStartConsumeAllocator(topics, group);
+        return doCreateConsumer(topics, group);
+    }
+
+    protected abstract Consumer doCreateConsumer(String[] topics, String group);
 
     @Override
     public void stop() {

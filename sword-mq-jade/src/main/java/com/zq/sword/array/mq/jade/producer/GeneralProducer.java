@@ -1,7 +1,6 @@
 package com.zq.sword.array.mq.jade.producer;
 
 import com.zq.sword.array.mq.jade.msg.Message;
-import com.zq.sword.array.stream.io.Resource;
 import com.zq.sword.array.stream.io.ex.OutputStreamOpenException;
 import com.zq.sword.array.stream.io.object.ObjectOutputStream;
 import org.slf4j.Logger;

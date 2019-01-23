@@ -5,6 +5,7 @@ import com.zq.sword.array.data.structure.queue.ResourceQueue;
 import com.zq.sword.array.mq.jade.broker.Broker;
 import com.zq.sword.array.mq.jade.consumer.*;
 import com.zq.sword.array.mq.jade.coordinator.NameCoordinator;
+import com.zq.sword.array.mq.jade.embedded.EmbeddedConsumeDispatcher;
 import com.zq.sword.array.mq.jade.msg.Message;
 import com.zq.sword.array.redis.command.RedisCommand;
 import com.zq.sword.array.redis.command.RedisCommandDeserializer;
@@ -35,7 +36,7 @@ public class EmbeddedRedisWriter extends AbstractThreadActuator implements Redis
     private EmbeddedRedisWriter(RedisConfig redisConfig, String fileLocation, Broker broker, NameCoordinator coordinator) {
         redisClient = new SwordRedisClient(redisConfig);
         this.resourceQueue = new FileResourceQueue(fileLocation, new RedisCommandSerializer(), new RedisCommandDeserializer());
-        this.consumeDispatcher = new BrokerConsumeDispatcher(broker, coordinator);
+        this.consumeDispatcher = new EmbeddedConsumeDispatcher(broker, coordinator);
     }
 
     @Override

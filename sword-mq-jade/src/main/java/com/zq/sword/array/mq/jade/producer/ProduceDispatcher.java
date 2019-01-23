@@ -11,18 +11,11 @@ import com.zq.sword.array.tasks.Actuator;
 public interface ProduceDispatcher extends Actuator {
 
     /**
-     * 指定 topic
-     * @param topics
-     */
-    void assignTopic(String... topics);
-
-    /**
      * 分配选择topic 下的一个分片
      * @param topic
      * @return
      */
     PartitionResource allotPartition(String topic);
-
     /**
      * 创建生产者
      * @return

@@ -113,7 +113,7 @@ public class DefaultConsumeAllocator extends AbstractThreadActuator implements C
                 List<NameDuplicatePartition> nameDuplicatePartitions = coordinator.gainDuplicatePartition(topic, dataEvent -> {
                     if(PARTITION_NODE_CHANGE.equals(dataEvent.getType())){
                         this.partitions.clear();
-                        this.partitions.addAll(dataEvent.getData());
+                        this.partitions.addAll(dataEvent.getData().get(topic));
                         reallocateConsumePartition();
                     }
                 });
