@@ -1,7 +1,9 @@
 package com.zq.sword.array.zpiper.server.piper.config;
 
+import com.zq.sword.array.config.client.ApplicationId;
 import com.zq.sword.array.config.client.ArgsChangeListener;
 import com.zq.sword.array.config.client.ArgsConfig;
+import com.zq.sword.array.config.client.ZkArgsConfig;
 import com.zq.sword.array.redis.writer.RedisConfig;
 import com.zq.sword.array.zpiper.server.piper.cluster.data.NamePiper;
 import org.springframework.core.env.Environment;
@@ -23,9 +25,9 @@ public class PiperConfig implements PropertiesConfig, DynamicConfig{
 
     private ArgsConfig argsConfig;
 
-    public PiperConfig(Environment environment, ArgsConfig argsConfig) {
+    public PiperConfig(Environment environment) {
         this.environment = environment;
-        this.argsConfig = argsConfig;
+        this.argsConfig = new ZkArgsConfig(environment.getProperty(PiperConfigKey.PIPER_ZK_CONNECT_ADDRESS), new ApplicationId());
         this.properties = new Properties();
     }
 
