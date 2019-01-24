@@ -1,7 +1,5 @@
 package com.zq.sword.array.zpiper.server.piper;
 
-import com.zq.sword.array.mq.jade.consumer.ConsumeStatus;
-import com.zq.sword.array.mq.jade.consumer.MessageListener;
 import com.zq.sword.array.mq.jade.coordinator.NameCoordinator;
 import com.zq.sword.array.mq.jade.coordinator.ZkNameCoordinator;
 import com.zq.sword.array.mq.jade.msg.Message;
@@ -51,19 +49,8 @@ public class RedisProxyPiper extends AbstractPiper implements Piper {
     }
 
     @Override
-    protected MessageListener createMessageListener() {
-        return new MessageListener(){
-            @Override
-            public ConsumeStatus consume(Message message) {
-                try{
-                    producer.sendMsg(message);
-                }catch (Exception e){
-                    logger.error("消费消息失败", e);
-                    return ConsumeStatus.CONSUME_FAIL;
-                }
-                return ConsumeStatus.CONSUME_SUCCESS;
-            }
-        };
+    protected void receiveMsg(Message message) {
+        sendMsg(message);
     }
 
 

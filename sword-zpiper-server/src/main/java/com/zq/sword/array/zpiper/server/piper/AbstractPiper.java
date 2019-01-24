@@ -1,10 +1,12 @@
 package com.zq.sword.array.zpiper.server.piper;
 
 import com.zq.sword.array.common.event.HotspotEventType;
+import com.zq.sword.array.mq.jade.consumer.ConsumeStatus;
 import com.zq.sword.array.mq.jade.consumer.Consumer;
 import com.zq.sword.array.mq.jade.consumer.MessageListener;
 import com.zq.sword.array.mq.jade.coordinator.ZkNameCoordinator;
 import com.zq.sword.array.mq.jade.embedded.AbstractEmbeddedBroker;
+import com.zq.sword.array.mq.jade.msg.Message;
 import com.zq.sword.array.mq.jade.producer.Producer;
 import com.zq.sword.array.zpiper.server.piper.cluster.PiperCluster;
 import com.zq.sword.array.zpiper.server.piper.cluster.ZkPiperCluster;
@@ -55,14 +57,39 @@ public abstract class AbstractPiper extends AbstractEmbeddedBroker implements Pi
 
         //创建消费者
         this.consumer  = createConsumer(id()+"group");
-        this.consumer.bindingMessageListener(createMessageListener());
+        this.consumer.bindingMessageListener(new ReceiveMessageListener());
     }
 
     /**
-     * 创建消费者消息监听器
-     * @return
+     * 接收消息监听器
      */
-    protected abstract MessageListener createMessageListener();
+    private class ReceiveMessageListener implements MessageListener {
+
+        @Override
+        public ConsumeStatus consume(Message message) {
+            try{
+                receiveMsg(message);
+            }catch (Exception e){
+                logger.error("接收消息发生异常", e);
+                return ConsumeStatus.CONSUME_FAIL;
+            }
+            return ConsumeStatus.CONSUME_SUCCESS;
+        }
+    }
+
+    /**
+     * 发送消息
+     * @param message
+     */
+    protected void sendMsg(Message message){
+        producer.sendMsg(message);
+    }
+
+    /**
+     * 接收消息
+     * @param message
+     */
+    protected abstract void receiveMsg(Message message);
 
     @Override
     public void start() {

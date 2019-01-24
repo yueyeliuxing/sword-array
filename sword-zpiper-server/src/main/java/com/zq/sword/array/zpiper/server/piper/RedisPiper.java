@@ -2,22 +2,20 @@ package com.zq.sword.array.zpiper.server.piper;
 
 import com.zq.sword.array.id.IdGenerator;
 import com.zq.sword.array.id.SnowFlakeIdGenerator;
-import com.zq.sword.array.mq.jade.consumer.ConsumeStatus;
-import com.zq.sword.array.mq.jade.consumer.MessageListener;
 import com.zq.sword.array.mq.jade.msg.Message;
+import com.zq.sword.array.redis.command.CommandMetadata;
 import com.zq.sword.array.redis.command.RedisCommand;
 import com.zq.sword.array.redis.command.RedisCommandDeserializer;
 import com.zq.sword.array.redis.command.RedisCommandSerializer;
 import com.zq.sword.array.redis.handler.CycleDisposeHandler;
 import com.zq.sword.array.redis.handler.SimpleCycleDisposeHandler;
-import com.zq.sword.array.redis.replicator.DefaultSlaveRedisReplicator;
-import com.zq.sword.array.redis.replicator.listener.RedisReplicatorListener;
-import com.zq.sword.array.redis.replicator.SlaveRedisReplicator;
-import com.zq.sword.array.redis.writer.DefaultRedisWriter;
-import com.zq.sword.array.redis.writer.RedisWriter;
-import com.zq.sword.array.redis.command.CommandMetadata;
 import com.zq.sword.array.redis.interceptor.AbstractCommandInterceptor;
 import com.zq.sword.array.redis.interceptor.CommandInterceptor;
+import com.zq.sword.array.redis.replicator.DefaultSlaveRedisReplicator;
+import com.zq.sword.array.redis.replicator.SlaveRedisReplicator;
+import com.zq.sword.array.redis.replicator.listener.RedisReplicatorListener;
+import com.zq.sword.array.redis.writer.DefaultRedisWriter;
+import com.zq.sword.array.redis.writer.RedisWriter;
 import com.zq.sword.array.zpiper.server.piper.config.PiperConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +38,8 @@ public class RedisPiper extends AbstractPiper implements Piper{
 
     private RedisWriter redisWriter;
 
+    private RedisCommandDeserializer redisCommandDeserializer = new RedisCommandDeserializer();
+
     public RedisPiper(PiperConfig config) {
         super(config);
 
@@ -57,17 +57,8 @@ public class RedisPiper extends AbstractPiper implements Piper{
     }
 
     @Override
-    protected MessageListener createMessageListener() {
-        return new MessageListener() {
-
-            private RedisCommandDeserializer redisCommandDeserializer = new RedisCommandDeserializer();
-
-            @Override
-            public ConsumeStatus consume(Message message) {
-                redisWriter.write(redisCommandDeserializer.deserialize(message.getBody()));
-                return ConsumeStatus.CONSUME_SUCCESS;
-            }
-        };
+    protected void receiveMsg(Message message) {
+        redisWriter.write(redisCommandDeserializer.deserialize(message.getBody()));
     }
 
     @Override
@@ -97,7 +88,7 @@ public class RedisPiper extends AbstractPiper implements Piper{
             message.setTag(command.getType()+"");
             message.setBody(redisCommandSerializer.serialize(command));
             message.setTimestamp(System.currentTimeMillis());
-            producer.sendMsg(message);
+            sendMsg(message);
         }
     }
 
