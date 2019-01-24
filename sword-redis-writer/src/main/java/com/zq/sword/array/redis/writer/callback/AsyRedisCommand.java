@@ -1,7 +1,6 @@
-package com.zq.sword.array.redis.writer.data;
+package com.zq.sword.array.redis.writer.callback;
 
 import com.zq.sword.array.redis.command.RedisCommand;
-import com.zq.sword.array.redis.writer.callback.CommandCallback;
 import lombok.Data;
 import lombok.ToString;
 

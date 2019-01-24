@@ -1,7 +1,7 @@
-package com.zq.sword.array.redis.writer.interceptor;
+package com.zq.sword.array.redis.interceptor;
 
 import com.zq.sword.array.redis.command.RedisCommand;
-import com.zq.sword.array.redis.writer.data.CommandMetadata;
+import com.zq.sword.array.redis.command.CommandMetadata;
 
 /**
  * @program: sword-array
@@ -16,7 +16,7 @@ public interface CommandInterceptor {
      * @param command
      * @return 如果返回 null 命令被抛弃
      */
-    RedisCommand onWrite(RedisCommand command);
+    RedisCommand interceptor(RedisCommand command);
 
     /**
      * 写入后的应答拦截

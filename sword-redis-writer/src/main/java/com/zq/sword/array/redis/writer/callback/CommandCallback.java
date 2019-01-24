@@ -1,6 +1,6 @@
 package com.zq.sword.array.redis.writer.callback;
 
-import com.zq.sword.array.redis.writer.data.CommandMetadata;
+import com.zq.sword.array.redis.command.CommandMetadata;
 
 /**
  * @program: sword-array

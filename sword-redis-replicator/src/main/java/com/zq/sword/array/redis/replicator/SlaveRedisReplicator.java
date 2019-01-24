@@ -1,6 +1,8 @@
 package com.zq.sword.array.redis.replicator;
 
 
+import com.zq.sword.array.redis.interceptor.CommandInterceptor;
+import com.zq.sword.array.redis.replicator.listener.RedisReplicatorListener;
 import com.zq.sword.array.tasks.Actuator;
 
 /**
@@ -11,5 +13,16 @@ import com.zq.sword.array.tasks.Actuator;
  **/
 public interface SlaveRedisReplicator extends Actuator {
 
+    /**
+     * 添加命令拦截器
+     * @param interceptor
+     */
+    void addCommandInterceptor(CommandInterceptor interceptor);
+
+    /**
+     * 添加复制监听器
+     * @param redisReplicatorListener
+     */
+    void addRedisReplicatorListener(RedisReplicatorListener redisReplicatorListener);
 
 }

@@ -4,11 +4,11 @@ import com.zq.sword.array.redis.command.RedisCommand;
 import com.zq.sword.array.redis.writer.callback.CommandCallback;
 import com.zq.sword.array.redis.writer.callback.CommandInterCallback;
 import com.zq.sword.array.redis.writer.client.RedisClient;
-import com.zq.sword.array.redis.writer.data.AsyRedisCommand;
-import com.zq.sword.array.redis.writer.data.CommandMetadata;
-import com.zq.sword.array.redis.writer.data.RedisConfig;
-import com.zq.sword.array.redis.writer.interceptor.CommandInterceptor;
-import com.zq.sword.array.redis.writer.interceptor.CommandInterceptors;
+import com.zq.sword.array.redis.writer.callback.AsyRedisCommand;
+import com.zq.sword.array.redis.command.CommandMetadata;
+import com.zq.sword.array.redis.util.RedisConfig;
+import com.zq.sword.array.redis.interceptor.CommandInterceptor;
+import com.zq.sword.array.redis.interceptor.CommandInterceptors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,8 +38,8 @@ public class DefaultRedisWriter implements RedisWriter {
     }
 
     @Override
-    public void addInterceptor(CommandInterceptor interceptor) {
-        interceptors.addInterceptor(interceptor);
+    public void addCommandInterceptor(CommandInterceptor interceptor) {
+        interceptors.addCommandInterceptor(interceptor);
     }
 
     @Override
@@ -57,7 +57,7 @@ public class DefaultRedisWriter implements RedisWriter {
     @Override
     public boolean write(RedisCommand command) {
         //拦截器处理
-        if((command = interceptors.onWrite(command)) == null){
+        if((command = interceptors.interceptor(command)) == null){
             return false;
         }
         try {
@@ -74,7 +74,7 @@ public class DefaultRedisWriter implements RedisWriter {
     @Override
     public void write(RedisCommand command, CommandCallback callback) {
         //拦截器处理
-        if((command = interceptors.onWrite(command)) == null){
+        if((command = interceptors.interceptor(command)) == null){
             return;
         }
         accumulator.add(new AsyRedisCommand(command, new CommandInterCallback(callback, interceptors)));

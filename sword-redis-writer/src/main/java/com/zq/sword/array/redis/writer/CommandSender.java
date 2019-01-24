@@ -1,8 +1,8 @@
 package com.zq.sword.array.redis.writer;
 
 import com.zq.sword.array.redis.writer.client.RedisClient;
-import com.zq.sword.array.redis.writer.data.AsyRedisCommand;
-import com.zq.sword.array.redis.writer.data.CommandMetadata;
+import com.zq.sword.array.redis.writer.callback.AsyRedisCommand;
+import com.zq.sword.array.redis.command.CommandMetadata;
 import com.zq.sword.array.tasks.AbstractThreadActuator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

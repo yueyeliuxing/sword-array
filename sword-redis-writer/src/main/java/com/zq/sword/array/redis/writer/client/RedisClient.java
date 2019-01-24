@@ -2,7 +2,8 @@ package com.zq.sword.array.redis.writer.client;
 
 import com.zq.sword.array.redis.command.CommandType;
 import com.zq.sword.array.redis.command.RedisCommand;
-import com.zq.sword.array.redis.writer.data.RedisConfig;
+import com.zq.sword.array.redis.util.JedisClient;
+import com.zq.sword.array.redis.util.RedisConfig;
 
 /**
  * @program: sword-array

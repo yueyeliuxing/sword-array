@@ -1,6 +1,6 @@
 package com.zq.sword.array.redis.writer;
 
-import com.zq.sword.array.redis.writer.data.AsyRedisCommand;
+import com.zq.sword.array.redis.writer.callback.AsyRedisCommand;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;

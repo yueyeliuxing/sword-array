@@ -3,6 +3,7 @@ package com.zq.sword.array.redis.handler;
 
 import com.zq.sword.array.redis.command.RedisCommand;
 import com.zq.sword.array.redis.util.JedisClient;
+import com.zq.sword.array.redis.util.RedisConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,10 +23,9 @@ public class RedisCycleDisposeHandler implements CycleDisposeHandler<RedisComman
 
     private JedisClient jedisClient;
 
-    public RedisCycleDisposeHandler(String host, int port, String pass) {
-        logger.info("SwordCommandCycleDisposeBridge 模块启动成功");
+    public RedisCycleDisposeHandler(RedisConfig redisConfig) {
         jedisClient = new JedisClient();
-        jedisClient.initJedis(host, port, pass);
+        jedisClient.initJedis(redisConfig);
     }
 
     @Override

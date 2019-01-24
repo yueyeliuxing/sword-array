@@ -1,4 +1,4 @@
-package com.zq.sword.array.redis.replicator;
+package com.zq.sword.array.redis.replicator.util;
 
 import com.moilioncircle.redis.replicator.cmd.Command;
 import com.moilioncircle.redis.replicator.cmd.impl.*;

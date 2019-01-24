@@ -1,7 +1,7 @@
-package com.zq.sword.array.redis.writer.interceptor;
+package com.zq.sword.array.redis.interceptor;
 
 import com.zq.sword.array.redis.command.RedisCommand;
-import com.zq.sword.array.redis.writer.data.CommandMetadata;
+import com.zq.sword.array.redis.command.CommandMetadata;
 
 /**
  * @program: sword-array
@@ -12,7 +12,7 @@ import com.zq.sword.array.redis.writer.data.CommandMetadata;
 public abstract class AbstractCommandInterceptor implements CommandInterceptor {
 
     @Override
-    public RedisCommand onWrite(RedisCommand command) {
+    public RedisCommand interceptor(RedisCommand command) {
         return null;
     }
 
