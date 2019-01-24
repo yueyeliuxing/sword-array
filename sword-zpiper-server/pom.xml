@@ -87,6 +87,12 @@
 
 		<dependency>
 			<groupId>com.zq.sword</groupId>
+			<artifactId>sword-config-lemna</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.zq.sword</groupId>
 			<artifactId>sword-redis-replicator</artifactId>
 			<version>${project.version}</version>
 		</dependency>

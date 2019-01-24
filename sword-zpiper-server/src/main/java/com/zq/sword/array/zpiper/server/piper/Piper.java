@@ -1,6 +1,6 @@
 package com.zq.sword.array.zpiper.server.piper;
 
-import com.zq.sword.array.mq.jade.broker.Broker;
+import com.zq.sword.array.mq.jade.embedded.EmbeddedBroker;
 
 /**
  * @program: sword-array
@@ -8,6 +8,6 @@ import com.zq.sword.array.mq.jade.broker.Broker;
  * @author: zhouqi1
  * @create: 2019-01-21 21:07
  **/
-public interface Piper extends Broker {
+public interface Piper extends EmbeddedBroker {
 
 }

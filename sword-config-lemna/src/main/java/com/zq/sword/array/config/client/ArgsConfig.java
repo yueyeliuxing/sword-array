@@ -13,14 +13,28 @@ public interface ArgsConfig {
      * @param key
      * @return
      */
-    String get(String key);
+    String getParam(String key);
 
     /**
      * 获取指定key的值
      * @param key
      * @return
      */
-    <T> T get(String key, Class<T> valueClazz);
+    String getParam(String key, String defaultValue);
+
+    /**
+     * 获取指定key的值
+     * @param key
+     * @return
+     */
+    <T> T getParam(String key, Class<T> valueClazz);
+
+    /**
+     * 获取指定key的值
+     * @param key
+     * @return
+     */
+    <T> T getParam(String key, Class<T> valueClazz, T defaultValue);
 
     /**
      * 监听指定key的数据变化

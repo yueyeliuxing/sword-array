@@ -63,6 +63,17 @@ public abstract class AbstractApplicationBroker extends AbstractConfigurableBrok
             }
         }
 
+        //注册broker及分片
+        registerBrokerAndPartitions(coordinator);
+
+
+    }
+
+    /**
+     * 注册broker及分片
+     * @param coordinator
+     */
+    protected void registerBrokerAndPartitions(NameCoordinator coordinator) {
         //注册broker
         coordinator.registerBroker(new NameBroker(id(), brokerLocation()));
 

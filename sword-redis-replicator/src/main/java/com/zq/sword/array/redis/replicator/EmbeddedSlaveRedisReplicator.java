@@ -1,9 +1,8 @@
 package com.zq.sword.array.redis.replicator;
 
 
-import com.zq.sword.array.mq.jade.broker.Broker;
-import com.zq.sword.array.mq.jade.coordinator.NameCoordinator;
-import com.zq.sword.array.mq.jade.embedded.EmbeddedProduceDispatcher;
+import com.zq.sword.array.mq.jade.embedded.EmbeddedBroker;
+import com.zq.sword.array.mq.jade.producer.Producer;
 import com.zq.sword.array.redis.command.RedisCommand;
 import com.zq.sword.array.redis.handler.CycleDisposeHandler;
 import org.slf4j.Logger;
@@ -19,7 +18,15 @@ public class EmbeddedSlaveRedisReplicator extends AbstractSlaveRedisReplicator i
 
     private Logger logger = LoggerFactory.getLogger(EmbeddedSlaveRedisReplicator.class);
 
-    public EmbeddedSlaveRedisReplicator(String uri, String topic, NameCoordinator coordinator, Broker broker, CycleDisposeHandler<RedisCommand> cycleDisposeHandler) {
-        super(uri, topic, new EmbeddedProduceDispatcher(coordinator, broker), cycleDisposeHandler);
+    private EmbeddedBroker broker;
+
+    public EmbeddedSlaveRedisReplicator(String uri, String topic,EmbeddedBroker broker, CycleDisposeHandler<RedisCommand> cycleDisposeHandler) {
+        super(uri, topic, cycleDisposeHandler);
+        this.broker =  broker;
+    }
+
+    @Override
+    protected Producer createProducer() {
+        return broker.createProducer();
     }
 }

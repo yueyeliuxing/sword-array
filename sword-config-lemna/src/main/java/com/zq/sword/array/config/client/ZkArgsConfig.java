@@ -47,7 +47,7 @@ public class ZkArgsConfig extends AbstractArgsConfig implements ArgsConfig{
 
     @Override
     protected void listenArgsConfigChange(ApplicationArgsConfigChangeHandler configChangeHandler) {
-        String appConfigPath = ZkTreePathBuilder.buildNodeConfigPath(id);
+        String appConfigPath = ZkConfigPathBuilder.buildNodeConfigPath(id);
         client.subscribeDataChanges(appConfigPath, new IZkDataListener(){
 
             @Override
@@ -70,7 +70,7 @@ public class ZkArgsConfig extends AbstractArgsConfig implements ArgsConfig{
 
     @Override
     protected void pullConfig() {
-        String appConfigPath = ZkTreePathBuilder.buildNodeConfigPath(id);
+        String appConfigPath = ZkConfigPathBuilder.buildNodeConfigPath(id);
         String appConfigString = client.readData(appConfigPath);
 
         //加载参数

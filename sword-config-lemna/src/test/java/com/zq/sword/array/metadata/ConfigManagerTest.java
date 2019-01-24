@@ -20,6 +20,6 @@ public class ConfigManagerTest {
 //        node.id.group.name=piperName
         ApplicationId id = new ApplicationId( "hz", "units", "unit1", "piperName");
         ArgsConfig argsConfig = new ZkArgsConfig(connectAddr, id);
-        System.out.println(argsConfig.get("data.right.queue.file.path"));
+        System.out.println(argsConfig.getParam("data.right.queue.file.path"));
     }
 }

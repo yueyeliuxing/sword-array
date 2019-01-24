@@ -2,6 +2,8 @@ package com.zq.sword.array.redis.replicator;
 
 
 import com.zq.sword.array.mq.jade.producer.DefaultProduceDispatcher;
+import com.zq.sword.array.mq.jade.producer.ProduceDispatcher;
+import com.zq.sword.array.mq.jade.producer.Producer;
 import com.zq.sword.array.redis.handler.RedisCycleDisposeHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +21,15 @@ public class ApplicationSlaveRedisReplicator extends AbstractSlaveRedisReplicato
 
     private Logger logger = LoggerFactory.getLogger(ApplicationSlaveRedisReplicator.class);
 
+    private ProduceDispatcher produceDispatcher;
+
     public ApplicationSlaveRedisReplicator(String uri, String topic, String connectAddr) throws URISyntaxException {
-        super(uri, topic, new DefaultProduceDispatcher(connectAddr), new RedisCycleDisposeHandler(new URI(uri).getHost(), new URI(uri).getPort(), null));
+        super(uri, topic, new RedisCycleDisposeHandler(new URI(uri).getHost(), new URI(uri).getPort(), null));
+        this.produceDispatcher = new DefaultProduceDispatcher(connectAddr);
+    }
+
+    @Override
+    protected Producer createProducer() {
+        return produceDispatcher.createProducer();
     }
 }

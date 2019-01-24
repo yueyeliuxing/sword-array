@@ -51,17 +51,32 @@ public abstract class AbstractArgsConfig implements ArgsConfig{
 
 
     @Override
-    public String get(String key) {
+    public String getParam(String key) {
         return properties.getProperty(key);
     }
 
     @Override
-    public <T> T get(String key, Class<T> valueClazz) {
+    public <T> T getParam(String key, Class<T> valueClazz) {
         Object value = properties.get(key);
         if(valueClazz.isInstance(value)){
             return valueClazz.cast(value);
         }
         return null;
+    }
+
+    @Override
+    public String getParam(String key, String defaultValue) {
+        String value = properties.getProperty(key);
+        return value == null ? defaultValue : value;
+    }
+
+    @Override
+    public <T> T getParam(String key, Class<T> valueClazz, T defaultValue) {
+        Object value = properties.get(key);
+        if(value != null && valueClazz.isInstance(value)){
+            return valueClazz.cast(value);
+        }
+        return defaultValue;
     }
 
     @Override

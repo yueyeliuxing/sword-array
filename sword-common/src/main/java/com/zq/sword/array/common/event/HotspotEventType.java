@@ -73,5 +73,10 @@ public enum HotspotEventType {
      */
     CONSUME_ALLOCATOR_NODE_DEL,
 
+    /**
+     * piper master 节点删除
+     */
+    PIPER_MASTER_NODE_DEL,
+
     ;
 }
