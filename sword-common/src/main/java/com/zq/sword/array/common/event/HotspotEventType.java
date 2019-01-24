@@ -9,36 +9,6 @@ package com.zq.sword.array.common.event;
 public enum HotspotEventType {
 
     /**
-     * 节点配置数据修改
-     */
-    NODE_CONFIG_DATA_CHANGE,
-
-    /**
-     * 节点配置删除
-     */
-    NODE_CONFIG_DATA_DELETE,
-
-    /**
-     * 节点Master running 临时节点数据修改
-     */
-    NODE_MASTER_DATA_CHANGE,
-
-    /**
-     * 节点Master running 临时节点删除
-     */
-    NODE_MASTER_DATA_DELETE,
-
-    /**
-     * 节点Master 启动成功
-     */
-    NODE_MASTER_STATED,
-
-    /**
-     * 节点数据改变
-     */
-    NODE_DATA_ITEM_CHANGE,
-
-    /**
      * 数据添加
      */
     SWORD_DATA_ADD,
