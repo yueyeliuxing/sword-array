@@ -4,7 +4,7 @@ import com.zq.sword.array.config.client.ApplicationId;
 import com.zq.sword.array.config.client.ArgsChangeListener;
 import com.zq.sword.array.config.client.ArgsConfig;
 import com.zq.sword.array.config.client.ZkArgsConfig;
-import com.zq.sword.array.redis.writer.RedisConfig;
+import com.zq.sword.array.redis.writer.data.RedisConfig;
 import com.zq.sword.array.zpiper.server.piper.cluster.data.NamePiper;
 import org.springframework.core.env.Environment;
 

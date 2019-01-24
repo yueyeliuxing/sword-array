@@ -1,4 +1,4 @@
-package com.zq.sword.array.redis.writer;
+package com.zq.sword.array.redis.writer.data;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

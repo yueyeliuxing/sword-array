@@ -93,4 +93,9 @@ public interface NameCoordinator {
      * @return true 成功 false 失败
      */
     boolean registerConsumeAllocator(NameConsumeAllocator consumeAllocator, HotspotEventListener<Long> eventListener);
+
+    /**
+     * 关闭
+     */
+    void close();
 }

@@ -337,4 +337,9 @@ public class ZkNameCoordinator implements NameCoordinator {
         return true;
     }
 
+    @Override
+    public void close() {
+        client.close();
+    }
+
 }

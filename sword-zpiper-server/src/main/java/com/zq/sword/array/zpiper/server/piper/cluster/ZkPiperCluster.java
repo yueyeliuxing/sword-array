@@ -57,6 +57,11 @@ public class ZkPiperCluster implements PiperCluster {
     }
 
     @Override
+    public void close() {
+        zkClient.close();
+    }
+
+    @Override
     public boolean register(NamePiper piper, HotspotEventListener<Void> eventListener) {
         String masterRunningPath = ZkClusterNodePathBuilder.buildPiperRunningPath(piper);
         String location = piper.getLocation();

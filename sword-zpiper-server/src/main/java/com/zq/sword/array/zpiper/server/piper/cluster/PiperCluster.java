@@ -23,4 +23,9 @@ public interface PiperCluster {
      * 设置piper 启动 状态
      */
     void setStartState(NamePiper piper, PiperStartState startState);
+
+    /***
+     * 关闭
+     */
+    void close();
 }

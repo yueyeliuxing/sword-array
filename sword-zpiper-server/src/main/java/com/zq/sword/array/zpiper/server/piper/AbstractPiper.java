@@ -1,8 +1,11 @@
 package com.zq.sword.array.zpiper.server.piper;
 
 import com.zq.sword.array.common.event.HotspotEventType;
+import com.zq.sword.array.mq.jade.consumer.Consumer;
+import com.zq.sword.array.mq.jade.consumer.MessageListener;
 import com.zq.sword.array.mq.jade.coordinator.ZkNameCoordinator;
 import com.zq.sword.array.mq.jade.embedded.AbstractEmbeddedBroker;
+import com.zq.sword.array.mq.jade.producer.Producer;
 import com.zq.sword.array.zpiper.server.piper.cluster.PiperCluster;
 import com.zq.sword.array.zpiper.server.piper.cluster.ZkPiperCluster;
 import com.zq.sword.array.zpiper.server.piper.cluster.data.NamePiper;
@@ -27,6 +30,10 @@ public abstract class AbstractPiper extends AbstractEmbeddedBroker implements Pi
 
     protected PiperCluster cluster;
 
+    protected Consumer consumer;
+
+    protected Producer producer;
+
     private volatile boolean isCanRegister = false;
 
     private volatile boolean isRegisterBroker = false;
@@ -35,13 +42,27 @@ public abstract class AbstractPiper extends AbstractEmbeddedBroker implements Pi
 
     public AbstractPiper(PiperConfig config) {
         super(config.piperId(), config.msgResourceLocation(), new ZkNameCoordinator(config.zkLocation()), config.piperLocation());
+
+        //创建集群协调器
+        cluster = new ZkPiperCluster(config.zkLocation());
+
         this.namePiper = config.namePiper();
         //设置topic
         topics(namePiper.getGroup());
 
-        //创建集群协调器
-        cluster = new ZkPiperCluster(config.zkLocation());
+        //创建生产者
+        this.producer = createProducer();
+
+        //创建消费者
+        this.consumer  = createConsumer(id()+"group");
+        this.consumer.bindingMessageListener(createMessageListener());
     }
+
+    /**
+     * 创建消费者消息监听器
+     * @return
+     */
+    protected abstract MessageListener createMessageListener();
 
     @Override
     public void start() {
@@ -74,7 +95,8 @@ public abstract class AbstractPiper extends AbstractEmbeddedBroker implements Pi
         if(!isRegisterBroker){
             super.start();
         }
-
+        this.consumer.start();
+        this.producer.start();
         doStartModule();
 
         cluster.setStartState(namePiper, PiperStartState.STARTED);
@@ -87,6 +109,9 @@ public abstract class AbstractPiper extends AbstractEmbeddedBroker implements Pi
     @Override
     public void shutdown() {
         super.shutdown();
+        this.consumer.stop();
+        this.producer.stop();
+        this.cluster.close();
         doStopModule();
     }
 

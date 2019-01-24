@@ -1,12 +1,10 @@
 package com.zq.sword.array.zpiper.server.piper;
 
 import com.zq.sword.array.mq.jade.consumer.ConsumeStatus;
-import com.zq.sword.array.mq.jade.consumer.Consumer;
 import com.zq.sword.array.mq.jade.consumer.MessageListener;
 import com.zq.sword.array.mq.jade.coordinator.NameCoordinator;
 import com.zq.sword.array.mq.jade.coordinator.ZkNameCoordinator;
 import com.zq.sword.array.mq.jade.msg.Message;
-import com.zq.sword.array.mq.jade.producer.Producer;
 import com.zq.sword.array.zpiper.server.piper.cluster.PiperCluster;
 import com.zq.sword.array.zpiper.server.piper.cluster.ZkPiperCluster;
 import com.zq.sword.array.zpiper.server.piper.cluster.data.NamePiper;
@@ -32,10 +30,6 @@ public class RedisProxyPiper extends AbstractPiper implements Piper {
 
     private Logger logger = LoggerFactory.getLogger(RedisProxyPiper.class);
 
-    private Consumer consumer;
-
-    private Producer producer;
-
     private Map<String, PiperCluster> proxyPiperClusters;
 
     private List<NameCoordinator> proxyCoordinators;
@@ -54,24 +48,48 @@ public class RedisProxyPiper extends AbstractPiper implements Piper {
             }
         }
 
-
-
-
-        //创建生产者
-        this.producer = createProducer();
-
-        //创建消费者
-        this.consumer = createConsumer(id()+"group");
-        this.consumer.bindingMessageListener(new MessageWriteBrokerListener());
-
     }
 
     @Override
-    protected void doStartModule() {
-        producer.start();
-        consumer.start();
+    protected MessageListener createMessageListener() {
+        return new MessageListener(){
+            @Override
+            public ConsumeStatus consume(Message message) {
+                try{
+                    producer.sendMsg(message);
+                }catch (Exception e){
+                    logger.error("消费消息失败", e);
+                    return ConsumeStatus.CONSUME_FAIL;
+                }
+                return ConsumeStatus.CONSUME_SUCCESS;
+            }
+        };
+    }
 
-        //注册到其他机房
+
+    @Override
+    protected void doStartModule() {
+        //注册piper到其他机房
+        registerPiper2OtherDcs();
+        //消息分片注册到其他机房
+        registerBroker2OtherDcs();
+    }
+
+    /**
+     * 消息分片注册到其他机房
+     */
+    private void registerBroker2OtherDcs() {
+        if(proxyCoordinators != null && !proxyCoordinators.isEmpty()){
+            for (NameCoordinator proxyCoordinator : proxyCoordinators){
+                registerBrokerAndPartitions(proxyCoordinator);
+            }
+        }
+    }
+
+    /**
+     * 注册piper到其他机房
+     */
+    private void registerPiper2OtherDcs() {
         if(proxyPiperClusters != null && !proxyPiperClusters.isEmpty()){
             for (String  dc : proxyPiperClusters.keySet()){
                 PiperCluster proxyPiperCluster = proxyPiperClusters.get(dc);
@@ -81,32 +99,15 @@ public class RedisProxyPiper extends AbstractPiper implements Piper {
                 }));
             }
         }
-
-        //消息分片注册到其他机房
-        if(proxyCoordinators != null && !proxyCoordinators.isEmpty()){
-            for (NameCoordinator proxyCoordinator : proxyCoordinators){
-                registerBrokerAndPartitions(proxyCoordinator);
-            }
-        }
     }
 
     @Override
     protected void doStopModule() {
-        producer.stop();
-        consumer.stop();
-    }
-
-    private class MessageWriteBrokerListener implements MessageListener{
-
-        @Override
-        public ConsumeStatus consume(Message message) {
-            try{
-                producer.sendMsg(message);
-            }catch (Exception e){
-                logger.error("消费消息失败", e);
-                return ConsumeStatus.CONSUME_FAIL;
-            }
-            return ConsumeStatus.CONSUME_SUCCESS;
+        for (PiperCluster cluster : proxyPiperClusters.values()){
+            cluster.close();
+        }
+        for(NameCoordinator coordinator : proxyCoordinators){
+            coordinator.close();
         }
     }
 }
