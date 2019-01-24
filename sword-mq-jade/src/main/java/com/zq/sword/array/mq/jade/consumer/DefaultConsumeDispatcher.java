@@ -19,9 +19,8 @@ public class DefaultConsumeDispatcher extends AbstractConsumeDispatcher implemen
         super(coordinator);
     }
 
-
     @Override
-    public Consumer createConsumer() {
+    protected Consumer doCreateConsumer(String[] topics, String group) {
         return new DefaultConsumer(coordinator, topics, group);
     }
 }
