@@ -48,7 +48,7 @@ public class RedisPiper extends AbstractPiper implements Piper{
         cycleDisposeHandler = new SimpleCycleDisposeHandler();
 
         //设置redis 复制器
-        redisReplicator = new DefaultSlaveRedisReplicator(config.redisUri());//new EmbeddedSlaveRedisReplicator(config.redisUri(), namePiper.getGroup(), this, cycleDisposeHandler);
+        redisReplicator = new DefaultSlaveRedisReplicator(config.redisUri());
         redisReplicator.addCommandInterceptor(new CycleCommandFilterInterceptor());
         redisReplicator.addRedisReplicatorListener(new RedisCommandListener());
         //设置redis 写入器
