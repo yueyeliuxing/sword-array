@@ -58,7 +58,11 @@ public class RedisPiper extends AbstractPiper implements Piper{
 
     @Override
     protected void receiveMsg(Message message) {
-        redisWriter.write(redisCommandDeserializer.deserialize(message.getBody()));
+        redisWriter.write(redisCommandDeserializer.deserialize(message.getBody()), metadata -> {
+            if(metadata.getException() != null){
+                logger.error("写入redis出错", metadata.getException());
+            }
+        });
     }
 
     @Override
