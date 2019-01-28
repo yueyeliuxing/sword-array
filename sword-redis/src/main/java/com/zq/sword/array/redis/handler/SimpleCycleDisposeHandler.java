@@ -75,6 +75,9 @@ public class SimpleCycleDisposeHandler implements CycleDisposeHandler<RedisComma
     }
 
 
+    /**
+     * 定时可删除的命令类
+     */
     private class DelayedCommand implements Delayed {
 
         private RedisCommand command;
