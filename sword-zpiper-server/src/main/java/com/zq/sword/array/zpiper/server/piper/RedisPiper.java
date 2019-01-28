@@ -32,33 +32,29 @@ public class RedisPiper extends AbstractPiper implements Piper{
 
     private IdGenerator idGenerator;
 
-    private CycleDisposeHandler<RedisCommand> cycleDisposeHandler;
-
     private SlaveRedisReplicator redisReplicator;
 
     private RedisWriter redisWriter;
-
-    private RedisCommandDeserializer redisCommandDeserializer = new RedisCommandDeserializer();
 
     public RedisPiper(PiperConfig config) {
         super(config);
 
         idGenerator = new SnowFlakeIdGenerator();
 
-        cycleDisposeHandler = new SimpleCycleDisposeHandler();
+        CycleDisposeHandler<RedisCommand> cycleDisposeHandler = new SimpleCycleDisposeHandler();
 
         //设置redis 复制器
         redisReplicator = new DefaultSlaveRedisReplicator(config.redisUri());
-        redisReplicator.addCommandInterceptor(new CycleCommandFilterInterceptor());
+        redisReplicator.addCommandInterceptor(new CycleCommandFilterInterceptor(cycleDisposeHandler));
         redisReplicator.addRedisReplicatorListener(new RedisCommandListener());
         //设置redis 写入器
         redisWriter = new DefaultRedisWriter(config.redisConfig());
-        redisWriter.addCommandInterceptor(new CycleCommandAddInterceptor());
+        redisWriter.addCommandInterceptor(new CycleCommandAddInterceptor(cycleDisposeHandler));
     }
 
     @Override
     protected void receiveMsg(Message message) {
-        redisWriter.write(redisCommandDeserializer.deserialize(message.getBody()), metadata -> {
+        redisWriter.write(new RedisCommandDeserializer().deserialize(message.getBody()), metadata -> {
             if(metadata.getException() != null){
                 logger.error("写入redis出错", metadata.getException());
             }
@@ -101,6 +97,12 @@ public class RedisPiper extends AbstractPiper implements Piper{
      */
     private class CycleCommandFilterInterceptor extends AbstractCommandInterceptor implements CommandInterceptor {
 
+        private CycleDisposeHandler<RedisCommand> cycleDisposeHandler;
+
+        public CycleCommandFilterInterceptor(CycleDisposeHandler<RedisCommand> cycleDisposeHandler) {
+            this.cycleDisposeHandler = cycleDisposeHandler;
+        }
+
         @Override
         public RedisCommand interceptor(RedisCommand command) {
             if(cycleDisposeHandler.isCycleData(command)){
@@ -115,6 +117,12 @@ public class RedisPiper extends AbstractPiper implements Piper{
      * 循环命令添加拦截器
      */
     private class CycleCommandAddInterceptor extends AbstractCommandInterceptor implements CommandInterceptor {
+
+        private CycleDisposeHandler<RedisCommand> cycleDisposeHandler;
+
+        public CycleCommandAddInterceptor(CycleDisposeHandler<RedisCommand> cycleDisposeHandler) {
+            this.cycleDisposeHandler = cycleDisposeHandler;
+        }
 
         @Override
         public void onAcknowledgment(CommandMetadata metadata) {
