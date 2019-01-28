@@ -29,6 +29,8 @@ public class SimpleCycleDisposeHandler implements CycleDisposeHandler<RedisComma
 
     private TimedTaskExecutor taskExecutor;
 
+    private volatile boolean isRun = true;
+
     public SimpleCycleDisposeHandler() {
         logger.info("SwordCommandCycleDisposeBridge 模块启动成功");
         consumedSwordDataSet = new CopyOnWriteArraySet<>();
@@ -43,10 +45,21 @@ public class SimpleCycleDisposeHandler implements CycleDisposeHandler<RedisComma
     private void startTasks(){
 
         //只保存两分钟的数据
-        taskExecutor.timedExecute(()->{
-            DelayedCommand delayedCommand = commandDelayQueue.poll();
-            consumedSwordDataSet.remove(delayedCommand.command);
-        }, 2, TimeUnit.MINUTES);
+        taskExecutor.execute(()->{
+            while (isRun){
+                DelayedCommand delayedCommand = commandDelayQueue.poll();
+                if(delayedCommand != null){
+                    consumedSwordDataSet.remove(delayedCommand.command);
+                }else {
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        isRun = false;
+                        logger.error("定时任务发生中断", e);
+                    }
+                }
+            }
+        });
     }
 
 
