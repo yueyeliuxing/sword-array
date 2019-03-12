@@ -23,8 +23,8 @@ public abstract class AbstractConfigurableBroker implements Broker {
 
     private void loadResources(String resourceLocation) {
         File file = new File(resourceLocation);
-        if(!file.isDirectory()){
-            throw new IllegalArgumentException(String.format("resourceLocation:%s is not a directory"));
+        if(!file.exists()){
+            file.mkdirs();
         }
         File[] partitionFiles = file.listFiles();
         if (partitionFiles != null && partitionFiles.length > 0){

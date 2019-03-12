@@ -54,6 +54,14 @@ public class ZkMqPathBuilder {
     }
 
     /**
+     * IDS 路径
+     * @return
+     */
+    public static String buildBrokerIdsPath(){
+        return ZK_MQ_BROKER_IDS;
+    }
+
+    /**
      * 获取broker注册地址
      * @param broker
      * @return
@@ -104,6 +112,16 @@ public class ZkMqPathBuilder {
      */
     public static String buildConsumerParentPath(String group){
         return String.format(ZK_MQ_CUSTOMERS_GROUP_CUSTOMER_IDS, group);
+    }
+
+    /**
+     * 消费者的父节点
+     * @param group
+     * @param topic
+     * @return
+     */
+    public static String buildConsumerParentPath(String group, String topic){
+        return String.format(ZK_MQ_CUSTOMERS_GROUP_CUSTOMER_TOPICS_TOPIC_FORMAT, group, topic);
     }
 
     /**

@@ -42,6 +42,7 @@ public class NettyRpcServer implements RpcServer {
     private volatile boolean started = false;
 
     public NettyRpcServer(int port) {
+        this.host = IPUtil.getServerIp();
         this.port = port;
         transferHandlers = new CopyOnWriteArrayList<>();
     }

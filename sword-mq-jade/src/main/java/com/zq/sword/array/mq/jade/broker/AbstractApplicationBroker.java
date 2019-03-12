@@ -13,6 +13,8 @@ import com.zq.sword.array.network.rpc.message.TransferMessage;
 import com.zq.sword.array.network.rpc.server.NettyRpcServer;
 import com.zq.sword.array.stream.io.object.ObjectInputStream;
 import com.zq.sword.array.stream.io.object.ObjectOutputStream;
+import com.zq.sword.array.tasks.SingleTaskExecutor;
+import com.zq.sword.array.tasks.TaskExecutor;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,10 +37,13 @@ public abstract class AbstractApplicationBroker extends AbstractConfigurableBrok
 
     protected NameCoordinator coordinator;
 
+    private TaskExecutor taskExecutor;
+
     public AbstractApplicationBroker(long id, String resourceLocation, NameCoordinator coordinator, String brokerLocation) {
         super(id, resourceLocation);
         this.coordinator = coordinator;
         this.rpcServer = createRpcServer(brokerLocation);
+        this.taskExecutor = new SingleTaskExecutor();
     }
     /**
      * 创建Rpc 服务
@@ -54,7 +59,9 @@ public abstract class AbstractApplicationBroker extends AbstractConfigurableBrok
 
     @Override
     public void start() {
-        rpcServer.start();
+        this.taskExecutor.execute(()->{
+            rpcServer.start();
+        });
         while (!started()){
             try {
                 Thread.sleep(10);

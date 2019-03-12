@@ -45,6 +45,8 @@ public abstract class AbstractConsumeDispatcher implements ConsumeDispatcher {
             if(groupConsumeAllocators == null || !groupConsumeAllocators.containsKey(group)){
                 groupConsumeAllocators = groupConsumeAllocators == null ? new HashMap<>() : groupConsumeAllocators;
                 ConsumeAllocator consumeAllocator = new DefaultConsumeAllocator(coordinator);
+                consumeAllocator.group(group);
+                consumeAllocator.topic(topic);
                 consumeAllocator.start();
                 groupConsumeAllocators.put(group, consumeAllocator);
                 consumeAllocators.put(topic, groupConsumeAllocators);

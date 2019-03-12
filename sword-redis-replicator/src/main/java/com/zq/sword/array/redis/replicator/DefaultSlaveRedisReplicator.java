@@ -13,6 +13,8 @@ import com.zq.sword.array.redis.interceptor.CommandInterceptors;
 import com.zq.sword.array.redis.replicator.listener.RedisReplicatorListener;
 import com.zq.sword.array.redis.replicator.listener.RedisReplicatorListeners;
 import com.zq.sword.array.redis.replicator.util.RedisCommandBuilder;
+import com.zq.sword.array.tasks.SingleTaskExecutor;
+import com.zq.sword.array.tasks.TaskExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +37,8 @@ public class DefaultSlaveRedisReplicator implements SlaveRedisReplicator {
 
     private Replicator replicator;
 
+    private TaskExecutor taskExecutor;
+
     public DefaultSlaveRedisReplicator(String uri) {
         this.redisReplicatorListeners = new RedisReplicatorListeners();
         this.commandInterceptors = new CommandInterceptors();
@@ -48,16 +52,20 @@ public class DefaultSlaveRedisReplicator implements SlaveRedisReplicator {
             logger.error("error", e);
             throw new RuntimeException(e);
         }
+
+        this.taskExecutor = new SingleTaskExecutor();
     }
 
     @Override
     public void start() {
-        try {
-            replicator.open();
-        } catch (IOException e) {
-            logger.error("error", e);
-            throw new RuntimeException(e);
-        }
+        taskExecutor.execute(()->{
+            try {
+                replicator.open();
+            } catch (IOException e) {
+                logger.error("error", e);
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     @Override
@@ -90,10 +98,14 @@ public class DefaultSlaveRedisReplicator implements SlaveRedisReplicator {
             if(event instanceof Command){
                 Command command = (Command) event;
                 RedisCommand redisCommand = RedisCommandBuilder.buildSwordCommand(command);
+                if(redisCommand.getType() == 0){
+                    return;
+                }
                 if((redisCommand = commandInterceptors.interceptor(redisCommand)) == null){
                     return;
                 }
                 try{
+                    logger.info("接收命令{}", redisCommand);
                     redisReplicatorListeners.receive(redisCommand);
                     commandInterceptors.onAcknowledgment(new CommandMetadata(redisCommand));
                 }catch (Exception e){

@@ -68,7 +68,7 @@ public abstract class AbstractEmbeddedBroker extends AbstractApplicationBroker i
     }
 
     private long generatePartitionId(long id, String topic){
-        return String.format("%s-%s", id, topic).hashCode();
+        return Math.abs(String.format("%s-%s", id, topic).hashCode());
     }
 
     @Override

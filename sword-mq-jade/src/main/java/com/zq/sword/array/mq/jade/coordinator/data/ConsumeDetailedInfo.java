@@ -13,11 +13,12 @@ public class ConsumeDetailedInfo {
     private Map<Long, List<String>> detailed;
 
     public ConsumeDetailedInfo() {
+        detailed = new HashMap<>();
     }
 
     public ConsumeDetailedInfo(String data) {
         detailed = new HashMap<>();
-        if(!"".equals(data)){
+        if(data != null && !"".equals(data)){
             String[] detailedItems = data.split(";");
             for (String detailedItem : detailedItems){
                 String[] cIds = detailedItem.split(":");

@@ -50,6 +50,9 @@ public class ZkNameCoordinator implements NameCoordinator {
 
     @Override
     public boolean registerBroker(NameBroker broker) {
+        if(!client.exists(ZkMqPathBuilder.buildBrokerIdsPath())){
+            client.createPersistent(ZkMqPathBuilder.buildBrokerIdsPath(), true);
+        }
         String brokerRegisterPath = ZkMqPathBuilder.buildBrokerRegisterPath(broker);
         if(client.exists(brokerRegisterPath)){
             String data = client.readData(brokerRegisterPath);
@@ -79,7 +82,7 @@ public class ZkNameCoordinator implements NameCoordinator {
             client.writeData(partitionRegisterPath, new String(duplicatePartitionInfo.serialize()));
             return false;
         }
-        client.createEphemeral(partitionRegisterPath, new DuplicatePartitionInfo(partition.getLocation()));
+        client.createEphemeral(partitionRegisterPath, new String(new DuplicatePartitionInfo(partition.getLocation()).serialize()));
         return true;
     }
 
@@ -308,8 +311,18 @@ public class ZkNameCoordinator implements NameCoordinator {
         client.writeData(consumePartitionPath, msgId);
     }
 
+    private void createConsumerParentNode(String group, String topic){
+        String consumerParentPath = ZkMqPathBuilder.buildConsumerParentPath(group, topic);
+        if(!client.exists(consumerParentPath)){
+            client.createPersistent(consumerParentPath, true);
+        }
+    }
+
     @Override
     public boolean registerConsumeAllocator(NameConsumeAllocator consumeAllocator, HotspotEventListener<Long> eventListener) {
+
+        createConsumerParentNode(consumeAllocator.getGroup(), consumeAllocator.getTopic());
+
         String consumerAllocatorRegisterPath = ZkMqPathBuilder.buildConsumerAllocatorRegisterPath(consumeAllocator);
         if(client.exists(consumerAllocatorRegisterPath)){
             String data = client.readData(consumerAllocatorRegisterPath);

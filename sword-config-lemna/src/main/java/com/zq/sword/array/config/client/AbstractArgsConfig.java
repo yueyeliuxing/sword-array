@@ -30,8 +30,9 @@ public abstract class AbstractArgsConfig implements ArgsConfig{
         this.id = id;
         properties = new Properties();
         argsChangeListeners = new ConcurrentHashMap<>();
+    }
 
-
+    protected void postConstruct(){
         //拉取配置
         pullConfig();
 

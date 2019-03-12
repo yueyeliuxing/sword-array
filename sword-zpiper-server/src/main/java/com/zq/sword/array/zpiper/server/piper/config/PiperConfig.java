@@ -32,7 +32,11 @@ public class PiperConfig implements PropertiesConfig, DynamicConfig{
     public PiperConfig(Environment environment) {
         this.environment = environment;
         this.argsConfig = new ZkArgsConfig(environment.getProperty(PiperConfigKey.PIPER_ZK_CONNECT_ADDRESS),
-                new ApplicationId());
+                new ApplicationId(
+                        environment.getProperty(PiperConfigKey.PIPER_DC_NAME),
+                        environment.getProperty(PiperConfigKey.PIPER_UNIT_CATEGORYE),
+                        environment.getProperty(PiperConfigKey.PIPER_UNIT),
+                        environment.getProperty(PiperConfigKey.PIPER_GROUP)));
         this.properties = new Properties();
     }
 
@@ -49,7 +53,7 @@ public class PiperConfig implements PropertiesConfig, DynamicConfig{
      * @return
      */
     public long piperId() {
-        return Objects.hashCode(piperLocation());
+        return Math.abs(Objects.hashCode(piperLocation()));
     }
 
     public String zkLocation() {

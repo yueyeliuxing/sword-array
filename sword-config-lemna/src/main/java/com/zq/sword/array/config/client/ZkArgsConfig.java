@@ -43,6 +43,7 @@ public class ZkArgsConfig extends AbstractArgsConfig implements ArgsConfig{
                 return new String(bytes);
             }
         });
+        postConstruct();
     }
 
     @Override

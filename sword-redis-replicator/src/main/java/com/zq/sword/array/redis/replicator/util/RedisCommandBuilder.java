@@ -25,8 +25,8 @@ public class RedisCommandBuilder {
             swordCommand.setType(CommandType.SET.getValue());
             swordCommand.setKey(setCommand.getKey());
             swordCommand.setValue(setCommand.getValue());
-            swordCommand.setEx(setCommand.getEx());
-            swordCommand.setPx(setCommand.getPx());
+            swordCommand.setEx(setCommand.getEx() == null ? 0 : setCommand.getEx());
+            swordCommand.setPx(setCommand.getPx() == null ? 0 : setCommand.getPx());
         }else if (command instanceof SetExCommand){
             SetExCommand setCommand = (SetExCommand) command;
             swordCommand.setType(CommandType.SET_EX.getValue());

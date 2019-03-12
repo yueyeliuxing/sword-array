@@ -56,7 +56,7 @@ public abstract class AbstractPiper extends AbstractEmbeddedBroker implements Pi
         this.producer = createProducer();
 
         //创建消费者
-        this.consumer  = createConsumer(id()+"group");
+        this.consumer  = createConsumer(id()+"");
         this.consumer.bindingMessageListener(new ReceiveMessageListener());
     }
 

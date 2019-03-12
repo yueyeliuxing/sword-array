@@ -63,6 +63,7 @@ public class SeqFileSegment implements Segment {
         this.name = id+SEGMENT_FILE_NAME_SUFFIX;
         this.segmentFile = new File(partition.path() + File.separator + this.name);
         this.messageOffsets = new HashMap<>();
+        this.segmentFile.getParentFile().mkdirs();
 
     }
 
