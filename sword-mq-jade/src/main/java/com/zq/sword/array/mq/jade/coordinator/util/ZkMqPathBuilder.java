@@ -17,7 +17,7 @@ public class ZkMqPathBuilder {
 
     public static final String ZK_MQ_ROOT= ZK_ROOT + "/mq";
 
-    public static final String ZK_MQ_BROKER_IDS = ZK_ROOT + "/brokers/ids";
+    public static final String ZK_MQ_BROKER_IDS = ZK_MQ_ROOT + "/brokers/ids";
 
     public static final String ZK_MQ_BROKER_IDS_ID_FORMAT = ZK_MQ_BROKER_IDS + "/%s";
 
@@ -29,7 +29,7 @@ public class ZkMqPathBuilder {
 
     public static final String ZK_MQ_TOPICS_TOPIC_PARTS_ID_FORMAT = ZK_MQ_TOPICS_TOPIC_PARTS_FORMAT + "/%s";
 
-    public static final String ZK_MQ_CUSTOMERS = ZK_ROOT + "/consumers";
+    public static final String ZK_MQ_CUSTOMERS = ZK_MQ_ROOT + "/consumers";
 
     public static final String ZK_MQ_CUSTOMERS_GROUP_FORMAT = ZK_MQ_CUSTOMERS + "/%s";
 
