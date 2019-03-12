@@ -4,6 +4,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 /**
  * @program: sword-array
  * @description:
@@ -30,6 +33,23 @@ public class RedisConfig {
     private String maxWaitMillis;
 
     private String testOnBorrow;
+
+    public RedisConfig(String redisUri) {
+        URI uri = null;
+        try {
+            uri = new URI(redisUri);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        this.host = uri.getHost();
+        this.port = uri.getPort()+"";
+        this.pass = null;
+        this.timeout = "5000";
+        this.maxIdle = "500";
+        this.maxTotal = "0";
+        this.maxWaitMillis = "0";
+        this.testOnBorrow = "true";
+    }
 
     public RedisConfig(String host, String port, String pass) {
         this.host = host;

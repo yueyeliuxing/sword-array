@@ -1,14 +1,18 @@
 package com.zq.sword.array.zpiper.server.piper.config;
 
+import com.google.common.collect.Lists;
+import com.zq.sword.array.common.utils.IPUtil;
 import com.zq.sword.array.config.client.ApplicationId;
 import com.zq.sword.array.config.client.ArgsChangeListener;
 import com.zq.sword.array.config.client.ArgsConfig;
 import com.zq.sword.array.config.client.ZkArgsConfig;
 import com.zq.sword.array.redis.util.RedisConfig;
 import com.zq.sword.array.zpiper.server.piper.cluster.data.NamePiper;
+import com.zq.sword.array.zpiper.server.piper.cluster.data.PiperType;
 import org.springframework.core.env.Environment;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 
 /**
@@ -27,7 +31,8 @@ public class PiperConfig implements PropertiesConfig, DynamicConfig{
 
     public PiperConfig(Environment environment) {
         this.environment = environment;
-        this.argsConfig = new ZkArgsConfig(environment.getProperty(PiperConfigKey.PIPER_ZK_CONNECT_ADDRESS), new ApplicationId());
+        this.argsConfig = new ZkArgsConfig(environment.getProperty(PiperConfigKey.PIPER_ZK_CONNECT_ADDRESS),
+                new ApplicationId());
         this.properties = new Properties();
     }
 
@@ -36,11 +41,7 @@ public class PiperConfig implements PropertiesConfig, DynamicConfig{
     }
 
     public String msgResourceLocation() {
-        return null;
-    }
-
-    public String zkConnection() {
-        return  null;
+        return getParam(PiperConfigKey.MSG_RESOURCE_LOCATION);
     }
 
     /**
@@ -48,15 +49,15 @@ public class PiperConfig implements PropertiesConfig, DynamicConfig{
      * @return
      */
     public long piperId() {
-        return 0;
+        return Objects.hashCode(piperLocation());
     }
 
     public String zkLocation() {
-        return null;
+        return getParam(PiperConfigKey.PIPER_ZK_CONNECT_ADDRESS);
     }
 
     public String piperLocation() {
-        return null;
+        return IPUtil.getServerIp()+":"+bindPort();
     }
 
     @Override
@@ -109,22 +110,25 @@ public class PiperConfig implements PropertiesConfig, DynamicConfig{
     }
 
     public NamePiper namePiper() {
-        return null;
+        return new NamePiper(piperId(),
+                PiperType.valueOf(getParam(PiperConfigKey.PIPER_TYPE)),
+                getParam(PiperConfigKey.PIPER_DC_NAME),
+                getParam(PiperConfigKey.PIPER_UNIT_CATEGORYE),
+                getParam(PiperConfigKey.PIPER_UNIT),
+                getParam(PiperConfigKey.PIPER_GROUP),
+                piperLocation());
     }
 
     public String redisUri() {
-        return null;
-    }
-
-    public String redisWriteTempFilePath() {
-        return null;
+        return getParam(PiperConfigKey.PIPER_REDIS_URI);
     }
 
     public RedisConfig redisConfig() {
-        return null;
+        return new RedisConfig(redisUri());
     }
 
     public List<String> otherDcZkLocations() {
-        return null;
+        String otherDcZkLocations = getParam(PiperConfigKey.PIPER_OTHER_DC_ZK_LOCATIONS);
+        return Lists.newArrayList(otherDcZkLocations.split(","));
     }
 }
