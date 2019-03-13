@@ -10,9 +10,9 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
  */
 @EnableAutoConfiguration
 @SpringBootApplication
-public class Application1 {
+public class HzUnit1Application {
     public static void main(String[] args) {
-        new SpringApplicationBuilder(Application1.class).profiles("dwd-dev").build(args).run(args);
+        new SpringApplicationBuilder(HzUnit1Application.class).profiles("hz-unit1").build(args).run(args);
         System.out.println("zpiper start success");
     }
 }
