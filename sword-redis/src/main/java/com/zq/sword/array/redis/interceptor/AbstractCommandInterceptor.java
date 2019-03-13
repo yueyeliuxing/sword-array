@@ -13,7 +13,7 @@ public abstract class AbstractCommandInterceptor implements CommandInterceptor {
 
     @Override
     public RedisCommand interceptor(RedisCommand command) {
-        return null;
+        return command;
     }
 
     @Override

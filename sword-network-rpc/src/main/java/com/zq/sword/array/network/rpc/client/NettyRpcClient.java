@@ -102,8 +102,12 @@ public class NettyRpcClient implements RpcClient {
 
     @Override
     public void disconnect() {
-        channel.close();
-        group.shutdownGracefully();
+        if(channel != null && channel.isOpen()){
+            channel.close();
+        }
+        if(group != null){
+            group.shutdownGracefully();
+        }
     }
 
     @Override

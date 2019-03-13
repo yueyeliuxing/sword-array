@@ -98,10 +98,8 @@ public class DefaultSlaveRedisReplicator implements SlaveRedisReplicator {
             if(event instanceof Command){
                 Command command = (Command) event;
                 RedisCommand redisCommand = RedisCommandBuilder.buildSwordCommand(command);
-                if(redisCommand.getType() == 0){
-                    return;
-                }
-                if((redisCommand = commandInterceptors.interceptor(redisCommand)) == null){
+                if(redisCommand.getType() == 0
+                        || (redisCommand = commandInterceptors.interceptor(redisCommand)) == null){
                     return;
                 }
                 try{

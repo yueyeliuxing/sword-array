@@ -1,10 +1,11 @@
 package com.zq.sword.array.redis.command;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @program: sword-array
@@ -14,7 +15,6 @@ import java.util.Map;
  **/
 @Data
 @ToString
-@EqualsAndHashCode
 public class RedisCommand {
 
     public static final RedisCommand DELETE_COMMAND = new RedisCommand();
@@ -57,4 +57,21 @@ public class RedisCommand {
     private int ex;
 
     private long px;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RedisCommand that = (RedisCommand) o;
+        return type == that.type &&
+                Arrays.equals(key, that.key);
+    }
+
+    @Override
+    public int hashCode() {
+
+        int result = Objects.hash(super.hashCode(), type);
+        result = 31 * result + Arrays.hashCode(key);
+        return result;
+    }
 }

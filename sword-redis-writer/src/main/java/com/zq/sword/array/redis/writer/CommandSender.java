@@ -40,6 +40,7 @@ public class CommandSender extends AbstractThreadActuator {
                 }
             }else {
                 try {
+                    logger.info("写入命令->{}",command.getCommand());
                     redisClient.write(command.getCommand());
                     command.getCallback().callback(new CommandMetadata(command.getCommand()));
                 } catch (Exception e) {

@@ -51,7 +51,7 @@ public class ZkPiperCluster implements PiperCluster {
     public void setStartState(NamePiper piper, PiperStartState startState) {
         String masterStaterStatePath = ZkClusterNodePathBuilder.buildPiperStartStatePath(piper);
         if(!zkClient.exists(masterStaterStatePath)){
-            zkClient.createPersistent(masterStaterStatePath);
+            zkClient.createPersistent(masterStaterStatePath, true);
         }
         zkClient.writeData(masterStaterStatePath, startState.name());
     }
@@ -68,32 +68,31 @@ public class ZkPiperCluster implements PiperCluster {
         //master 节点已经存在
         if(zkClient.exists(masterRunningPath)){
             String oldValue = zkClient.readData(masterRunningPath);
-            if(location.equals(oldValue)){
-                try{
-                    zkClient.delete(masterRunningPath);
-                }catch (Exception e){
-                    logger.error("删除节点失败", e);
-                }
-                zkClient.createEphemeral(masterRunningPath, location);
-                return true;
+            if(!location.equals(oldValue)){
+                return false;
             }
-            zkClient.subscribeDataChanges(masterRunningPath, new IZkDataListener(){
+            try{
+                zkClient.delete(masterRunningPath);
+            }catch (Exception e){
+                logger.error("删除节点失败", e);
+            }
 
-                @Override
-                public void handleDataChange(String dataPath, Object data) throws Exception {
-
-                }
-
-                @Override
-                public void handleDataDeleted(String dataPath) throws Exception {
-                    HotspotEvent<Void> event = new HotspotEvent<>();
-                    event.setType(PIPER_MASTER_NODE_DEL);
-                    eventListener.listen(event);
-                }
-            });
-            return false;
         }
         zkClient.createEphemeral(masterRunningPath, location);
+        zkClient.subscribeDataChanges(masterRunningPath, new IZkDataListener(){
+
+            @Override
+            public void handleDataChange(String dataPath, Object data) throws Exception {
+
+            }
+
+            @Override
+            public void handleDataDeleted(String dataPath) throws Exception {
+                HotspotEvent<Void> event = new HotspotEvent<>();
+                event.setType(PIPER_MASTER_NODE_DEL);
+                eventListener.listen(event);
+            }
+        });
         logger.info("server 注册成功");
         return true;
     }

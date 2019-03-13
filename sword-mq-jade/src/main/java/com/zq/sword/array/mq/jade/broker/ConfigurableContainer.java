@@ -19,5 +19,5 @@ public interface ConfigurableContainer extends Container {
      * @param partId
      * @param partition
      */
-    void put(long partId, Partition partition);
+    void put(Long partId, Partition partition);
 }

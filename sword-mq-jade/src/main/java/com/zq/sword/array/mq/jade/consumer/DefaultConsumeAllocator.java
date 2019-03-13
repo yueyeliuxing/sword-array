@@ -125,7 +125,6 @@ public class DefaultConsumeAllocator extends AbstractThreadActuator implements C
                 logger.error("分配器出现异常", e);
                 stop();
             }
-
         }
     }
 
@@ -149,7 +148,7 @@ public class DefaultConsumeAllocator extends AbstractThreadActuator implements C
             if(i == consumerSize -1){
                 for(int j = i + 1; j < partitionSize; j++){
                     partition = partitions.get(j);
-                    putInto(partitionsOfConsumeIndexs, ThreadLocalRandom.current().nextInt(0, consumerSize-1), partition);
+                    putInto(partitionsOfConsumeIndexs, ThreadLocalRandom.current().nextInt(0, consumerSize), partition);
                 }
             }else if(i == partitionSize - 1){
                 break;
@@ -160,6 +159,7 @@ public class DefaultConsumeAllocator extends AbstractThreadActuator implements C
             consumeOfPartitions.put(consumers.get(consumeIndex), parts);
         });
 
+        logger.info("消费者变动->生成消费者，分片对应关系{}", consumeOfPartitions);
         //更改消费者对应的消费分片信息
         coordinator.editConsumePartitions(topic, group, consumeOfPartitions);
 

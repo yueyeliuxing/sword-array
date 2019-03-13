@@ -15,6 +15,8 @@ import com.zq.sword.array.stream.io.ex.InputStreamOpenException;
 import com.zq.sword.array.stream.io.ex.OutputStreamOpenException;
 import com.zq.sword.array.stream.io.object.ObjectInputStream;
 import com.zq.sword.array.stream.io.object.ObjectOutputStream;
+import com.zq.sword.array.tasks.SingleTaskExecutor;
+import com.zq.sword.array.tasks.TaskExecutor;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * @program: sword-array
@@ -48,22 +47,33 @@ public class RpcPartition implements Partition {
     private Queue<Object> sendMsgQueue;
 
     /**
+     * 发送消息请求对列
+     */
+    private SynchronousQueue<MsgReq> sendMsgReqQueue;
+
+    /**
      * 接收消息队列
      */
     private BlockingQueue<Object> receiveMsgQueue;
 
     private RpcClient client;
 
+    private TaskExecutor taskExecutor;
+
     public RpcPartition(long id, String location, String topic) {
         this.id = id;
         this.location = location;
         this.topic = topic;
         String[] ps = location.split(":");
+        this.taskExecutor = new SingleTaskExecutor();
         this.sendMsgQueue = new LinkedBlockingQueue<>();
+        this.sendMsgReqQueue = new SynchronousQueue<>();
         this.receiveMsgQueue = new LinkedBlockingQueue<>();
         client = new NettyRpcClient(ps[0], Integer.parseInt(ps[1]));
-        client.registerTransferHandler(new SendMsgToRemoteHostHandler(sendMsgQueue, receiveMsgQueue));
-        client.connect();
+        client.registerTransferHandler(new SendMsgToRemoteHostHandler(sendMsgQueue, sendMsgReqQueue, receiveMsgQueue));
+        this.taskExecutor.execute(()->{
+            client.connect();
+        });
     }
 
     @Override
@@ -88,7 +98,7 @@ public class RpcPartition implements Partition {
 
     @Override
     public ObjectInputStream openInputStream() throws InputStreamOpenException {
-        return new RpcPartitionInputStream(sendMsgQueue, receiveMsgQueue);
+        return new RpcPartitionInputStream(sendMsgReqQueue, receiveMsgQueue);
     }
 
     @Override
@@ -108,14 +118,14 @@ public class RpcPartition implements Partition {
 
         private Logger logger = LoggerFactory.getLogger(RpcPartitionInputStream.class);
 
-        private Queue<Object> sendMsgQueue;
+        private SynchronousQueue<MsgReq> sendMsgReqQueue;
 
         private BlockingQueue<Object> receiveMsgQueue;
 
         private long msgId;
 
-        public RpcPartitionInputStream(Queue<Object> sendMsgQueue, BlockingQueue<Object> receiveMsgQueue) {
-            this.sendMsgQueue = sendMsgQueue;
+        public RpcPartitionInputStream(SynchronousQueue<MsgReq> sendMsgReqQueue, BlockingQueue<Object> receiveMsgQueue) {
+            this.sendMsgReqQueue = sendMsgReqQueue;
             this.receiveMsgQueue = receiveMsgQueue;
         }
 
@@ -126,18 +136,39 @@ public class RpcPartition implements Partition {
 
         @Override
         public Object readObject() throws IOException {
-            sendMsgQueue.offer(new MsgReq(id, msgId, 1));
-            Object obj =  receiveMsgQueue.poll();
-            if(obj instanceof Message){
-                return obj;
+            try {
+                sendMsgReqQueue.put(new MsgReq(id, msgId, 1));
+                Object obj = receiveMsgQueue.poll(1, TimeUnit.SECONDS);
+                if(obj != null && obj instanceof Message){
+                    return obj;
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
             return null;
         }
 
         @Override
         public void readObject(Object[] objs) throws IOException {
-            sendMsgQueue.offer(new MsgReq(id, msgId, objs.length));
-
+            try {
+                sendMsgReqQueue.put(new MsgReq(id, msgId, objs.length));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            int i=0;
+            while (true){
+                Object obj = null;
+                try {
+                    obj = receiveMsgQueue.poll(1, TimeUnit.SECONDS);
+                    if(obj != null && obj instanceof Message){
+                        objs[i++] = obj;
+                    }else {
+                        return;
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         @Override
@@ -183,12 +214,17 @@ public class RpcPartition implements Partition {
 
         private volatile ScheduledFuture<?> sendMsgFuture;
 
+        private volatile ScheduledFuture<?> sendMsgReqFuture;
+
         private Queue<Object> sendMsgQueue;
 
-        private Queue<Object> receiveMsgQueue;
+        private SynchronousQueue<MsgReq> sendMsgReqQueue;
 
-        public SendMsgToRemoteHostHandler(Queue<Object> sendMsgQueue,  Queue<Object> receiveMsgQueue) {
+        private BlockingQueue<Object> receiveMsgQueue;
+
+        public SendMsgToRemoteHostHandler(Queue<Object> sendMsgQueue, SynchronousQueue<MsgReq> sendMsgReqQueue,  BlockingQueue<Object> receiveMsgQueue) {
             this.sendMsgQueue = sendMsgQueue;
+            this.sendMsgReqQueue = sendMsgReqQueue;
             this.receiveMsgQueue = receiveMsgQueue;
         }
 
@@ -197,6 +233,10 @@ public class RpcPartition implements Partition {
             if(sendMsgFuture != null) {
                 sendMsgFuture.cancel(true);
                 sendMsgFuture = null;
+            }
+            if(sendMsgReqFuture != null) {
+                sendMsgReqFuture.cancel(true);
+                sendMsgReqFuture = null;
             }
             ctx.fireExceptionCaught(cause);
         }
@@ -208,9 +248,13 @@ public class RpcPartition implements Partition {
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-
+            logger.error("rpcPartition receive msg request : {}", msg);
             if(sendMsgFuture == null) {
                 sendMsgFuture = ctx.executor().scheduleAtFixedRate(new SendMsgTask(ctx), 0, 5000, TimeUnit.MILLISECONDS);
+            }
+
+            if(sendMsgReqFuture == null) {
+                sendMsgReqFuture = ctx.executor().scheduleAtFixedRate(new SendMsgReqTask(ctx), 0, 5000, TimeUnit.MILLISECONDS);
             }
 
             TransferMessage message = (TransferMessage)msg;
@@ -238,16 +282,50 @@ public class RpcPartition implements Partition {
             @Override
             public void run() {
                 Object obj = sendMsgQueue.poll();
+                logger.info("定时获取消息数据，request->{} queue: {}", obj, sendMsgQueue);
                 if(obj != null){
-                    TransferMessage transferMessage = null;
-                    if(obj instanceof Message){
-                        transferMessage = buildSendMessageReq(new LocatedMessage(id, (Message)obj));
-                    }else if(obj instanceof MsgReq){
-                        transferMessage = buildReceiveMessageReq((MsgReq) obj);
-                    }else {
-                        return;
-                    }
+                    TransferMessage transferMessage = buildSendMessageReq(new LocatedMessage(id, (Message)obj));
                     System.out.println("Client send message to server : --> " + transferMessage);
+                    ctx.writeAndFlush(transferMessage);
+                }else {
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            /**
+             * 构建发送数据请求
+             * @param msg
+             * @return
+             */
+            private TransferMessage buildSendMessageReq(LocatedMessage msg) {
+                TransferMessage message = new TransferMessage();
+                Header header = new Header();
+                header.setType(MessageType.SEND_MESSAGE_REQ.value());
+                message.setHeader(header);
+                message.setBody(msg);
+                return message;
+            }
+        }
+
+        public class SendMsgReqTask implements Runnable {
+
+            private final ChannelHandlerContext ctx;
+
+            public SendMsgReqTask(ChannelHandlerContext ctx) {
+                this.ctx = ctx;
+            }
+
+            @Override
+            public void run() {
+                MsgReq msgReq = sendMsgReqQueue.poll();
+                logger.info("定时获取消息数据，request->{} queue: {}", msgReq, sendMsgQueue);
+                if(msgReq != null){
+                    TransferMessage transferMessage = buildReceiveMessageReq(msgReq);
+                    System.out.println("Client send message req to server : --> " + transferMessage);
                     ctx.writeAndFlush(transferMessage);
                 }
             }
@@ -265,20 +343,6 @@ public class RpcPartition implements Partition {
                 message.setBody(msgReq);
                 return message;
 
-            }
-
-            /**
-             * 构建发送数据请求
-             * @param msg
-             * @return
-             */
-            private TransferMessage buildSendMessageReq(LocatedMessage msg) {
-                TransferMessage message = new TransferMessage();
-                Header header = new Header();
-                header.setType(MessageType.SEND_MESSAGE_REQ.value());
-                message.setHeader(header);
-                message.setBody(msg);
-                return message;
             }
         }
     }

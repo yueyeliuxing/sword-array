@@ -44,11 +44,11 @@ public class RedisConfig {
         this.host = uri.getHost();
         this.port = uri.getPort()+"";
         this.pass = null;
-        this.timeout = "5000";
-        this.maxIdle = "500";
-        this.maxTotal = "0";
-        this.maxWaitMillis = "0";
-        this.testOnBorrow = "true";
+        this.timeout = "100000";
+        this.maxIdle = "10";
+        this.maxTotal = "100";
+        this.maxWaitMillis = "30000";
+        this.testOnBorrow = null;
     }
 
     public RedisConfig(String host, String port, String pass) {

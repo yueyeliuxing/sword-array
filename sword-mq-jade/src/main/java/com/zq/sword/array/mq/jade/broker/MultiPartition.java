@@ -1,12 +1,14 @@
 package com.zq.sword.array.mq.jade.broker;
 
 import com.zq.sword.array.mq.jade.msg.Message;
-import com.zq.sword.array.stream.io.ex.InputStreamOpenException;
-import com.zq.sword.array.stream.io.ex.OutputStreamOpenException;
 import com.zq.sword.array.stream.io.AbstractResourceInputStream;
 import com.zq.sword.array.stream.io.AbstractResourceOutputStream;
+import com.zq.sword.array.stream.io.ex.InputStreamOpenException;
+import com.zq.sword.array.stream.io.ex.OutputStreamOpenException;
 import com.zq.sword.array.stream.io.object.ObjectInputStream;
 import com.zq.sword.array.stream.io.object.ObjectOutputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +22,8 @@ import java.util.List;
  * @create: 2019-01-16 10:59
  **/
 public class MultiPartition implements Partition {
+
+    private Logger logger = LoggerFactory.getLogger(MultiPartition.class);
 
     /**
      * 分片文件前缀
@@ -219,19 +223,31 @@ public class MultiPartition implements Partition {
         public void readObject(Object[] objs) throws IOException {
             int size = objs.length;
             Segment sequenceFileSegment = partition.findSegment(msgId);
+            logger.info("通过消息ID->{}读取分片->{}", msgId, sequenceFileSegment == null ? null : sequenceFileSegment.id());
             if(sequenceFileSegment == null){
+                if(msgId == 0){
+                    return;
+                }
                 throw new IOException("msgId is not find in partition");
             }
             ObjectInputStream inputStream = null;
             try {
                 inputStream = sequenceFileSegment.openInputStream();
-                inputStream.skip(msgId);
-                //读当前定位到的msg
-                inputStream.readObject();
+                try{
+                    inputStream.skip(msgId);
+                }catch (Exception e){
+                    logger.info(e.getMessage());
+                }
+
                 int i = 0;
+                //读当前定位到的msg
+                Object obj = inputStream.readObject();
+                if(msgId == 0){
+                    objs[i++] = obj;
+                }
                 while (i < size){
                     //获取下一个msg
-                    Object obj =   inputStream.readObject();
+                    obj =   inputStream.readObject();
                     if(obj != null){
                         objs[i++] = obj;
                         msgId = ((Message)obj).getMsgId();

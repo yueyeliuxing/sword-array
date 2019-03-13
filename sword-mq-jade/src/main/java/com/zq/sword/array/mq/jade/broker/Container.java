@@ -27,14 +27,14 @@ public interface Container {
      * @param partId
      * @return
      */
-    boolean contains(long partId);
+    boolean contains(Long partId);
 
     /**
      * 得到指定ID的分片数据
      * @param partId
      * @return
      */
-    Partition getPartition(long partId);
+    Partition getPartition(Long partId);
 
     /**
      * 得到所有的分片数据

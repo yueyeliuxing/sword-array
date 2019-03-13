@@ -182,7 +182,7 @@ public class SeqFileSegment implements Segment {
      * @param msgId
      * @return
      */
-    private long findOffset(long msgId){
+    private Long findOffset(Long msgId){
         return messageOffsets.get(msgId);
     }
 
@@ -200,7 +200,7 @@ public class SeqFileSegment implements Segment {
 
         @Override
         public void skip(long msgId) throws IOException {
-            Long offset = segment.findOffset(msgId);
+            Long offset = msgId == 0 ? 0:  segment.findOffset(msgId);
             if(offset == null){
                 throw new IllegalArgumentException(String.format("msgId:%s is not find in segment", msgId));
             }

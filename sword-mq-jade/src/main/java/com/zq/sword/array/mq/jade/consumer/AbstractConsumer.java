@@ -30,6 +30,8 @@ import java.util.concurrent.ConcurrentHashMap;
  **/
 public abstract class AbstractConsumer implements Consumer {
 
+    private Logger logger = LoggerFactory.getLogger(AbstractConsumer.class);
+
     private long id;
 
     private String group;
@@ -116,22 +118,25 @@ public abstract class AbstractConsumer implements Consumer {
         //获取可以消费的分片信息
         List<NameDuplicatePartition> duplicateNamePartitions = coordinator.gainConsumeDuplicatePartition(consumer, (dataEvent)->{
             List<NameDuplicatePartition> duplicateNameParts = dataEvent.getData();
+            logger.info("消费者消费的分片变动->{}", duplicateNameParts);
             if(duplicateNameParts != null && !duplicateNameParts.isEmpty()){
                 HotspotEventType type = dataEvent.getType();
                 switch (type){
                     case CONSUME_PARTITION_DATA_CHANGE:
                         Map<Long, PartitionMessageConsumer> tempMessageConsumers = new HashMap<>();
                         for(NameDuplicatePartition duplicateNamePart : duplicateNameParts){
-                            long partId = duplicateNamePart.getId();
+                            Long partId = duplicateNamePart.getId();
                             if(messageConsumers.containsKey(partId)){
                                 tempMessageConsumers.put(partId, messageConsumers.get(partId));
                                 messageConsumers.remove(partId);
                             }else {
                                 Partition partition = createRpcPartition(duplicateNamePart);
+                                logger.info("创建分片->{}", partition);
                                 if(partition != null){
                                     PartitionMessageConsumer messageConsumer = new PartitionMessageConsumer(partition);
                                     messageConsumer.start();
-                                    messageConsumers.put(partition.id(), messageConsumer);
+                                    tempMessageConsumers.put(partition.id(), messageConsumer);
+                                    logger.info("对分片—>{}生成消费者", partition.id());
                                 }
                             }
                         }
@@ -151,10 +156,12 @@ public abstract class AbstractConsumer implements Consumer {
         if(duplicateNamePartitions != null && !duplicateNamePartitions.isEmpty()){
             for(NameDuplicatePartition duplicateNamePartition : duplicateNamePartitions){
                 Partition partition = createRpcPartition(duplicateNamePartition);
+                logger.info("创建分片->{}", partition);
                 if(partition != null){
                     PartitionMessageConsumer messageConsumer = new PartitionMessageConsumer(partition);
                     messageConsumer.start();
                     messageConsumers.put(partition.id(), messageConsumer);
+                    logger.info("对分片—>{}生成消费者", duplicateNamePartition.getId());
                 }
             }
         }
@@ -166,8 +173,21 @@ public abstract class AbstractConsumer implements Consumer {
      * @param duplicateNamePartition
      * @return
      */
-    protected Partition createRpcPartition(NameDuplicatePartition duplicateNamePartition){
-        return new RpcPartition(duplicateNamePartition.getId(), duplicateNamePartition.getTopic(), duplicateNamePartition.getLocation());
+    public Partition createRpcPartition(NameDuplicatePartition duplicateNamePartition){
+        boolean success =  beforeCreateRpcPartition(duplicateNamePartition);
+        if(!success){
+            return null;
+        }
+        return new RpcPartition(duplicateNamePartition.getId(), duplicateNamePartition.getLocation(), duplicateNamePartition.getTopic());
+    }
+
+    /**
+     * 创建分片前置处理
+     * @param duplicateNamePartition
+     * @return
+     */
+    protected boolean beforeCreateRpcPartition(NameDuplicatePartition duplicateNamePartition){
+        return true;
     }
 
     @Override
@@ -192,22 +212,28 @@ public abstract class AbstractConsumer implements Consumer {
         public void run() {
             ObjectInputStream inputStream = null;
             try {
+                logger.info("消费者开始消费消息");
                 Message lastConsumeFailMessage = null;
-                inputStream = partition.openInputStream();
                 while (!isClose && !Thread.currentThread().isInterrupted()) {
                     Message message = null;
                     if (lastConsumeFailMessage != null) {
                         message = lastConsumeFailMessage;
                     } else {
-                        long msgId = getConsumeMsgId(new NamePartition(partition.id()));
+                        long msgId = getConsumeMsgId(new NamePartition(partition.id(), partition.topic()));
+                        logger.info("消费者消费msgId->{}", msgId);
+                        inputStream = partition.openInputStream();
                         inputStream.skip(msgId);
                         message = (Message) inputStream.readObject();
+                    }
+                    if(message == null){
+                        continue;
                     }
 
                     ConsumeStatus consumeStatus = messageListener.consume(message);
                     switch (consumeStatus) {
                         case CONSUME_SUCCESS:
-                            coordinator.recordConsumeMsgId(new NameConsumer(id, group, topics), new NamePartition(partition.id()), message.getMsgId());
+                            coordinator.recordConsumeMsgId(new NameConsumer(id, group, topics), new NamePartition(partition.id(), partition.topic()), message.getMsgId());
+                            consumeMsgIds.put(partition.id(), message.getMsgId());
                             break;
                         case CONSUME_FAIL:
                             lastConsumeFailMessage = message;

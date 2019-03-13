@@ -141,7 +141,7 @@ public abstract class AbstractApplicationBroker extends AbstractConfigurableBrok
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
             TransferMessage message = (TransferMessage)msg;
-            logger.error("receive msg request : {}", msg);
+            logger.info("receive msg request : {}", message);
             if(message.getHeader() != null && message.getHeader().getType() == MessageType.RECEIVE_DATA_REQ.value()) {
                 MsgReq msgReq = (MsgReq)message.getBody();
                 Partition partition = getPartition(msgReq.getPartId());
@@ -172,7 +172,7 @@ public abstract class AbstractApplicationBroker extends AbstractConfigurableBrok
         private TransferMessage buildReceiveMessageResp(List<Message> msgs) {
             TransferMessage message = new TransferMessage();
             Header header = new Header();
-            header.setType(MessageType.SEND_MESSAGE_RESP.value());
+            header.setType(MessageType.RECEIVE_DATA_RESP.value());
             message.setHeader(header);
             if(msgs != null){
                 message.setBody(msgs);

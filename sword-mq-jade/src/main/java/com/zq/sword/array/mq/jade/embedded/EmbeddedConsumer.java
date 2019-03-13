@@ -1,11 +1,12 @@
 package com.zq.sword.array.mq.jade.embedded;
 
 import com.zq.sword.array.mq.jade.broker.Broker;
-import com.zq.sword.array.mq.jade.broker.Partition;
 import com.zq.sword.array.mq.jade.consumer.AbstractConsumer;
 import com.zq.sword.array.mq.jade.consumer.Consumer;
-import com.zq.sword.array.mq.jade.coordinator.data.NameDuplicatePartition;
 import com.zq.sword.array.mq.jade.coordinator.NameCoordinator;
+import com.zq.sword.array.mq.jade.coordinator.data.NameDuplicatePartition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @program: sword-array
@@ -14,6 +15,8 @@ import com.zq.sword.array.mq.jade.coordinator.NameCoordinator;
  * @create: 2019-01-18 13:22
  **/
 public class EmbeddedConsumer extends AbstractConsumer implements Consumer {
+
+    private Logger logger = LoggerFactory.getLogger(EmbeddedConsumer.class);
 
     private Broker broker;
 
@@ -28,10 +31,11 @@ public class EmbeddedConsumer extends AbstractConsumer implements Consumer {
     }
 
     @Override
-    protected Partition createRpcPartition(NameDuplicatePartition duplicateNamePartition) {
+    protected boolean beforeCreateRpcPartition(NameDuplicatePartition duplicateNamePartition) {
         if(broker.contains(duplicateNamePartition.getId())){
-            return null;
+            logger.info("如果是本地分片就返回为null, partId->{}", duplicateNamePartition.getId());
+            return false;
         }
-        return super.createRpcPartition(duplicateNamePartition);
+        return true;
     }
 }

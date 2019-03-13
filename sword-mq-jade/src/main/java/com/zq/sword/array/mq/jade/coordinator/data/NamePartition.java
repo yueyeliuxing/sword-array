@@ -18,7 +18,7 @@ public class NamePartition {
     /**
      * partition id
      */
-    protected long id;
+    protected Long id;
 
     /**
      * topic

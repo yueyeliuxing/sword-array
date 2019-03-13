@@ -70,7 +70,7 @@ public class SimpleCycleDisposeHandler implements CycleDisposeHandler<RedisComma
 
     @Override
     public boolean addCycleData(RedisCommand command) {
-        commandDelayQueue.add(new DelayedCommand(command, System.currentTimeMillis() + 2000));
+        commandDelayQueue.add(new DelayedCommand(command, System.currentTimeMillis() + 2000*60));
         return consumedSwordDataSet.add(command);
     }
 
@@ -98,7 +98,7 @@ public class SimpleCycleDisposeHandler implements CycleDisposeHandler<RedisComma
         public int compareTo(Delayed o) {
             if(o instanceof DelayedCommand){
                 DelayedCommand delayedCommand = (DelayedCommand)o;
-                return this.equals(delayedCommand) ? 0 : (int)(this.expires - delayedCommand.expires);
+                return (int)(this.expires - delayedCommand.expires);
             }
             return 0;
         }

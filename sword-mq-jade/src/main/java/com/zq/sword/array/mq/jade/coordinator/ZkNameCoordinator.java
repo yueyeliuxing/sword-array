@@ -56,10 +56,10 @@ public class ZkNameCoordinator implements NameCoordinator {
         String brokerRegisterPath = ZkMqPathBuilder.buildBrokerRegisterPath(broker);
         if(client.exists(brokerRegisterPath)){
             String data = client.readData(brokerRegisterPath);
-            if(data.equals(broker.getLocation())){
-                return true;
+            if(!data.equals(broker.getLocation())){
+                return false;
             }
-            return false;
+            client.delete(brokerRegisterPath);
         }
         client.createEphemeral(brokerRegisterPath, broker.getLocation());
         return true;
@@ -75,12 +75,12 @@ public class ZkNameCoordinator implements NameCoordinator {
             String data = client.readData(partitionRegisterPath);
             DuplicatePartitionInfo duplicatePartitionInfo = new DuplicatePartitionInfo();
             duplicatePartitionInfo.deserialize(data.getBytes());
-            if(duplicatePartitionInfo.getMaster().equals(partition.getLocation())){
-                return true;
+            if(!duplicatePartitionInfo.getMaster().equals(partition.getLocation())){
+                duplicatePartitionInfo.addSlave(String.format("%s|%s", partition.getId(), partition.getLocation()));
+                client.writeData(partitionRegisterPath, new String(duplicatePartitionInfo.serialize()));
+                return false;
             }
-            duplicatePartitionInfo.addSlave(String.format("%s|%s", partition.getId(), partition.getLocation()));
-            client.writeData(partitionRegisterPath, new String(duplicatePartitionInfo.serialize()));
-            return false;
+            client.delete(partitionRegisterPath);
         }
         client.createEphemeral(partitionRegisterPath, new String(new DuplicatePartitionInfo(partition.getLocation()).serialize()));
         return true;
@@ -171,9 +171,10 @@ public class ZkNameCoordinator implements NameCoordinator {
         createConsumerParentNode(consumer.getGroup());
 
         String consumerRegisterPath = buildConsumerRegisterPath(consumer);
-        if(!client.exists(consumerRegisterPath)){
-            client.createEphemeral(consumerRegisterPath, consumer.getId());
+        if(client.exists(consumerRegisterPath)){
+            client.delete(consumerRegisterPath);
         }
+        client.createEphemeral(consumerRegisterPath, consumer.getId());
         return true;
     }
 
@@ -267,7 +268,7 @@ public class ZkNameCoordinator implements NameCoordinator {
 
     private void assignmentDuplicatePartitionsByConsumerId(List<NameDuplicatePartition> duplicatePartitions, long id, String topic, String detailed) {
         ConsumeDetailedInfo detailedInfo = new ConsumeDetailedInfo(detailed);
-        List<String> partIds = detailedInfo.getPartIds(id);
+        List<String> partIds = detailedInfo.getPartIds(Long.valueOf(id));
         if(partIds == null || partIds.isEmpty()){
             return;
         }
@@ -282,7 +283,8 @@ public class ZkNameCoordinator implements NameCoordinator {
             return 0L;
         }
         String msgId = client.readData(consumePartitionPath);
-        return Long.parseLong(msgId);
+        logger.info("路径->{}获取msgId->{}", consumePartitionPath, msgId);
+        return Long.parseLong(msgId == null ? "0" : msgId);
     }
 
     @Override
@@ -300,6 +302,7 @@ public class ZkNameCoordinator implements NameCoordinator {
                 }
             }
         }
+        client.writeData(consumerDetailedPath, consumeDetailedInfo.toString());
     }
 
     @Override
@@ -326,10 +329,10 @@ public class ZkNameCoordinator implements NameCoordinator {
         String consumerAllocatorRegisterPath = ZkMqPathBuilder.buildConsumerAllocatorRegisterPath(consumeAllocator);
         if(client.exists(consumerAllocatorRegisterPath)){
             String data = client.readData(consumerAllocatorRegisterPath);
-            if(data.equals(consumeAllocator.getId())){
-                return true;
+            if(!data.equals(consumeAllocator.getId())){
+                return false;
             }
-            return false;
+            client.delete(consumerAllocatorRegisterPath);
         }
         client.createEphemeral(consumerAllocatorRegisterPath, consumeAllocator.getId());
         client.subscribeDataChanges(consumerAllocatorRegisterPath, new IZkDataListener(){

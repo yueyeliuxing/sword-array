@@ -105,7 +105,9 @@ public class RedisPiper extends AbstractPiper implements Piper{
 
         @Override
         public RedisCommand interceptor(RedisCommand command) {
+            logger.info("命令比对->{}", command);
             if(cycleDisposeHandler.isCycleData(command)){
+                logger.info("命令存在循环缓存->{}", command);
                 return null;
             }
             return command;
@@ -128,6 +130,7 @@ public class RedisPiper extends AbstractPiper implements Piper{
         public void onAcknowledgment(CommandMetadata metadata) {
             Exception exception = metadata.getException();
             if(exception == null){
+                logger.info("命令写入循环缓存->{}", metadata.getCommand());
                 cycleDisposeHandler.addCycleData(metadata.getCommand());
             }
         }

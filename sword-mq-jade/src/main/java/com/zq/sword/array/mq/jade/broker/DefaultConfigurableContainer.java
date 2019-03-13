@@ -27,7 +27,7 @@ public class DefaultConfigurableContainer implements ConfigurableContainer{
     }
 
     @Override
-    public void put(long partId, Partition partition) {
+    public void put(Long partId, Partition partition) {
         partitionOfIds.put(partId, partition);
     }
 
@@ -42,12 +42,12 @@ public class DefaultConfigurableContainer implements ConfigurableContainer{
     }
 
     @Override
-    public boolean contains(long partId) {
+    public boolean contains(Long partId) {
         return partitionOfIds.containsKey(partId);
     }
 
     @Override
-    public Partition getPartition(long partId) {
+    public Partition getPartition(Long partId) {
         return partitionOfIds.get(partId);
     }
 

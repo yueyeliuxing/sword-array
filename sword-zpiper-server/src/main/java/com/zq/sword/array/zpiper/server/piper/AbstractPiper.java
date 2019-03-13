@@ -68,6 +68,7 @@ public abstract class AbstractPiper extends AbstractEmbeddedBroker implements Pi
         @Override
         public ConsumeStatus consume(Message message) {
             try{
+                logger.info("接收消息->{}", message);
                 receiveMsg(message);
             }catch (Exception e){
                 logger.error("接收消息发生异常", e);

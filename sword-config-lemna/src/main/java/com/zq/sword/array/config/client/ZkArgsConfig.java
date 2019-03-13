@@ -54,11 +54,13 @@ public class ZkArgsConfig extends AbstractArgsConfig implements ArgsConfig{
             @Override
             public void handleDataChange(String dataPath, Object data) throws Exception {
                 properties.clear();
-                Properties properties = new Properties();
-                loadProperties(data.toString(), properties);
-                for(String key : properties.stringPropertyNames()){
-                    Object value = properties.get(key);
-                    configChangeHandler.handle(key, value);
+                if(data != null){
+                    Properties properties = new Properties();
+                    loadProperties(data.toString(), properties);
+                    for(String key : properties.stringPropertyNames()){
+                        Object value = properties.get(key);
+                        configChangeHandler.handle(key, value);
+                    }
                 }
             }
 
@@ -72,10 +74,15 @@ public class ZkArgsConfig extends AbstractArgsConfig implements ArgsConfig{
     @Override
     protected void pullConfig() {
         String appConfigPath = ZkConfigPathBuilder.buildNodeConfigPath(id);
+        if(!client.exists(appConfigPath)){
+            client.createPersistent(appConfigPath, true);
+            return;
+        }
         String appConfigString = client.readData(appConfigPath);
-
-        //加载参数
-        loadProperties(appConfigString, properties);
+        if(appConfigString != null && !"".equals(appConfigString)){
+            //加载参数
+            loadProperties(appConfigString, properties);
+        }
     }
 
     /**

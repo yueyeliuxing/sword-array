@@ -56,12 +56,12 @@ public abstract class AbstractConfigurableBroker implements Broker {
     }
 
     @Override
-    public boolean contains(long partId) {
+    public boolean contains(Long partId) {
         return container.contains(partId);
     }
 
     @Override
-    public Partition getPartition(long partId) {
+    public Partition getPartition(Long partId) {
         return container.getPartition(partId);
     }
 
