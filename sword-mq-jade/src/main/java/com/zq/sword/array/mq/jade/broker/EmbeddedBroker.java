@@ -1,4 +1,4 @@
-package com.zq.sword.array.mq.jade.embedded;
+package com.zq.sword.array.mq.jade.broker;
 
 import com.zq.sword.array.mq.jade.broker.Broker;
 import com.zq.sword.array.mq.jade.consumer.Consumer;

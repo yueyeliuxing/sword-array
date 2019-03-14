@@ -2,7 +2,11 @@ package com.zq.sword.array.zpiper.server.piper;
 
 import com.zq.sword.array.id.IdGenerator;
 import com.zq.sword.array.id.SnowFlakeIdGenerator;
+import com.zq.sword.array.mq.jade.consumer.ConsumeStatus;
+import com.zq.sword.array.mq.jade.consumer.Consumer;
+import com.zq.sword.array.mq.jade.consumer.MessageListener;
 import com.zq.sword.array.mq.jade.msg.Message;
+import com.zq.sword.array.mq.jade.producer.Producer;
 import com.zq.sword.array.redis.command.CommandMetadata;
 import com.zq.sword.array.redis.command.RedisCommand;
 import com.zq.sword.array.redis.command.RedisCommandDeserializer;
@@ -30,6 +34,10 @@ public class RedisPiper extends AbstractPiper implements Piper{
 
     private Logger logger = LoggerFactory.getLogger(RedisPiper.class);
 
+    protected Consumer consumer;
+
+    protected Producer producer;
+
     private IdGenerator idGenerator;
 
     private SlaveRedisReplicator redisReplicator;
@@ -38,6 +46,13 @@ public class RedisPiper extends AbstractPiper implements Piper{
 
     public RedisPiper(PiperConfig config) {
         super(config);
+
+        //创建生产者
+        this.producer = createProducer();
+
+        //创建消费者
+        this.consumer  = createConsumer(id()+"");
+        this.consumer.bindingMessageListener(new ReceiveMessageListener());
 
         idGenerator = new SnowFlakeIdGenerator();
 
@@ -52,23 +67,40 @@ public class RedisPiper extends AbstractPiper implements Piper{
         redisWriter.addCommandInterceptor(new CycleCommandAddInterceptor(cycleDisposeHandler));
     }
 
-    @Override
-    protected void receiveMsg(Message message) {
-        redisWriter.write(new RedisCommandDeserializer().deserialize(message.getBody()), metadata -> {
-            if(metadata.getException() != null){
-                logger.error("写入redis出错", metadata.getException());
+    /**
+     * 接收消息监听器
+     */
+    private class ReceiveMessageListener implements MessageListener {
+
+        @Override
+        public ConsumeStatus consume(Message message) {
+            try{
+                logger.info("接收消息->{}", message);
+                redisWriter.write(new RedisCommandDeserializer().deserialize(message.getBody()), metadata -> {
+                    if(metadata.getException() != null){
+                        logger.error("写入redis出错", metadata.getException());
+                    }
+                });
+            }catch (Exception e){
+                logger.error("接收消息发生异常", e);
+                return ConsumeStatus.CONSUME_FAIL;
             }
-        });
+            return ConsumeStatus.CONSUME_SUCCESS;
+        }
     }
 
     @Override
     protected void doStartModule() {
+        producer.start();
+        consumer.start();
         redisWriter.start();
         redisReplicator.start();
     }
 
     @Override
     protected void doStopModule() {
+        producer.stop();
+        consumer.stop();
         redisReplicator.stop();
         redisWriter.stop();
     }
@@ -88,7 +120,7 @@ public class RedisPiper extends AbstractPiper implements Piper{
             message.setTag(command.getType()+"");
             message.setBody(redisCommandSerializer.serialize(command));
             message.setTimestamp(System.currentTimeMillis());
-            sendMsg(message);
+            producer.sendMsg(message);
         }
     }
 

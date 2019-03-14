@@ -15,6 +15,12 @@ import java.util.Map;
 public interface NameCoordinator {
 
     /**
+     * ID 唯一标识
+     * @return
+     */
+    Long id();
+
+    /**
      * broker 注册
      * @param broker broker容器
      */

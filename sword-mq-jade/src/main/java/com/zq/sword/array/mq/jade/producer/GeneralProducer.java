@@ -18,10 +18,10 @@ public class GeneralProducer implements Producer {
 
     private Logger logger = LoggerFactory.getLogger(GeneralProducer.class);
 
-    private ProduceDispatcher dispatcher;
+    private PartitionAlloter partitionAlloter;
 
-    public GeneralProducer(ProduceDispatcher dispatcher) {
-        this.dispatcher = dispatcher;
+    public GeneralProducer(PartitionAlloter partitionAlloter) {
+        this.partitionAlloter = partitionAlloter;
     }
 
     @Override
@@ -36,7 +36,7 @@ public class GeneralProducer implements Producer {
     @Override
     public boolean sendMsg(Message message) {
         String topic = message.getTopic();
-        PartitionResource partitionResource = dispatcher.allotPartition(topic);
+        PartitionResource partitionResource = partitionAlloter.allotPartition(topic);
         if(partitionResource != null){
             try {
                 ObjectOutputStream outputStream = partitionResource.openOutputStream();

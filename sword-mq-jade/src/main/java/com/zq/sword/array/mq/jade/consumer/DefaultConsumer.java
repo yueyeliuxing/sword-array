@@ -21,6 +21,10 @@ public class DefaultConsumer extends AbstractConsumer implements Consumer {
     }
 
     public DefaultConsumer(NameCoordinator coordinator, String[] topics, String group) {
-        super(coordinator);
+        super(coordinator, topics, group);
+    }
+
+    public DefaultConsumer(NameCoordinator coordinator, String[] topics, String group, ConsumePartitionFilter partitionFilter) {
+        super(coordinator, topics, group, partitionFilter);
     }
 }

@@ -58,11 +58,20 @@ public abstract class AbstractConsumer implements Consumer {
      */
     private Map<Long, Long> consumeMsgIds;
 
+    private ConsumePartitionFilter partitionFilter;
+
     public AbstractConsumer(NameCoordinator coordinator, String[] topics, String group) {
+        this(coordinator, topics, group, (partition -> false));
+    }
+
+    public AbstractConsumer(NameCoordinator coordinator, String[] topics, String group, ConsumePartitionFilter partitionFilter) {
         this(coordinator);
         this.topics = topics;
         this.group = group;
+        this.partitionFilter = partitionFilter;
     }
+
+
 
     public AbstractConsumer(NameCoordinator coordinator) {
         this.id = generateConsumerId();
@@ -130,6 +139,9 @@ public abstract class AbstractConsumer implements Consumer {
                                 tempMessageConsumers.put(partId, messageConsumers.get(partId));
                                 messageConsumers.remove(partId);
                             }else {
+                                if(partitionFilter.filter(duplicateNamePart)){
+                                    continue;
+                                }
                                 Partition partition = createRpcPartition(duplicateNamePart);
                                 logger.info("创建分片->{}", partition);
                                 if(partition != null){
@@ -155,14 +167,15 @@ public abstract class AbstractConsumer implements Consumer {
         //对于每个分片创建对应的消费者
         if(duplicateNamePartitions != null && !duplicateNamePartitions.isEmpty()){
             for(NameDuplicatePartition duplicateNamePartition : duplicateNamePartitions){
+                if(partitionFilter.filter(duplicateNamePartition)){
+                    continue;
+                }
                 Partition partition = createRpcPartition(duplicateNamePartition);
                 logger.info("创建分片->{}", partition);
-                if(partition != null){
-                    PartitionMessageConsumer messageConsumer = new PartitionMessageConsumer(partition);
-                    messageConsumer.start();
-                    messageConsumers.put(partition.id(), messageConsumer);
-                    logger.info("对分片—>{}生成消费者", duplicateNamePartition.getId());
-                }
+                PartitionMessageConsumer messageConsumer = new PartitionMessageConsumer(partition);
+                messageConsumer.start();
+                messageConsumers.put(partition.id(), messageConsumer);
+                logger.info("对分片—>{}生成消费者", duplicateNamePartition.getId());
             }
         }
 
@@ -174,25 +187,14 @@ public abstract class AbstractConsumer implements Consumer {
      * @return
      */
     public Partition createRpcPartition(NameDuplicatePartition duplicateNamePartition){
-        boolean success =  beforeCreateRpcPartition(duplicateNamePartition);
-        if(!success){
-            return null;
-        }
         return new RpcPartition(duplicateNamePartition.getId(), duplicateNamePartition.getLocation(), duplicateNamePartition.getTopic());
-    }
-
-    /**
-     * 创建分片前置处理
-     * @param duplicateNamePartition
-     * @return
-     */
-    protected boolean beforeCreateRpcPartition(NameDuplicatePartition duplicateNamePartition){
-        return true;
     }
 
     @Override
     public void stop() {
-
+        for(PartitionMessageConsumer messageConsumer : messageConsumers.values()){
+            messageConsumer.stop();
+        }
     }
 
     /**

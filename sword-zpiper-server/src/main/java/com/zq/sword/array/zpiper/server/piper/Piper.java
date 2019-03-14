@@ -1,6 +1,6 @@
 package com.zq.sword.array.zpiper.server.piper;
 
-import com.zq.sword.array.mq.jade.embedded.EmbeddedBroker;
+import com.zq.sword.array.mq.jade.broker.EmbeddedBroker;
 
 /**
  * @program: sword-array

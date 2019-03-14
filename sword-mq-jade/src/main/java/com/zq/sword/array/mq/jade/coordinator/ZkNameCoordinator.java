@@ -27,6 +27,9 @@ public class ZkNameCoordinator implements NameCoordinator {
 
     private Logger logger = LoggerFactory.getLogger(ZkNameCoordinator.class);
 
+
+    private String connectAddr;
+
     private ZkClient client;
 
     public ZkNameCoordinator(ZkClient client) {
@@ -35,6 +38,7 @@ public class ZkNameCoordinator implements NameCoordinator {
 
     public ZkNameCoordinator(String connectAddr) {
         logger.info("ZkNameCoordinator module starting...");
+        this.connectAddr = connectAddr;
         client = new ZkClient(new ZkConnection(connectAddr), 500, new ZkSerializer() {
             @Override
             public byte[] serialize(Object data) throws ZkMarshallingError {
@@ -46,6 +50,11 @@ public class ZkNameCoordinator implements NameCoordinator {
                 return new String(bytes);
             }
         });
+    }
+
+    @Override
+    public Long id() {
+        return Long.valueOf(Math.abs(this.connectAddr.hashCode()));
     }
 
     @Override
