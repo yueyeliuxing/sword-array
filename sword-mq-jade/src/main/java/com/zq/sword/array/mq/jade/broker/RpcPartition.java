@@ -41,6 +41,8 @@ public class RpcPartition implements Partition {
 
     private String topic;
 
+    private String tag;
+
     /**
      * 发送消息队列
      */
@@ -60,10 +62,11 @@ public class RpcPartition implements Partition {
 
     private TaskExecutor taskExecutor;
 
-    public RpcPartition(long id, String location, String topic) {
+    public RpcPartition(long id, String location, String topic, String tag) {
         this.id = id;
         this.location = location;
         this.topic = topic;
+        this.tag = tag;
         String[] ps = location.split(":");
         this.taskExecutor = new SingleTaskExecutor();
         this.sendMsgQueue = new LinkedBlockingQueue<>();
@@ -79,6 +82,11 @@ public class RpcPartition implements Partition {
     @Override
     public long id() {
         return id;
+    }
+
+    @Override
+    public String tag() {
+        return tag;
     }
 
     @Override

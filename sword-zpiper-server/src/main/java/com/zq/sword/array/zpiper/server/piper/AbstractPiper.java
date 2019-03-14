@@ -43,6 +43,8 @@ public abstract class AbstractPiper extends AbstractEmbeddedBroker implements Pi
         //设置topic
         topics(namePiper.getGroup());
 
+        tag(namePiper.getType().name().toLowerCase());
+
     }
 
     @Override

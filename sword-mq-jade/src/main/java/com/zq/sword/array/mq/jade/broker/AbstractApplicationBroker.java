@@ -88,7 +88,7 @@ public abstract class AbstractApplicationBroker extends AbstractConfigurableBrok
         Collection<Partition> partitions = container.getPartitions();
         if(partitions != null && !partitions.isEmpty()){
             for(Partition partition : partitions){
-                coordinator.registerPartition(new NamePartition(partition.id(), partition.topic(), brokerLocation()));
+                coordinator.registerPartition(new NamePartition(partition.id(), partition.topic(), partition.tag(), brokerLocation()));
             }
         }
     }

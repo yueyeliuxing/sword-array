@@ -1,6 +1,5 @@
 package com.zq.sword.array.mq.jade.broker;
 
-import com.zq.sword.array.mq.jade.broker.Broker;
 import com.zq.sword.array.mq.jade.consumer.Consumer;
 import com.zq.sword.array.mq.jade.producer.Producer;
 
@@ -18,6 +17,12 @@ public interface EmbeddedBroker extends Broker {
      * @param topics
      */
     void topics(String... topics);
+
+    /**
+     * 设置tag
+     * @param tag
+     */
+    void tag(String tag);
 
     /**
      * 创建生产者

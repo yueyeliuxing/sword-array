@@ -187,7 +187,7 @@ public abstract class AbstractConsumer implements Consumer {
      * @return
      */
     public Partition createRpcPartition(NameDuplicatePartition duplicateNamePartition){
-        return new RpcPartition(duplicateNamePartition.getId(), duplicateNamePartition.getLocation(), duplicateNamePartition.getTopic());
+        return new RpcPartition(duplicateNamePartition.getId(), duplicateNamePartition.getLocation(), duplicateNamePartition.getTopic(), duplicateNamePartition.getTag());
     }
 
     @Override
@@ -221,7 +221,7 @@ public abstract class AbstractConsumer implements Consumer {
                     if (lastConsumeFailMessage != null) {
                         message = lastConsumeFailMessage;
                     } else {
-                        long msgId = getConsumeMsgId(new NamePartition(partition.id(), partition.topic()));
+                        long msgId = getConsumeMsgId(new NamePartition(partition.id(), partition.topic(), partition.tag()));
                         logger.info("消费者消费msgId->{}", msgId);
                         inputStream = partition.openInputStream();
                         inputStream.skip(msgId);
@@ -234,7 +234,7 @@ public abstract class AbstractConsumer implements Consumer {
                     ConsumeStatus consumeStatus = messageListener.consume(message);
                     switch (consumeStatus) {
                         case CONSUME_SUCCESS:
-                            coordinator.recordConsumeMsgId(new NameConsumer(id, group, topics), new NamePartition(partition.id(), partition.topic()), message.getMsgId());
+                            coordinator.recordConsumeMsgId(new NameConsumer(id, group, topics), new NamePartition(partition.id(), partition.topic(), partition.tag()), message.getMsgId());
                             consumeMsgIds.put(partition.id(), message.getMsgId());
                             break;
                         case CONSUME_FAIL:

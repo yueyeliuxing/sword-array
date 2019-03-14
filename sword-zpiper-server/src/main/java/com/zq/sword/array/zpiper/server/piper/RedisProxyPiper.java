@@ -3,6 +3,7 @@ package com.zq.sword.array.zpiper.server.piper;
 import com.zq.sword.array.mq.jade.consumer.*;
 import com.zq.sword.array.mq.jade.msg.Message;
 import com.zq.sword.array.mq.jade.producer.Producer;
+import com.zq.sword.array.zpiper.server.piper.cluster.data.PiperType;
 import com.zq.sword.array.zpiper.server.piper.config.PiperConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +37,8 @@ public class RedisProxyPiper extends AbstractPiper implements Piper {
             for(String otherDcZkLocation : otherDcZkLocations){
                 String[] params = otherDcZkLocation.split(":");
                 Consumer consumer =  DefaultConsumeDispatcher.createDispatcher(params[1])
-                        .createDefaultConsumer(new String[]{namePiper.getGroup()}, id()+"");
+                        .createDefaultConsumer(new String[]{namePiper.getGroup()}, id()+"",
+                                (partition -> PiperType.PROXY.name().equalsIgnoreCase(partition.getTag())));
                 consumer.bindingMessageListener(new ReceiveMessageListener());
                 this.otherConsumers.add(consumer);
             }

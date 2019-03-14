@@ -98,7 +98,7 @@ public class DefaultProduceDispatcher implements ProduceDispatcher{
                     NameDuplicatePartition namePartition = partitions.get(index);
                     Partition partition = getPartition(namePartition.getId());
                     if(partition == null){
-                        partition = new RpcPartition(namePartition.getId(), namePartition.getLocation(), namePartition.getTopic());
+                        partition = new RpcPartition(namePartition.getId(), namePartition.getLocation(), namePartition.getTopic(), namePartition.getTag());
                         addPartition(partition);
                     }
                     return new PartitionResource(partition);

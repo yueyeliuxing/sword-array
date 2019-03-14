@@ -34,6 +34,8 @@ public class MultiPartition implements Partition {
 
     private long id;
 
+    private String tag;
+
     private String name;
 
     private String topic;
@@ -50,12 +52,13 @@ public class MultiPartition implements Partition {
      */
     private volatile boolean writing = false;
 
-    public MultiPartition(Broker broker, String topic, long id) {
+    public MultiPartition(Broker broker, String topic, String tag, long id) {
         this.broker = broker;
         this.topic = topic;
+        this.tag = tag;
         this.id = id;
-        this.name = PARTITION_FILE_PREFIX + topic + "-" + id;
-        this.partitionFile = new File(broker.getResourceLocation() + File.separator + name);
+        this.name = PARTITION_FILE_PREFIX + tag + "-" + id;
+        this.partitionFile = new File(broker.getResourceLocation() + File.separator + topic + File.separator + name);
         this.segments = new ArrayList<>();
     }
 
@@ -64,7 +67,8 @@ public class MultiPartition implements Partition {
         this.partitionFile = partitionFile;
         this.name = partitionFile.getName();
         String[] params = partitionFile.getName().split("-");
-        this.topic = params[1];
+        this.topic = partitionFile.getParentFile().getName();
+        this.tag = params[1];
         this.id = Long.parseLong(params[2]);
         this.segments = loadSegments();
     }
@@ -94,6 +98,11 @@ public class MultiPartition implements Partition {
     @Override
     public long id() {
         return id;
+    }
+
+    @Override
+    public String tag() {
+        return tag;
     }
 
     @Override

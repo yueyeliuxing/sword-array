@@ -26,23 +26,28 @@ public class NamePartition {
     protected String topic;
 
     /**
+     * 标签
+     */
+    protected String tag;
+
+    /**
      * 地址定位：host:port
      */
     protected String location;
-
-
-    public NamePartition(long id) {
-        this.id = id;
-    }
 
     public NamePartition(long id, String topic) {
         this.id = id;
         this.topic = topic;
     }
 
-    public NamePartition(long id, String topic, String location) {
+    public NamePartition(long id, String topic, String tag) {
         this.id = id;
         this.topic = topic;
+        this.tag = tag;
+    }
+
+    public NamePartition(long id, String topic, String tag, String location) {
+        this(id, topic, tag);
         this.location = location;
     }
 

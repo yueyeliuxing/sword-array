@@ -91,7 +91,7 @@ public class ZkNameCoordinator implements NameCoordinator {
             }
             client.delete(partitionRegisterPath);
         }
-        client.createEphemeral(partitionRegisterPath, new String(new DuplicatePartitionInfo(partition.getLocation()).serialize()));
+        client.createEphemeral(partitionRegisterPath, new String(new DuplicatePartitionInfo(partition.getTag(), partition.getLocation()).serialize()));
         return true;
     }
 
@@ -161,12 +161,12 @@ public class ZkNameCoordinator implements NameCoordinator {
                 DuplicatePartitionInfo duplicatePartitionInfo = new DuplicatePartitionInfo();
                 duplicatePartitionInfo.deserialize(data.getBytes());
 
-                NameDuplicatePartition duplicatePartition = new NameDuplicatePartition(Long.parseLong(partId), topic, duplicatePartitionInfo.getMaster());
+                NameDuplicatePartition duplicatePartition = new NameDuplicatePartition(Long.parseLong(partId), topic, duplicatePartitionInfo.getTag(), duplicatePartitionInfo.getMaster());
                 Set<String> slaveStrs = duplicatePartitionInfo.getSlaves();
                 if(slaveStrs != null && !slaveStrs.isEmpty()){
                     for(String slaveStr : slaveStrs){
                         String[] params = slaveStr.split("\\|");
-                        duplicatePartition.addSlave(new NamePartition(Long.parseLong(params[0]), topic, params[1]));
+                        duplicatePartition.addSlave(new NamePartition(Long.parseLong(params[0]), topic, duplicatePartitionInfo.getTag(), params[1]));
                     }
                 }
                 duplicatePartitions.add(duplicatePartition);

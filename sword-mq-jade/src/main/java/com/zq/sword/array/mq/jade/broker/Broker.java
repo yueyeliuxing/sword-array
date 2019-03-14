@@ -20,9 +20,10 @@ public interface Broker extends RpcServer, Container {
     /**
      * 新创建一个分片
      * @param topic
+     * @param tag
      * @param partId
      * @return
      */
-    Partition newPartition(String topic, long partId);
+    Partition newPartition(String topic, String tag, long partId);
 
 }

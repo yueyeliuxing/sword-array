@@ -20,6 +20,11 @@ import java.util.Set;
 public class DuplicatePartitionInfo {
 
     /**
+     * 标签
+     */
+    private String tag;
+
+    /**
      * 主的location
      */
     private String master;
@@ -29,7 +34,8 @@ public class DuplicatePartitionInfo {
      */
     private Set<String> slaves;
 
-    public DuplicatePartitionInfo(String master) {
+    public DuplicatePartitionInfo(String tag, String master) {
+        this.tag = tag;
         this.master = master;
         this.slaves = new HashSet<>();
     }
@@ -43,6 +49,11 @@ public class DuplicatePartitionInfo {
      * @return
      */
     public byte[] serialize() {
+        int tagLen = 0;
+        if(!"".equals(tag)){
+            tagLen = tag.length();
+        }
+
         int masterLen = 0;
         if(!"".equals(master)){
             masterLen = master.length();
@@ -57,9 +68,13 @@ public class DuplicatePartitionInfo {
             }
         }
 
-        int capacity = 4 + master.length() + 4 + slaveValueLen;
+        int capacity = 4 + tagLen + 4 + master.length() + 4 + slaveValueLen;
 
         ByteBuffer byteBuffer = ByteBuffer.allocate(capacity);
+        byteBuffer.putInt(tagLen);
+        if(tagLen > 0){
+            byteBuffer.put(tag.getBytes());
+        }
         byteBuffer.putInt(masterLen);
         if(masterLen > 0){
             byteBuffer.put(master.getBytes());
@@ -81,6 +96,13 @@ public class DuplicatePartitionInfo {
      */
     public void deserialize(byte[] data) {
         ByteBuffer byteBuffer = ByteBuffer.wrap(data);
+        int tagLen = byteBuffer.getInt();
+        if(tagLen >  0){
+            byte[] tagBytes = new byte[tagLen];
+            byteBuffer.get(tagBytes);
+            tag = new String(tagBytes);
+        }
+
         int masterLen = byteBuffer.getInt();
         if(masterLen ==  0){
             return;

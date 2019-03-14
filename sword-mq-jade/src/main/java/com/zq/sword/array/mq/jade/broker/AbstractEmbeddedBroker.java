@@ -8,7 +8,6 @@ import com.zq.sword.array.mq.jade.coordinator.data.NamePartition;
 import com.zq.sword.array.mq.jade.producer.DefaultProduceDispatcher;
 import com.zq.sword.array.mq.jade.producer.DuplicatePartitionResource;
 import com.zq.sword.array.mq.jade.producer.Producer;
-import com.zq.sword.array.network.rpc.server.NettyRpcServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,17 +27,20 @@ public abstract class AbstractEmbeddedBroker extends AbstractApplicationBroker i
 
     private String[] topics;
 
+    private String tag;
+
     public AbstractEmbeddedBroker(long id, String resourceLocation, NameCoordinator coordinator, String brokerLocation) {
         super(id, resourceLocation, coordinator, brokerLocation);
-    }
-
-    protected NettyRpcServer getRpcServer() {
-        return rpcServer;
     }
 
     @Override
     public void topics(String... topics) {
         this.topics = topics;
+    }
+
+    @Override
+    public void tag(String tag) {
+        this.tag = tag;
     }
 
     @Override
@@ -55,7 +57,7 @@ public abstract class AbstractEmbeddedBroker extends AbstractApplicationBroker i
                                     for(NamePartition slaveNamePartition : slaveNamePartitions){
                                         Partition slavePartition = defaultProduceDispatcher.getPartition(slaveNamePartition.getId());
                                         if(slavePartition == null){
-                                            slavePartition = new RpcPartition(slaveNamePartition.getId(), slaveNamePartition.getLocation(), slaveNamePartition.getTopic());
+                                            slavePartition = new RpcPartition(slaveNamePartition.getId(), slaveNamePartition.getLocation(), slaveNamePartition.getTopic(), slaveNamePartition.getTag());
                                             defaultProduceDispatcher.addPartition(slavePartition);
                                         }
                                         slavePartitions.add(slavePartition);
@@ -90,7 +92,7 @@ public abstract class AbstractEmbeddedBroker extends AbstractApplicationBroker i
         for(String topic : topics){
             Collection<Partition> partitions = getPartitions();
             if(partitions == null || partitions.isEmpty()){
-                newPartition(topic, generatePartitionId(id(), topic));
+                newPartition(topic, tag, generatePartitionId(id(), topic));
             }
         }
         super.start();

@@ -22,10 +22,10 @@ public class PiperFactory {
         NamePiper namePiper = piperConfig.namePiper();
         PiperType type = namePiper.getType();
         switch (type){
-            case DC_UNIT_PIPER:
+            case SIMPLE:
                 piper = new RedisPiper(piperConfig);
                 break;
-            case DC_UNIT_PROXY_PIPER:
+            case PROXY:
                 piper = new RedisProxyPiper(piperConfig);
                 break;
             default:

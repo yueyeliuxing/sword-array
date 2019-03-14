@@ -26,18 +26,24 @@ public abstract class AbstractConfigurableBroker implements Broker {
         if(!file.exists()){
             file.mkdirs();
         }
-        File[] partitionFiles = file.listFiles();
-        if (partitionFiles != null && partitionFiles.length > 0){
-            for(File partitionFile : partitionFiles){
-                Partition partition = new MultiPartition(this, partitionFile);
-                container.put(partition.id(), partition);
+        File[] topicFiles = file.listFiles();
+        if(topicFiles != null && topicFiles.length > 0){
+            for (File topicFile : topicFiles){
+                File[] partitionFiles = topicFile.listFiles();
+                if (partitionFiles != null && partitionFiles.length > 0){
+                    for(File partitionFile : partitionFiles){
+                        Partition partition = new MultiPartition(this, partitionFile);
+                        container.put(partition.id(), partition);
+                    }
+                }
             }
         }
+
     }
 
     @Override
-    public Partition newPartition(String topic, long partId) {
-        Partition partition = new MultiPartition(this, topic, partId);
+    public Partition newPartition(String topic, String tag, long partId) {
+        Partition partition = new MultiPartition(this, topic, tag, partId);
         container.put(partition.id(), partition);
         return partition;
     }

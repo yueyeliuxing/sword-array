@@ -19,13 +19,9 @@ public class NameDuplicatePartition extends NamePartition {
      */
     private List<NamePartition> slaves;
 
-    public NameDuplicatePartition(long id) {
-        super(id);
-        this.slaves = new ArrayList<>();
-    }
 
-    public NameDuplicatePartition(long id, String topic, String location) {
-        super(id, topic, location);
+    public NameDuplicatePartition(long id, String topic, String tag, String location) {
+        super(id, topic, tag, location);
         this.slaves = new ArrayList<>();
     }
 
