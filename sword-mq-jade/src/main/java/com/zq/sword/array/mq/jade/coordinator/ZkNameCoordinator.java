@@ -244,12 +244,12 @@ public class ZkNameCoordinator implements NameCoordinator {
                 String consumerDetailedPath = buildConsumerDetailedPath(group, topic);
                 if(!client.exists(consumerDetailedPath)){
                     client.createPersistent(consumerDetailedPath, true);
-                    continue;
+                }else {
+                    //获取指定消费者需要消费的分片信息
+                    String detailed = client.readData(consumerDetailedPath);
+                    logger.info("消费者消费数据路径->{} 消费信息->{}",consumerDetailedPath, detailed);
+                    assignmentDuplicatePartitionsByConsumerId(duplicatePartitions, id, topic, detailed);
                 }
-                logger.info("消费者消费数据路径->{}",consumerDetailedPath);
-                //获取指定消费者需要消费的分片信息
-                String detailed = client.readData(consumerDetailedPath);
-                assignmentDuplicatePartitionsByConsumerId(duplicatePartitions, id, topic, detailed);
 
                 client.subscribeDataChanges(consumerDetailedPath, new IZkDataListener(){
 
