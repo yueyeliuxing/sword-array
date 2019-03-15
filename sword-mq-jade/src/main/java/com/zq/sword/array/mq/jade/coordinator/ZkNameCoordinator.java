@@ -303,16 +303,18 @@ public class ZkNameCoordinator implements NameCoordinator {
         if(!client.exists(consumerDetailedPath)){
             client.createPersistent(consumerDetailedPath, true);
         }
-        ConsumeDetailedInfo consumeDetailedInfo = new ConsumeDetailedInfo();
+       String detailedValue = "";
         if(consumerPartitions != null && !consumerPartitions.isEmpty()){
+            ConsumeDetailedInfo consumeDetailedInfo = new ConsumeDetailedInfo();
             for (NameConsumer consumer : consumerPartitions.keySet()){
                 List<NameDuplicatePartition> partitions = consumerPartitions.get(consumer);
                 for(NameDuplicatePartition partition : partitions){
                     consumeDetailedInfo.addDetailedItem(consumer.getId(), String.valueOf(partition.getId()));
                 }
             }
+            detailedValue = consumeDetailedInfo.toString();
         }
-        client.writeData(consumerDetailedPath, consumeDetailedInfo.toString());
+        client.writeData(consumerDetailedPath, detailedValue);
     }
 
     @Override
@@ -340,6 +342,21 @@ public class ZkNameCoordinator implements NameCoordinator {
         if(client.exists(consumerAllocatorRegisterPath)){
             String data = client.readData(consumerAllocatorRegisterPath);
             if(!data.equals(consumeAllocator.getId())){
+                client.subscribeDataChanges(consumerAllocatorRegisterPath, new IZkDataListener(){
+
+                    @Override
+                    public void handleDataChange(String dataPath, Object data) throws Exception {
+
+                    }
+
+                    @Override
+                    public void handleDataDeleted(String dataPath) throws Exception {
+                        HotspotEvent<Long> event = new HotspotEvent<>();
+                        event.setType(CONSUME_ALLOCATOR_NODE_DEL);
+                        event.setData(0L);
+                        eventListener.listen(event);
+                    }
+                });
                 return false;
             }
             client.delete(consumerAllocatorRegisterPath);

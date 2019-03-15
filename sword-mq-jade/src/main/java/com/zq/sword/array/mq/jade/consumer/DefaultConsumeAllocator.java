@@ -139,6 +139,7 @@ public class DefaultConsumeAllocator extends AbstractThreadActuator implements C
         int partitionSize = partitions.size();
 
         if(consumerSize == 0 || partitionSize == 0){
+            coordinator.editConsumePartitions(topic, group, null);
             return;
         }
         Map<Integer, List<NameDuplicatePartition>> partitionsOfConsumeIndexs = new HashMap<>();
