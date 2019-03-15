@@ -246,7 +246,7 @@ public class ZkNameCoordinator implements NameCoordinator {
                     client.createPersistent(consumerDetailedPath, true);
                     continue;
                 }
-
+                logger.info("消费者消费数据路径->{}",consumerDetailedPath);
                 //获取指定消费者需要消费的分片信息
                 String detailed = client.readData(consumerDetailedPath);
                 assignmentDuplicatePartitionsByConsumerId(duplicatePartitions, id, topic, detailed);
@@ -255,6 +255,7 @@ public class ZkNameCoordinator implements NameCoordinator {
 
                     @Override
                     public void handleDataChange(String dataPath, Object data) throws Exception {
+                        logger.info("消费分片数据变动");
                         List<NameDuplicatePartition> duplicateParts = new ArrayList<>();
                         HotspotEvent<List<NameDuplicatePartition>> event = new HotspotEvent<>();
                         event.setType(CONSUME_PARTITION_DATA_CHANGE);

@@ -48,7 +48,7 @@ public class SeqFileSegment implements Segment {
 
     private String name;
 
-    private Map<Long, Long> messageOffsets;
+    private Map<Long, OffsetMeta> messageOffsets;
 
     private File segmentFile;
 
@@ -84,8 +84,8 @@ public class SeqFileSegment implements Segment {
      * 读文件获取索引
      * @return
      */
-    private Map<Long, Long> loadMessageOffsets() {
-        Map<Long, Long> messageOffsets = new HashMap<>();
+    private Map<Long, OffsetMeta> loadMessageOffsets() {
+        Map<Long, OffsetMeta> messageOffsets = new HashMap<>();
         FileResource fileResource = new FileResource(segmentFile);
         ObjectResourceInputStream inputStream = null;
         try {
@@ -95,7 +95,7 @@ public class SeqFileSegment implements Segment {
                 long offset = inputStream.offset();
                 message = (Message) inputStream.readObject();
                 if(message != null){
-                    messageOffsets.put(message.getMsgId(), offset);
+                    messageOffsets.put(message.getMsgId(), new OffsetMeta(offset, new  MessageSerializer().serialize(message).length + 4));
                 }
             }while (message != null);
         } catch (InputStreamOpenException e) {
@@ -182,7 +182,7 @@ public class SeqFileSegment implements Segment {
      * @param msgId
      * @return
      */
-    private Long findOffset(Long msgId){
+    private OffsetMeta findOffset(Long msgId){
         return messageOffsets.get(msgId);
     }
 
@@ -200,9 +200,13 @@ public class SeqFileSegment implements Segment {
 
         @Override
         public void skip(long msgId) throws IOException {
-            Long offset = msgId == 0 ? 0:  segment.findOffset(msgId);
-            if(offset == null){
-                throw new IllegalArgumentException(String.format("msgId:%s is not find in segment", msgId));
+            long offset = 0;
+            if(msgId != 0){
+                OffsetMeta segmentMeta = segment.findOffset(msgId);
+                if(segmentMeta == null){
+                    throw new IllegalArgumentException(String.format("msgId:%s is not find in segment", msgId));
+                }
+                offset = segmentMeta.getOffset() + segmentMeta.getDataLen();
             }
             super.skip(offset);
         }
@@ -215,6 +219,12 @@ public class SeqFileSegment implements Segment {
 
         public SegmentOutputStream(SeqFileSegment segment) throws IOException {
             super(new FileResourceOutputStream(segment.segmentFile), new MessageSerializer());
+        }
+
+        @Override
+        protected void writeAfter(long offset, int dataLen, Object obj) {
+            Message message = (Message)obj;
+            messageOffsets.put(message.getMsgId(), new OffsetMeta(offset, dataLen));
         }
     }
 }

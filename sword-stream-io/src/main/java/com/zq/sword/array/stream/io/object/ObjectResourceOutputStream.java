@@ -37,6 +37,11 @@ public class ObjectResourceOutputStream extends AbstractResourceOutputStream imp
     }
 
     @Override
+    public long offset() throws IOException {
+        return  this.outputStream.offset();
+    }
+
+    @Override
     public void writeInt(int data) throws IOException {
         this.outputStream.writeInt(data);
     }
@@ -68,7 +73,9 @@ public class ObjectResourceOutputStream extends AbstractResourceOutputStream imp
     public void writeObject(List<Object> objs) throws IOException {
         if(objs != null && !objs.isEmpty()){
             for (Object obj : objs){
+
                 byte[] dataArray = objectSerializer.serialize(obj);
+                writeBefore(offset(), 4 + dataArray.length, obj);
                 if(dataSeparator == null){
                     this.outputStream.writeInt(dataArray.length);
                     this.outputStream.write(dataArray);
@@ -78,8 +85,17 @@ public class ObjectResourceOutputStream extends AbstractResourceOutputStream imp
                     this.outputStream.write(dataArray);
                     this.outputStream.writeBytes(character.getBytes());
                 }
+                writeAfter(offset(), 4 + dataArray.length, obj);
             }
         }
+
+    }
+
+    protected void writeAfter(long offset, int dataLen, Object obj) {
+
+    }
+
+    protected void writeBefore(long offset, int dataLen, Object obj) {
 
     }
 

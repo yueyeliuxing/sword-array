@@ -35,7 +35,7 @@ public class RedisProxyPiper extends AbstractPiper implements Piper {
         List<String> otherDcZkLocations = config.otherDcZkLocations();
         if(otherDcZkLocations != null && !otherDcZkLocations.isEmpty()){
             for(String otherDcZkLocation : otherDcZkLocations){
-                String[] params = otherDcZkLocation.split(":");
+                String[] params = otherDcZkLocation.split("\\|");
                 Consumer consumer =  DefaultConsumeDispatcher.createDispatcher(params[1])
                         .createDefaultConsumer(new String[]{namePiper.getGroup()}, id()+"",
                                 (partition -> PiperType.PROXY.name().equalsIgnoreCase(partition.getTag())));

@@ -140,6 +140,7 @@ public abstract class AbstractConsumer implements Consumer {
                                 messageConsumers.remove(partId);
                             }else {
                                 if(partitionFilter.filter(duplicateNamePart)){
+                                    logger.info("分片被过滤->{}", duplicateNamePart);
                                     continue;
                                 }
                                 Partition partition = createRpcPartition(duplicateNamePart);
@@ -166,12 +167,13 @@ public abstract class AbstractConsumer implements Consumer {
 
         //对于每个分片创建对应的消费者
         if(duplicateNamePartitions != null && !duplicateNamePartitions.isEmpty()){
+            logger.info("消费者消费的分片变动1->{}", duplicateNamePartitions);
             for(NameDuplicatePartition duplicateNamePartition : duplicateNamePartitions){
                 if(partitionFilter.filter(duplicateNamePartition)){
                     continue;
                 }
                 Partition partition = createRpcPartition(duplicateNamePartition);
-                logger.info("创建分片->{}", partition);
+                logger.info("创建分片1->{}", partition);
                 PartitionMessageConsumer messageConsumer = new PartitionMessageConsumer(partition);
                 messageConsumer.start();
                 messageConsumers.put(partition.id(), messageConsumer);

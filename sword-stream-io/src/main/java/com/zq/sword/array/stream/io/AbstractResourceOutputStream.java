@@ -17,6 +17,11 @@ public abstract class AbstractResourceOutputStream implements ObjectOutputStream
     }
 
     @Override
+    public long offset() throws IOException {
+        return 0;
+    }
+
+    @Override
     public void writeInt(int data) throws IOException {
 
     }

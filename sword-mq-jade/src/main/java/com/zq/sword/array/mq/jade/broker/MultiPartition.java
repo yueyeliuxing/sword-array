@@ -246,17 +246,18 @@ public class MultiPartition implements Partition {
                     inputStream.skip(msgId);
                 }catch (Exception e){
                     logger.info(e.getMessage());
+                    return;
                 }
 
                 int i = 0;
                 //读当前定位到的msg
-                Object obj = inputStream.readObject();
+               /* Object obj = inputStream.readObject();
                 if(msgId == 0){
                     objs[i++] = obj;
-                }
+                }*/
                 while (i < size){
                     //获取下一个msg
-                    obj =   inputStream.readObject();
+                    Object obj =   inputStream.readObject();
                     if(obj != null){
                         objs[i++] = obj;
                         msgId = ((Message)obj).getMsgId();

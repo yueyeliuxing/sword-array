@@ -44,6 +44,11 @@ public class FileResourceOutputStream implements ResourceOutputStream {
     }
 
     @Override
+    public long offset() throws IOException {
+        return file.getFilePointer();
+    }
+
+    @Override
     public void writeInt(int data) throws IOException {
         file.writeInt(data);
     }
