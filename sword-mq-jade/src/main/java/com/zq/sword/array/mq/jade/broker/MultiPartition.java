@@ -11,9 +11,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.zq.sword.array.mq.jade.broker.SeqFileSegment.SEGMENT_FILE_NAME_SUFFIX;
 
 /**
  * @program: sword-array
@@ -81,7 +84,12 @@ public class MultiPartition implements Partition {
             return segments;
         }
 
-        File[] segmentFiles = partitionFile.listFiles();
+        File[] segmentFiles = partitionFile.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.contains(SEGMENT_FILE_NAME_SUFFIX);
+            }
+        });
         if(segmentFiles != null && segmentFiles.length > 0){
             int i = 0;
             for (File segmentFile : segmentFiles){

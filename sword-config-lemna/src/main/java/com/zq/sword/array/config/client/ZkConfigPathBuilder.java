@@ -10,21 +10,7 @@ public class ZkConfigPathBuilder {
 
     public static final String ZK_ROOT = "/p-piper";
 
-    public static final String ZK_SWORD_UNITS= "/units";
-
-    public static final String ZK_SWORD_PROXY_UNITS= "/own-proxy-units";
-
-    public static final String ZK_SWORD_OTHER_PROXY_UNITS= "/other-proxy-units";
-
     public static final String ZK_SWORD_PIPER = "/piper";
-
-    public static final String ZK_SWORD_PIPER_MASTER = "/master";
-
-    public static final String ZK_SWORD_PIPER_MASTER_RUNNING = "/running";
-
-    public static final String ZK_SWORD_PIPER_MASTER_STATER_STATE = "/stater-state";
-
-    public static final String ZK_SWORD_PIPER_DATA = "/data";
 
     public static final String ZK_SWORD_PIPER_CONFIG = "/config";
 

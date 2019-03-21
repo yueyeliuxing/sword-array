@@ -1,6 +1,7 @@
 package com.zq.sword.array.mq.jade.broker;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
@@ -11,13 +12,17 @@ import lombok.ToString;
  **/
 @Data
 @ToString
+@NoArgsConstructor
 public class OffsetMeta {
+
+    private long msgId;
 
     private long offset;
 
     private long dataLen;
 
-    public OffsetMeta(long offset, long dataLen) {
+    public OffsetMeta(long msgId, long offset, long dataLen) {
+        this.msgId = msgId;
         this.offset = offset;
         this.dataLen = dataLen;
     }

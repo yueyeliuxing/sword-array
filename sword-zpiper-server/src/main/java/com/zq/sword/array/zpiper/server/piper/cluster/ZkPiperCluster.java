@@ -63,12 +63,19 @@ public class ZkPiperCluster implements PiperCluster {
 
     @Override
     public boolean register(NamePiper piper, HotspotEventListener<Void> eventListener) {
+
+        String masterPath = ZkClusterNodePathBuilder.buildPiperMasterPath(piper);
+        if(!zkClient.exists(masterPath)){
+            zkClient.createPersistent(masterPath, true);
+        }
+
         String masterRunningPath = ZkClusterNodePathBuilder.buildPiperRunningPath(piper);
         String location = piper.getLocation();
         //master 节点已经存在
         if(zkClient.exists(masterRunningPath)){
             String oldValue = zkClient.readData(masterRunningPath);
             if(!location.equals(oldValue)){
+                listenMasterChange(eventListener, masterRunningPath);
                 return false;
             }
             try{
@@ -79,6 +86,12 @@ public class ZkPiperCluster implements PiperCluster {
 
         }
         zkClient.createEphemeral(masterRunningPath, location);
+        listenMasterChange(eventListener, masterRunningPath);
+        logger.info("server 注册成功");
+        return true;
+    }
+
+    private void listenMasterChange(HotspotEventListener<Void> eventListener, String masterRunningPath) {
         zkClient.subscribeDataChanges(masterRunningPath, new IZkDataListener(){
 
             @Override
@@ -93,7 +106,5 @@ public class ZkPiperCluster implements PiperCluster {
                 eventListener.listen(event);
             }
         });
-        logger.info("server 注册成功");
-        return true;
     }
 }

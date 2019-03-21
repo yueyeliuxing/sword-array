@@ -12,6 +12,8 @@ import com.zq.sword.array.stream.io.object.ObjectInputStream;
 import com.zq.sword.array.stream.io.object.ObjectOutputStream;
 import com.zq.sword.array.stream.io.object.ObjectResourceInputStream;
 import com.zq.sword.array.stream.io.object.ObjectResourceOutputStream;
+import com.zq.sword.array.tasks.SingleTaskExecutor;
+import com.zq.sword.array.tasks.TaskExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +35,12 @@ public class SeqFileSegment implements Segment {
     /**
      * 文件后缀
      */
-    private static final String SEGMENT_FILE_NAME_SUFFIX = ".segment";
+    public static final String SEGMENT_FILE_NAME_SUFFIX = ".segment";
+
+    /**
+     * 索引文件后缀
+     */
+    public static final String INDEX_FILE_NAME_SUFFIX = ".index";
 
     /**
      * 段最大长度
@@ -52,6 +59,10 @@ public class SeqFileSegment implements Segment {
 
     private File segmentFile;
 
+    private File indexFile;
+
+    private TaskExecutor taskExecutor;
+
     /**
      * 创建一个空的段
      * @param partition
@@ -62,9 +73,10 @@ public class SeqFileSegment implements Segment {
         this.id = id;
         this.name = id+SEGMENT_FILE_NAME_SUFFIX;
         this.segmentFile = new File(partition.path() + File.separator + this.name);
+        this.indexFile = new File(partition.path() + File.separator + id+INDEX_FILE_NAME_SUFFIX);
         this.messageOffsets = new HashMap<>();
         this.segmentFile.getParentFile().mkdirs();
-
+        this.taskExecutor = new SingleTaskExecutor();
     }
 
     /**
@@ -77,7 +89,9 @@ public class SeqFileSegment implements Segment {
         this.segmentFile = segmentFile;
         this.name = segmentFile.getName();
         this.id = Long.parseLong(segmentFile.getName().substring(0, segmentFile.getName().indexOf(SEGMENT_FILE_NAME_SUFFIX)));
+        this.indexFile = new File(segmentFile.getParent()+File.separator+id+INDEX_FILE_NAME_SUFFIX);
         this.messageOffsets = loadMessageOffsets();
+        this.taskExecutor = new SingleTaskExecutor();
     }
 
     /**
@@ -86,18 +100,17 @@ public class SeqFileSegment implements Segment {
      */
     private Map<Long, OffsetMeta> loadMessageOffsets() {
         Map<Long, OffsetMeta> messageOffsets = new HashMap<>();
-        FileResource fileResource = new FileResource(segmentFile);
+        FileResource fileResource = new FileResource(indexFile);
         ObjectResourceInputStream inputStream = null;
         try {
-            inputStream = new ObjectResourceInputStream(fileResource.openInputStream(), new MessageDeserializer());
-            Message message = null;
+            inputStream = new ObjectResourceInputStream(fileResource.openInputStream(), new OffsetMetaDeserializer());
+            OffsetMeta offsetMeta = null;
             do{
-                long offset = inputStream.offset();
-                message = (Message) inputStream.readObject();
-                if(message != null){
-                    messageOffsets.put(message.getMsgId(), new OffsetMeta(offset, new  MessageSerializer().serialize(message).length + 4));
+                offsetMeta = (OffsetMeta) inputStream.readObject();
+                if(offsetMeta != null){
+                    messageOffsets.put(offsetMeta.getMsgId(), offsetMeta);
                 }
-            }while (message != null);
+            }while (offsetMeta != null);
         } catch (InputStreamOpenException e) {
             logger.error("打开文件失败", e);
         } catch (IOException e) {
@@ -223,8 +236,30 @@ public class SeqFileSegment implements Segment {
 
         @Override
         protected void writeAfter(long offset, int dataLen, Object obj) {
+            System.out.println("asdsa");
             Message message = (Message)obj;
-            messageOffsets.put(message.getMsgId(), new OffsetMeta(offset, dataLen));
+            OffsetMeta offsetMeta = new OffsetMeta(message.getMsgId(), offset, dataLen);
+
+            //异步写入索引文件
+            taskExecutor.execute(()->{
+                ObjectResourceOutputStream outputStream = null;
+                try {
+                    FileResource fileResource = new FileResource(indexFile);
+                    outputStream = new ObjectResourceOutputStream(fileResource.openOutputStream(), new OffsetMetaSerializer());
+                    outputStream.writeObject(offsetMeta);
+                } catch (OutputStreamOpenException e) {
+                    logger.error("打开文件失败", e);
+                } catch (IOException e) {
+                    logger.error("写文件失败", e);
+                }finally {
+                    try {
+                        outputStream.close();
+                    } catch (IOException e) {
+                        logger.error("关闭文件流失败", e);
+                    }
+                }
+            });
+            messageOffsets.put(offsetMeta.getMsgId(), offsetMeta);
         }
     }
 }
