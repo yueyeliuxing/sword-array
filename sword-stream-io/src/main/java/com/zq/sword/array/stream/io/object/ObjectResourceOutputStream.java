@@ -75,7 +75,8 @@ public class ObjectResourceOutputStream extends AbstractResourceOutputStream imp
             for (Object obj : objs){
 
                 byte[] dataArray = objectSerializer.serialize(obj);
-                writeBefore(offset(), 4 + dataArray.length, obj);
+                long offset = offset();
+                writeBefore(offset, 4 + dataArray.length, obj);
                 if(dataSeparator == null){
                     this.outputStream.writeInt(dataArray.length);
                     this.outputStream.write(dataArray);
@@ -85,7 +86,7 @@ public class ObjectResourceOutputStream extends AbstractResourceOutputStream imp
                     this.outputStream.write(dataArray);
                     this.outputStream.writeBytes(character.getBytes());
                 }
-                writeAfter(offset(), 4 + dataArray.length, obj);
+                writeAfter(offset, 4 + dataArray.length, obj);
             }
         }
 

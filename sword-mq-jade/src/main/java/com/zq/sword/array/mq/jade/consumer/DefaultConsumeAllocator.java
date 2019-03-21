@@ -81,50 +81,48 @@ public class DefaultConsumeAllocator extends AbstractThreadActuator implements C
 
     @Override
     public void run() {
-        while (!isClose && !Thread.currentThread().isInterrupted()){
-            try{
-                NameConsumeAllocator consumeAllocator = new NameConsumeAllocator(id, group, topic);
-                while(!coordinator.registerConsumeAllocator(consumeAllocator, (dataEvent)->{
-                    HotspotEventType type = dataEvent.getType();
-                    if(HotspotEventType.CONSUME_ALLOCATOR_NODE_DEL.equals(type)){
-                        isCanRegister = true;
-                        latch.countDown();
-                    }
-                })){
-                    latch.await();
-                    if (isCanRegister) {
-                        logger.info("监听到分配器临时节点消失，延迟5s启动");
-                        Thread.sleep(5000);
-                    }
+        try{
+            NameConsumeAllocator consumeAllocator = new NameConsumeAllocator(id, group, topic);
+            while(!coordinator.registerConsumeAllocator(consumeAllocator, (dataEvent)->{
+                HotspotEventType type = dataEvent.getType();
+                if(HotspotEventType.CONSUME_ALLOCATOR_NODE_DEL.equals(type)){
+                    isCanRegister = true;
+                    latch.countDown();
                 }
-                logger.info("分配器：{}注册成功", id);
-
-                List<NameConsumer> nameConsumers = coordinator.gainConsumers(group, dataEvent -> {
-                    if(CONSUMER_NODE_CHANGE.equals(dataEvent.getType())){
-                        this.consumers.clear();
-                        this.consumers.addAll(dataEvent.getData());
-                        reallocateConsumePartition();
-                    }
-                });
-                if(nameConsumers != null && !nameConsumers.isEmpty()){
-                    this.consumers.addAll(nameConsumers);
+            })){
+                latch.await();
+                if (isCanRegister) {
+                    logger.info("监听到分配器临时节点消失，延迟5s启动");
+                    Thread.sleep(5000);
                 }
-
-                List<NameDuplicatePartition> nameDuplicatePartitions = coordinator.gainDuplicatePartition(topic, dataEvent -> {
-                    if(PARTITION_NODE_CHANGE.equals(dataEvent.getType())){
-                        this.partitions.clear();
-                        this.partitions.addAll(dataEvent.getData().get(topic));
-                        reallocateConsumePartition();
-                    }
-                });
-                if(nameDuplicatePartitions != null && !nameDuplicatePartitions.isEmpty()){
-                    this.partitions.addAll(nameDuplicatePartitions);
-                }
-                reallocateConsumePartition();
-            }catch (Exception e){
-                logger.error("分配器出现异常", e);
-                stop();
             }
+            logger.info("分配器：{}注册成功", id);
+
+            List<NameConsumer> nameConsumers = coordinator.gainConsumers(group, dataEvent -> {
+                if(CONSUMER_NODE_CHANGE.equals(dataEvent.getType())){
+                    this.consumers.clear();
+                    this.consumers.addAll(dataEvent.getData());
+                    reallocateConsumePartition();
+                }
+            });
+            if(nameConsumers != null && !nameConsumers.isEmpty()){
+                this.consumers.addAll(nameConsumers);
+            }
+
+            List<NameDuplicatePartition> nameDuplicatePartitions = coordinator.gainDuplicatePartition(topic, dataEvent -> {
+                if(PARTITION_NODE_CHANGE.equals(dataEvent.getType())){
+                    this.partitions.clear();
+                    this.partitions.addAll(dataEvent.getData().get(topic));
+                    reallocateConsumePartition();
+                }
+            });
+            if(nameDuplicatePartitions != null && !nameDuplicatePartitions.isEmpty()){
+                this.partitions.addAll(nameDuplicatePartitions);
+            }
+            reallocateConsumePartition();
+        }catch (Exception e){
+            logger.error("分配器出现异常", e);
+            stop();
         }
     }
 

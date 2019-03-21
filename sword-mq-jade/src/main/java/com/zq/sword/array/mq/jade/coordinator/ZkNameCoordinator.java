@@ -358,8 +358,10 @@ public class ZkNameCoordinator implements NameCoordinator {
                     }
                 });
                 return false;
+            }else {
+                return true;
             }
-            client.delete(consumerAllocatorRegisterPath);
+            //client.delete(consumerAllocatorRegisterPath);
         }
         client.createEphemeral(consumerAllocatorRegisterPath, consumeAllocator.getId());
         client.subscribeDataChanges(consumerAllocatorRegisterPath, new IZkDataListener(){
