@@ -15,6 +15,7 @@ import com.zq.sword.array.stream.io.object.ObjectInputStream;
 import com.zq.sword.array.stream.io.object.ObjectOutputStream;
 import com.zq.sword.array.tasks.SingleTaskExecutor;
 import com.zq.sword.array.tasks.TaskExecutor;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -124,6 +125,7 @@ public abstract class AbstractApplicationBroker extends AbstractConfigurableBrok
     /**
      * 数据传输
      */
+    @ChannelHandler.Sharable
     private class MessageDataTransferHandler extends TransferHandler {
 
         private Logger logger = LoggerFactory.getLogger(MessageDataTransferHandler.class);

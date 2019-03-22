@@ -314,6 +314,7 @@ public class ZkNameCoordinator implements NameCoordinator {
             }
             detailedValue = consumeDetailedInfo.toString();
         }
+        logger.info("写入到节点：{} 数据：{}", consumerDetailedPath, detailedValue);
         client.writeData(consumerDetailedPath, detailedValue);
     }
 

@@ -22,6 +22,9 @@ public class PiperFactory {
         NamePiper namePiper = piperConfig.namePiper();
         PiperType type = namePiper.getType();
         switch (type){
+            case X_SIMPLE:
+                piper = new RedisXPiper(piperConfig);
+                break;
             case SIMPLE:
                 piper = new RedisPiper(piperConfig);
                 break;

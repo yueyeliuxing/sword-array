@@ -135,9 +135,9 @@ public abstract class AbstractConsumer implements Consumer {
                         Map<Long, PartitionMessageConsumer> tempMessageConsumers = new HashMap<>();
                         for(NameDuplicatePartition duplicateNamePart : duplicateNameParts){
                             Long partId = duplicateNamePart.getId();
-                            if(messageConsumers.containsKey(partId)){
+                            PartitionMessageConsumer partitionMessageConsumer = messageConsumers.get(partId);
+                            if(partitionMessageConsumer != null && !partitionMessageConsumer.isClose()){
                                 tempMessageConsumers.put(partId, messageConsumers.get(partId));
-                                messageConsumers.remove(partId);
                             }else {
                                 if(partitionFilter.filter(duplicateNamePart)){
                                     logger.info("分片被过滤->{}", duplicateNamePart);
@@ -258,6 +258,10 @@ public abstract class AbstractConsumer implements Consumer {
                     logger.error("关闭输入流失败", e);
                 }
             }
+        }
+
+        public boolean isClose(){
+            return partition.isClose();
         }
     }
 }

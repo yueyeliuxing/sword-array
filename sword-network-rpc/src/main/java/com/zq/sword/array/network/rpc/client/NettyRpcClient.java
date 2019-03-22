@@ -114,4 +114,9 @@ public class NettyRpcClient implements RpcClient {
     public void reconnect() {
         connect();
     }
+
+    @Override
+    public boolean isClose() {
+        return channel == null || !channel.isOpen();
+    }
 }

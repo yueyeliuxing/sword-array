@@ -17,6 +17,7 @@ import com.zq.sword.array.stream.io.object.ObjectInputStream;
 import com.zq.sword.array.stream.io.object.ObjectOutputStream;
 import com.zq.sword.array.tasks.SingleTaskExecutor;
 import com.zq.sword.array.tasks.TaskExecutor;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,6 +113,11 @@ public class RpcPartition implements Partition {
     @Override
     public ObjectOutputStream openOutputStream() throws OutputStreamOpenException {
         return new RpcPartitionOutputStream(sendMsgQueue);
+    }
+
+    @Override
+    public boolean isClose() {
+        return client.isClose();
     }
 
     @Override
@@ -216,6 +222,7 @@ public class RpcPartition implements Partition {
     /**
      * 发送数据到远程broker
      */
+    @ChannelHandler.Sharable
     private class SendMsgToRemoteHostHandler extends TransferHandler {
 
         private Logger logger = LoggerFactory.getLogger(SendMsgToRemoteHostHandler.class);

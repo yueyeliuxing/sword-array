@@ -49,4 +49,10 @@ public interface Partition extends Resource {
 
     @Override
     ObjectOutputStream openOutputStream() throws OutputStreamOpenException;
+
+    /**
+     * 是否关闭
+     * @return
+     */
+    boolean isClose();
 }

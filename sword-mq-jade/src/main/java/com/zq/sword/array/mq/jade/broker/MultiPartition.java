@@ -55,6 +55,8 @@ public class MultiPartition implements Partition {
      */
     private volatile boolean writing = false;
 
+    private volatile boolean isClose = false;
+
     public MultiPartition(Broker broker, String topic, String tag, long id) {
         this.broker = broker;
         this.topic = topic;
@@ -143,11 +145,17 @@ public class MultiPartition implements Partition {
     }
 
     @Override
+    public boolean isClose() {
+        return isClose;
+    }
+
+    @Override
     public void close() {
         for (Segment segment : segments){
             segment.close();
         }
         segments.clear();
+        isClose = true;
     }
 
     /**

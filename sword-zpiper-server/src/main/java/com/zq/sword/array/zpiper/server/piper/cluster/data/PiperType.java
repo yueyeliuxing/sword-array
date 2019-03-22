@@ -7,6 +7,7 @@ package com.zq.sword.array.zpiper.server.piper.cluster.data;
  * @create: 2018-07-24 17:05
  **/
 public enum PiperType {
+    X_SIMPLE,
     SIMPLE,
     PROXY,
     ;

@@ -2,8 +2,6 @@ package com.zq.sword.array.network.rpc.client;
 
 import com.zq.sword.array.network.rpc.handler.TransferHandler;
 
-import java.nio.channels.Channel;
-
 /**
  * @program: sword-array
  * @description: 传输客户端
@@ -32,4 +30,10 @@ public interface RpcClient {
      * 重启
      */
     void reconnect();
+
+    /**
+     * 是否关闭
+     * @return
+     */
+    boolean isClose();
 }

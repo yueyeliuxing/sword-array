@@ -70,7 +70,7 @@ public class RedisPiper extends AbstractPiper implements Piper{
     /**
      * 接收消息监听器
      */
-    private class ReceiveMessageListener implements MessageListener {
+    public class ReceiveMessageListener implements MessageListener {
 
         @Override
         public ConsumeStatus consume(Message message) {
