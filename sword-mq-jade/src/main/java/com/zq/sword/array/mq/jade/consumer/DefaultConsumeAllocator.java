@@ -137,7 +137,6 @@ public class DefaultConsumeAllocator extends AbstractThreadActuator implements C
         int partitionSize = partitions.size();
 
         if(consumerSize == 0 || partitionSize == 0){
-            coordinator.editConsumePartitions(topic, group, null);
             return;
         }
         Map<Integer, List<NameDuplicatePartition>> partitionsOfConsumeIndexs = new HashMap<>();
@@ -167,9 +166,56 @@ public class DefaultConsumeAllocator extends AbstractThreadActuator implements C
     private void putInto(Map<Integer, List<NameDuplicatePartition>> partitionsOfConsumeIndexs, int consumerIndex, NameDuplicatePartition partition) {
         List<NameDuplicatePartition> duplicatePartitions = partitionsOfConsumeIndexs.get(consumerIndex);
         if(duplicatePartitions == null){
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             duplicatePartitions = new ArrayList<>();
             partitionsOfConsumeIndexs.put(consumerIndex, duplicatePartitions);
         }
         duplicatePartitions.add(partition);
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+        coordinator.editConsumePartitions(topic, group, null);
     }
 }

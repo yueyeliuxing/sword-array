@@ -22,6 +22,7 @@
 		<module>sword-id-generator</module>
 		<module>sword-redis</module>
 		<module>sword-config-lemna</module>
+		<module>sword-config-web</module>
 		<module>sword-stream-io</module>
 		<module>sword-data-structure</module>
 		<module>sword-mq-jade</module>

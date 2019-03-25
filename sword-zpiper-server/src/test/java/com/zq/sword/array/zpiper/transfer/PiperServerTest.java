@@ -2,7 +2,7 @@ package com.zq.sword.array.zpiper.transfer;
 
 import org.junit.Test;
 
-import java.io.File;
+import java.io.UnsupportedEncodingException;
 
 /**
  * @program: sword-array
@@ -14,8 +14,9 @@ import java.io.File;
 public class PiperServerTest {
 
     @Test
-    public void server1(){
-        File file = null;
+    public void server1() throws UnsupportedEncodingException {
+        String city = new String("重庆".getBytes(), "utf-8");
+        System.out.println(city);
     }
 
 }

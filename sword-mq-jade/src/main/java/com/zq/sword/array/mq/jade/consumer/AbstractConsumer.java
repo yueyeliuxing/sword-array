@@ -120,7 +120,7 @@ public abstract class AbstractConsumer implements Consumer {
     @Override
     public void start() {
         NameConsumer consumer = new NameConsumer(id, group, topics);
-
+        logger.info("consumer register 注册：{}", id);
         //注册consumer
         coordinator.registerConsumer(consumer);
 

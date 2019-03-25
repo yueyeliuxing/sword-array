@@ -263,7 +263,7 @@ public class RpcPartition implements Partition {
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            logger.error("rpcPartition receive msg request : {}", msg);
+            logger.info("rpcPartition receive msg request : {}", msg);
             if(sendMsgFuture == null) {
                 sendMsgFuture = ctx.executor().scheduleAtFixedRate(new SendMsgTask(ctx), 0, 5000, TimeUnit.MILLISECONDS);
             }
