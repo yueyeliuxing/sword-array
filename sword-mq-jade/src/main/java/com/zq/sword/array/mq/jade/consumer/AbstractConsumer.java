@@ -120,9 +120,6 @@ public abstract class AbstractConsumer implements Consumer {
     @Override
     public void start() {
         NameConsumer consumer = new NameConsumer(id, group, topics);
-        logger.info("consumer register 注册：{}", id);
-        //注册consumer
-        coordinator.registerConsumer(consumer);
 
         //获取可以消费的分片信息
         List<NameDuplicatePartition> duplicateNamePartitions = coordinator.gainConsumeDuplicatePartition(consumer, (dataEvent)->{
@@ -180,6 +177,10 @@ public abstract class AbstractConsumer implements Consumer {
                 logger.info("对分片—>{}生成消费者", duplicateNamePartition.getId());
             }
         }
+
+        logger.info("consumer register 注册：{}", id);
+        //注册consumer
+        coordinator.registerConsumer(consumer);
 
     }
 

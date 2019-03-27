@@ -2,20 +2,22 @@ package com.zq.sword.array.mq.jade.consumer;
 
 import com.zq.sword.array.common.event.HotspotEventType;
 import com.zq.sword.array.id.SnowFlakeIdGenerator;
+import com.zq.sword.array.mq.jade.coordinator.NameCoordinator;
 import com.zq.sword.array.mq.jade.coordinator.data.NameConsumeAllocator;
 import com.zq.sword.array.mq.jade.coordinator.data.NameConsumer;
-import com.zq.sword.array.mq.jade.coordinator.NameCoordinator;
 import com.zq.sword.array.mq.jade.coordinator.data.NameDuplicatePartition;
-import com.zq.sword.array.tasks.AbstractThreadActuator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadLocalRandom;
-import static com.zq.sword.array.common.event.HotspotEventType.*;
+
+import static com.zq.sword.array.common.event.HotspotEventType.CONSUMER_NODE_CHANGE;
+import static com.zq.sword.array.common.event.HotspotEventType.PARTITION_NODE_CHANGE;
 
 /**
  * @program: sword-array
@@ -23,7 +25,7 @@ import static com.zq.sword.array.common.event.HotspotEventType.*;
  * @author: zhouqi1
  * @create: 2019-01-18 13:58
  **/
-public class DefaultConsumeAllocator extends AbstractThreadActuator implements ConsumeAllocator {
+public class DefaultConsumeAllocator implements ConsumeAllocator {
 
     private Logger logger = LoggerFactory.getLogger(DefaultConsumeAllocator.class);
 
@@ -80,7 +82,7 @@ public class DefaultConsumeAllocator extends AbstractThreadActuator implements C
     }
 
     @Override
-    public void run() {
+    public void start() {
         try{
             NameConsumeAllocator consumeAllocator = new NameConsumeAllocator(id, group, topic);
             while(!coordinator.registerConsumeAllocator(consumeAllocator, (dataEvent)->{
@@ -166,47 +168,6 @@ public class DefaultConsumeAllocator extends AbstractThreadActuator implements C
     private void putInto(Map<Integer, List<NameDuplicatePartition>> partitionsOfConsumeIndexs, int consumerIndex, NameDuplicatePartition partition) {
         List<NameDuplicatePartition> duplicatePartitions = partitionsOfConsumeIndexs.get(consumerIndex);
         if(duplicatePartitions == null){
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             duplicatePartitions = new ArrayList<>();
             partitionsOfConsumeIndexs.put(consumerIndex, duplicatePartitions);
         }
@@ -215,7 +176,6 @@ public class DefaultConsumeAllocator extends AbstractThreadActuator implements C
 
     @Override
     public void stop() {
-        super.stop();
         coordinator.editConsumePartitions(topic, group, null);
     }
 }

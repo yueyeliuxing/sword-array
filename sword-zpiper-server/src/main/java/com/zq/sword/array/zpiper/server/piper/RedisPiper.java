@@ -114,6 +114,7 @@ public class RedisPiper extends AbstractPiper implements Piper{
 
         @Override
         public void receive(RedisCommand command) {
+            logger.info("接收到命令，时间：{}", System.currentTimeMillis());
             Message message = new Message();
             message.setMsgId(idGenerator.nextId());
             message.setTopic(namePiper.getGroup());
