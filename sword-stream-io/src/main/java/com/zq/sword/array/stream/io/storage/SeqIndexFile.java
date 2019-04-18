@@ -19,12 +19,15 @@ public class SeqIndexFile extends DataFileDecorator implements DataFile {
 
     private Logger logger = LoggerFactory.getLogger(SeqIndexFile.class);
 
+    private File file;
+
     public static final String INDEX_FILE_NAME = ".index";
 
     private Map<String, SeqIndex> seqIndexCache;
 
     public SeqIndexFile(File file) {
         super(new OSDataFile(file));
+        this.file = file;
         this.seqIndexCache = new ConcurrentHashMap<>();
 
         //加载索引数据到内存
@@ -52,6 +55,14 @@ public class SeqIndexFile extends DataFileDecorator implements DataFile {
 
     public SeqIndexFile(String fileParentPath, String fileName) {
         this(new File(fileParentPath + File.separator + fileName + INDEX_FILE_NAME));
+    }
+
+    /**
+     * 索引字段
+     * @return
+     */
+    public String indexField(){
+        return file.getName().split("\\.")[0];
     }
 
     /**

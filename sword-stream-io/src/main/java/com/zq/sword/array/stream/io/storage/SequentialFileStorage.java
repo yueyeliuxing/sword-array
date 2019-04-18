@@ -81,6 +81,63 @@ public class SequentialFileStorage<T extends IndexableDataWritable> implements S
         this.dataFiles = new ConcurrentHashMap<>();
         this.indexFileMappings = new ConcurrentHashMap<>();
 
+        //加载数据结构
+        loadDataAndIndexFile();
+    }
+
+    /**
+     * 加载
+     */
+    private void loadDataAndIndexFile() {
+        String dataFileDirPath = getDataFileDir();
+        File dataFile = new File(dataFileDirPath);
+        if(!dataFile.exists()){
+            return;
+        }
+        File[] dataFiles = dataFile.listFiles();
+        if(dataFiles == null){
+            return;
+        }
+        SeqDataFile<T> preDataFile = null;
+        for (File file : dataFiles){
+            SeqDataFile<T> seqDataFile = new SeqDataFile(file);
+            this.dataFiles.putIfAbsent(seqDataFile.sequence(), seqDataFile);
+            if(preDataFile != null){
+                preDataFile.next(seqDataFile);
+            }
+            preDataFile = seqDataFile;
+
+            if(seqDataFile.isCurrent()){
+                currentDataFile = seqDataFile;
+            }
+        }
+
+        //加载索引数据
+        String indexFileDirPath = getIndexFileDir();
+        File indexFileDir = new File(dataFileDirPath);
+        if(!indexFileDir.exists()){
+            return;
+        }
+        File[] indexFiles = indexFileDir.listFiles();
+        if(indexFiles == null){
+            return;
+        }
+        for (File indexFile : indexFiles){
+            SeqIndexFile seqIndexFile = new SeqIndexFile(indexFile);
+            this.indexFileMappings.putIfAbsent(seqIndexFile.indexField(), seqIndexFile);
+        }
+    }
+
+    private String getIndexFileDir() {
+        return storagePath + File.separator + INDEX_FILE_DIR;
+    }
+
+    /**
+     * 得到数据文件目录
+     * @return
+     */
+    private String getDataFileDir() {
+        return storagePath + File.separator + DATA_FILE_DIR;
     }
 
     @Override
@@ -91,7 +148,7 @@ public class SequentialFileStorage<T extends IndexableDataWritable> implements S
             //如果当前文件还没有创建 或者 当前文件已写满 需要重新创建
             if(currentDataFile == null || currentDataFile.isFull()){
                 SeqDataFile<T> preDataFile = currentDataFile;
-                currentDataFile = new SeqDataFile(storagePath + File.separator + DATA_FILE_DIR, preDataFile == null ? "0" : preDataFile.size()+"");
+                currentDataFile = new SeqDataFile(getDataFileDir(), preDataFile == null ? "0" : preDataFile.size()+"");
                 dataFiles.put(currentDataFile.sequence(), currentDataFile);
                 if(currentDataFile.isFull()){
                     preDataFile.next(currentDataFile);
@@ -106,7 +163,7 @@ public class SequentialFileStorage<T extends IndexableDataWritable> implements S
                 for (String indexField : indexFields){
                     SeqIndexFile indexFile = indexFileMappings.get(indexField);
                     if(indexFile == null){
-                        indexFile = new SeqIndexFile(storagePath + File.separator + INDEX_FILE_DIR, indexField);
+                        indexFile = new SeqIndexFile(getIndexFileDir(), indexField);
                         indexFileMappings.put(indexField, indexFile);
                     }
                     indexFile.writeObject(new SeqIndex(ByteUtils.primitiveType2ByteArray(ReflectUtils.getFieldValue(data, indexField)), currentDataFile.sequence(), offset));
