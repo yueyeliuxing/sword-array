@@ -1,4 +1,4 @@
-package com.zq.sword.array.stream.io.storage;
+package com.zq.sword.array.stream.io.serialize;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import java.io.IOException;
  * @author: zhouqi1
  * @create: 2019-04-17 15:25
  **/
-public interface DataFile extends Closeable {
+public interface RWStore extends Closeable {
 
     /**
      * 跳转到指定索引处

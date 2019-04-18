@@ -1,6 +1,7 @@
 package com.zq.sword.array.stream.io.storage;
 
 import com.zq.sword.array.common.utils.ReflectUtils;
+import com.zq.sword.array.stream.io.serialize.RWStore;
 import com.zq.sword.array.stream.io.serialize.DataWritable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +18,7 @@ import java.util.List;
  * @author: zhouqi1
  * @create: 2019-04-17 14:49
  **/
-public class SeqDataFile<T extends DataWritable> extends DataFileDecorator implements DataFile {
+public class SeqDataFile<T extends DataWritable> extends DataFileDecorator implements RWStore {
 
     private Logger logger = LoggerFactory.getLogger(SeqDataFile.class);
 

@@ -1,5 +1,7 @@
 package com.zq.sword.array.stream.io.storage;
 
+import com.zq.sword.array.stream.io.serialize.RWStore;
+
 import java.io.IOException;
 
 /**
@@ -8,11 +10,11 @@ import java.io.IOException;
  * @author: zhouqi1
  * @create: 2019-04-17 16:03
  **/
-public abstract class DataFileDecorator implements DataFile {
+public abstract class DataFileDecorator implements RWStore {
     
-    protected DataFile dataFile;
+    protected RWStore dataFile;
 
-    public DataFileDecorator(DataFile dataFile) {
+    public DataFileDecorator(RWStore dataFile) {
         this.dataFile = dataFile;
     }
 

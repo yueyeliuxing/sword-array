@@ -1,7 +1,5 @@
 package com.zq.sword.array.stream.io.serialize;
 
-import com.zq.sword.array.stream.io.storage.DataFile;
-
 import java.io.EOFException;
 
 /**
@@ -22,11 +20,11 @@ public interface DataWritable {
      * 读入数据文件
      * @param file
      */
-    void read(DataFile file) throws EOFException;
+    void read(RWStore file) throws EOFException;
 
     /**
      * 写入数据
      * @param file
      */
-    void write(DataFile file);
+    void write(RWStore file);
 }

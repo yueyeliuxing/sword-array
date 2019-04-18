@@ -1,5 +1,6 @@
 package com.zq.sword.array.stream.io.storage;
 
+import com.zq.sword.array.stream.io.serialize.RWStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author: zhouqi1
  * @create: 2019-04-17 14:49
  **/
-public class SeqIndexFile extends DataFileDecorator implements DataFile {
+public class SeqIndexFile extends DataFileDecorator implements RWStore {
 
     private Logger logger = LoggerFactory.getLogger(SeqIndexFile.class);
 

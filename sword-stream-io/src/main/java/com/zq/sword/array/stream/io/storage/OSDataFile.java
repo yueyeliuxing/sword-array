@@ -1,5 +1,7 @@
 package com.zq.sword.array.stream.io.storage;
 
+import com.zq.sword.array.stream.io.serialize.RWStore;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -13,7 +15,7 @@ import java.nio.channels.FileLock;
  * @author: zhouqi1
  * @create: 2019-04-17 15:29
  **/
-public class OSDataFile implements DataFile {
+public class OSDataFile implements RWStore {
 
     /**
      * 对应的文件

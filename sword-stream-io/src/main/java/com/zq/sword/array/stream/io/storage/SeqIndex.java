@@ -1,5 +1,6 @@
 package com.zq.sword.array.stream.io.storage;
 
+import com.zq.sword.array.stream.io.serialize.RWStore;
 import com.zq.sword.array.stream.io.serialize.DataWritable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -50,7 +51,7 @@ public class SeqIndex implements DataWritable {
     }
 
     @Override
-    public void read(DataFile file) throws EOFException {
+    public void read(RWStore file) throws EOFException {
         try {
             int keySize = file.readInt();
             if(keySize > 0){
@@ -68,7 +69,7 @@ public class SeqIndex implements DataWritable {
     }
 
     @Override
-    public void write(DataFile file) {
+    public void write(RWStore file) {
         try {
             int keySize = key == null ? 0 : key.length();
             file.writeInt(keySize);

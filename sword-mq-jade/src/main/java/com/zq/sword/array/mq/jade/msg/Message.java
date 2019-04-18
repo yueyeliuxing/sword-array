@@ -1,6 +1,6 @@
 package com.zq.sword.array.mq.jade.msg;
 
-import com.zq.sword.array.stream.io.storage.DataFile;
+import com.zq.sword.array.stream.io.serialize.RWStore;
 import com.zq.sword.array.stream.io.serialize.DataWritable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -57,7 +57,7 @@ public class Message implements Serializable, DataWritable{
     }
 
     @Override
-    public void read(DataFile file) throws EOFException {
+    public void read(RWStore file) throws EOFException {
         try{
             msgId = file.readLong();
             int topicLen = file.readInt();
@@ -90,7 +90,7 @@ public class Message implements Serializable, DataWritable{
     }
 
     @Override
-    public void write(DataFile file) {
+    public void write(RWStore file) {
         try{
             file.writeLong(msgId);
             file.writeInt(topic.length());
