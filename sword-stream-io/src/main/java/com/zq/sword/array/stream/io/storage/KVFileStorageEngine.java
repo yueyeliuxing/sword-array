@@ -1,7 +1,5 @@
-package com.zq.sword.array.stream.io.storage.engine;
+package com.zq.sword.array.stream.io.storage;
 
-import com.zq.sword.array.stream.io.storage.IndexableOffsetFileStorageEngine;
-import com.zq.sword.array.stream.io.storage.IndexableOffsetStorageEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

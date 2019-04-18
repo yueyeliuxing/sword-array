@@ -1,7 +1,7 @@
 package com.zq.sword.array.stream.io;
 
-import com.zq.sword.array.stream.io.storage.engine.KVStorageEngine;
-import com.zq.sword.array.stream.io.storage.engine.KVFileStorageEngine;
+import com.zq.sword.array.stream.io.storage.KVStorageEngine;
+import com.zq.sword.array.stream.io.storage.KVFileStorageEngine;
 import org.junit.Before;
 import org.junit.Test;
 
