@@ -2,7 +2,6 @@ package com.zq.sword.array.common.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.reflect.misc.ReflectUtil;
 
 import java.lang.reflect.Field;
 
@@ -42,7 +41,7 @@ public class ReflectUtils {
      */
     public static  <T> T newInstance(Class<T> clazz){
         try {
-            return (T) ReflectUtil.newInstance(clazz);
+            return (T) clazz.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
             logger.error("反射失败", e);
             return null;

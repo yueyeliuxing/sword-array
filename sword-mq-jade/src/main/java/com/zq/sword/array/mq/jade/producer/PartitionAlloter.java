@@ -13,5 +13,5 @@ public interface PartitionAlloter {
      * @param topic
      * @return
      */
-    PartitionResource allotPartition(String topic);
+    ProducePartition allotPartition(String topic);
 }

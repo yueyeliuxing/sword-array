@@ -15,17 +15,14 @@ import java.io.Serializable;
 @Data
 @ToString
 @NoArgsConstructor
-public class MsgReq implements Serializable{
+public class MsgResp implements Serializable{
 
-    private long partId;
+    private long msgId;
 
     private long offset;
 
-    private int msgSize;
-
-    public MsgReq(long partId, long offset, int msgSize) {
-        this.partId = partId;
+    public MsgResp(long msgId, long offset) {
+        this.msgId = msgId;
         this.offset = offset;
-        this.msgSize = msgSize;
     }
 }

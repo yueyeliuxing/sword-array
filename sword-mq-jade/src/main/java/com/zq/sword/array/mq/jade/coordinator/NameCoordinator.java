@@ -70,10 +70,10 @@ public interface NameCoordinator {
     List<NameDuplicatePartition> gainConsumeDuplicatePartition(NameConsumer consumer, HotspotEventListener<List<NameDuplicatePartition>> partitionEventListener);
 
     /**
-     * 获区指定消费者消费指定分片的消息ID
+     * 获区指定消费者消费指定分片的偏移量
      * @param consumer 消费者
      * @param partition 分片
-     * @return 指定分片上消费的消息ID
+     * @return 指定分片上消费的偏移量
      */
     Long gainConsumeMsgId(NameConsumer consumer, NamePartition partition);
 
@@ -86,12 +86,12 @@ public interface NameCoordinator {
     void editConsumePartitions(String topic, String group, Map<NameConsumer, List<NameDuplicatePartition>> consumerPartitions);
 
     /**
-     * 记录已经消费的消息ID
+     * 记录已经消费的偏移量
      * @param consumer 消费者
      * @param partition 分片
-     * @param msgId 消息ID
+     * @param offset 偏移量
      */
-    void recordConsumeMsgId(NameConsumer consumer, NamePartition partition, long msgId);
+    void recordConsumeOffset(NameConsumer consumer, NamePartition partition, long offset);
 
     /**
      *

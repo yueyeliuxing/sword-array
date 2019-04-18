@@ -4,19 +4,16 @@ import com.zq.sword.array.common.event.HotspotEventType;
 import com.zq.sword.array.id.SnowFlakeIdGenerator;
 import com.zq.sword.array.mq.jade.broker.Partition;
 import com.zq.sword.array.mq.jade.broker.RpcPartition;
-import com.zq.sword.array.mq.jade.coordinator.data.NameDuplicatePartition;
-import com.zq.sword.array.mq.jade.coordinator.data.NameConsumer;
 import com.zq.sword.array.mq.jade.coordinator.NameCoordinator;
+import com.zq.sword.array.mq.jade.coordinator.data.NameConsumer;
+import com.zq.sword.array.mq.jade.coordinator.data.NameDuplicatePartition;
 import com.zq.sword.array.mq.jade.coordinator.data.NamePartition;
 import com.zq.sword.array.mq.jade.msg.Message;
-import com.zq.sword.array.stream.io.ex.InputStreamOpenException;
-import com.zq.sword.array.stream.io.object.ObjectInputStream;
 import com.zq.sword.array.tasks.AbstractThreadActuator;
 import com.zq.sword.array.tasks.Actuator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +53,7 @@ public abstract class AbstractConsumer implements Consumer {
     /**
      * 消费对应分片的消息ID
      */
-    private Map<Long, Long> consumeMsgIds;
+    private Map<Long, Long> partitionNextConsumeOffsetMappings;
 
     private ConsumePartitionFilter partitionFilter;
 
@@ -77,7 +74,7 @@ public abstract class AbstractConsumer implements Consumer {
         this.id = generateConsumerId();
         this.coordinator = coordinator;
         this.messageConsumers = new ConcurrentHashMap<>();
-        this.consumeMsgIds = new ConcurrentHashMap<>();
+        this.partitionNextConsumeOffsetMappings = new ConcurrentHashMap<>();
     }
 
     /**
@@ -108,13 +105,13 @@ public abstract class AbstractConsumer implements Consumer {
      * @param partition 分片
      * @return 消息ID
      */
-    public long getConsumeMsgId(NamePartition partition){
-        if(consumeMsgIds.containsKey(partition.getId())){
-            return consumeMsgIds.get(partition.getId());
+    public long getConsumeOffset(NamePartition partition){
+        if(partitionNextConsumeOffsetMappings.containsKey(partition.getId())){
+            return partitionNextConsumeOffsetMappings.get(partition.getId());
         }
-        Long msgId = coordinator.gainConsumeMsgId(new NameConsumer(id, group, topics), partition);
-        consumeMsgIds.put(partition.getId(), msgId);
-        return msgId;
+        Long offset = coordinator.gainConsumeMsgId(new NameConsumer(id, group, topics), partition);
+        partitionNextConsumeOffsetMappings.put(partition.getId(), offset);
+        return offset;
     }
 
     @Override
@@ -215,20 +212,17 @@ public abstract class AbstractConsumer implements Consumer {
 
         @Override
         public void run() {
-            ObjectInputStream inputStream = null;
             try {
                 logger.info("消费者开始消费消息");
                 Message lastConsumeFailMessage = null;
                 while (!isClose && !Thread.currentThread().isInterrupted()) {
+                    long offset = getConsumeOffset(new NamePartition(partition.id(), partition.topic(), partition.tag()));
                     Message message = null;
                     if (lastConsumeFailMessage != null) {
                         message = lastConsumeFailMessage;
                     } else {
-                        long msgId = getConsumeMsgId(new NamePartition(partition.id(), partition.topic(), partition.tag()));
-                        logger.info("消费者消费msgId->{}", msgId);
-                        inputStream = partition.openInputStream();
-                        inputStream.skip(msgId);
-                        message = (Message) inputStream.readObject();
+                        logger.info("消费者消费offset->{}", offset);
+                        message = partition.search(offset);
                     }
                     if(message == null){
                         continue;
@@ -237,8 +231,10 @@ public abstract class AbstractConsumer implements Consumer {
                     ConsumeStatus consumeStatus = messageListener.consume(message);
                     switch (consumeStatus) {
                         case CONSUME_SUCCESS:
-                            coordinator.recordConsumeMsgId(new NameConsumer(id, group, topics), new NamePartition(partition.id(), partition.topic(), partition.tag()), message.getMsgId());
-                            consumeMsgIds.put(partition.id(), message.getMsgId());
+                            //得到下一个消费消息的偏移量
+                            long nextConsumeOffset = offset + message.length();
+                            coordinator.recordConsumeOffset(new NameConsumer(id, group, topics), new NamePartition(partition.id(), partition.topic(), partition.tag()), nextConsumeOffset);
+                            partitionNextConsumeOffsetMappings.put(partition.id(), nextConsumeOffset);
                             break;
                         case CONSUME_FAIL:
                             lastConsumeFailMessage = message;
@@ -247,17 +243,8 @@ public abstract class AbstractConsumer implements Consumer {
                             break;
                     }
                 }
-            } catch (InputStreamOpenException e) {
-                logger.error("打开分片输入流失败", e);
-            } catch (IOException e) {
-                logger.error("读取数据出现异常", e);
             } finally {
-                try {
-                    inputStream.close();
-                    partition.close();
-                } catch (IOException e) {
-                    logger.error("关闭输入流失败", e);
-                }
+                partition.close();
             }
         }
 

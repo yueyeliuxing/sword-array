@@ -6,13 +6,12 @@ import com.zq.sword.array.mq.jade.coordinator.data.NamePartition;
 import com.zq.sword.array.mq.jade.msg.LocatedMessage;
 import com.zq.sword.array.mq.jade.msg.Message;
 import com.zq.sword.array.mq.jade.msg.MsgReq;
+import com.zq.sword.array.mq.jade.msg.MsgResp;
 import com.zq.sword.array.network.rpc.handler.TransferHandler;
 import com.zq.sword.array.network.rpc.message.Header;
 import com.zq.sword.array.network.rpc.message.MessageType;
 import com.zq.sword.array.network.rpc.message.TransferMessage;
 import com.zq.sword.array.network.rpc.server.NettyRpcServer;
-import com.zq.sword.array.stream.io.object.ObjectInputStream;
-import com.zq.sword.array.stream.io.object.ObjectOutputStream;
 import com.zq.sword.array.tasks.SingleTaskExecutor;
 import com.zq.sword.array.tasks.TaskExecutor;
 import io.netty.channel.ChannelHandler;
@@ -20,7 +19,6 @@ import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -147,25 +145,13 @@ public abstract class AbstractApplicationBroker extends AbstractConfigurableBrok
             if(message.getHeader() != null && message.getHeader().getType() == MessageType.RECEIVE_DATA_REQ.value()) {
                 MsgReq msgReq = (MsgReq)message.getBody();
                 Partition partition = getPartition(msgReq.getPartId());
-                ObjectInputStream inputStream = partition.openInputStream();
-                inputStream.skip(msgReq.getMsgId());
-                Object[] objs = new Object[msgReq.getMsgSize()];
-                inputStream.readObject(objs);
-                inputStream.close();
-                List<Message> msgs = new ArrayList<>();
-                for(Object obj : objs){
-                    if(obj != null){
-                        msgs.add((Message)obj);
-                    }
-                }
-                ctx.writeAndFlush(buildReceiveMessageResp(msgs));
+                List<Message> messages = partition.orderSearch(msgReq.getOffset(), msgReq.getMsgSize());
+                ctx.writeAndFlush(buildReceiveMessageResp(messages));
             }else if(message.getHeader() != null && message.getHeader().getType() == MessageType.SEND_MESSAGE_REQ.value()) {
                 LocatedMessage locatedMessage = (LocatedMessage)message.getBody();
                 Partition partition = getPartition(locatedMessage.getPartId());
-                ObjectOutputStream inputStream = partition.openOutputStream();
-                inputStream.writeObject(locatedMessage.getMessage());
-                inputStream.close();
-                ctx.writeAndFlush(buildSendMessageResp(locatedMessage.getMessage()));
+                long offset = partition.append(locatedMessage.getMessage());
+                ctx.writeAndFlush(buildSendMessageResp(new MsgResp(locatedMessage.getMessage().getMsgId(), offset)));
             }else {
                 ctx.fireChannelRead(msg);
             }
@@ -182,13 +168,13 @@ public abstract class AbstractApplicationBroker extends AbstractConfigurableBrok
             return message;
         }
 
-        private TransferMessage buildSendMessageResp(Message msg) {
+        private TransferMessage buildSendMessageResp(MsgResp msgResp) {
             TransferMessage message = new TransferMessage();
             Header header = new Header();
             header.setType(MessageType.SEND_MESSAGE_RESP.value());
             message.setHeader(header);
-            if(msg != null){
-                message.setBody(msg.getMsgId());
+            if(msgResp != null){
+                message.setBody(msgResp);
             }
             return message;
         }

@@ -1,12 +1,8 @@
 package com.zq.sword.array.mq.jade.producer;
 
 import com.zq.sword.array.mq.jade.msg.Message;
-import com.zq.sword.array.stream.io.ex.OutputStreamOpenException;
-import com.zq.sword.array.stream.io.object.ObjectOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 /**
  * @program: sword-array
@@ -36,20 +32,11 @@ public class GeneralProducer implements Producer {
     @Override
     public boolean sendMsg(Message message) {
         String topic = message.getTopic();
-        PartitionResource partitionResource = partitionAlloter.allotPartition(topic);
-        if(partitionResource != null){
-            try {
-                ObjectOutputStream outputStream = partitionResource.openOutputStream();
-                outputStream.writeObject(message);
-                outputStream.close();
-                return true;
-            } catch (OutputStreamOpenException e) {
-                logger.error("输出流打开失败", e);
-            } catch (IOException e) {
-                logger.error("输出流写入数据失败", e);
-            }
+        ProducePartition producePartition = partitionAlloter.allotPartition(topic);
+        if(producePartition != null){
+            producePartition.append(message);
+            return true;
         }
-
         return false;
     }
 }

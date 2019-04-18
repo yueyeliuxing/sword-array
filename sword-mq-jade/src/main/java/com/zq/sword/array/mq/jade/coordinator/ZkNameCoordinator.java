@@ -319,7 +319,7 @@ public class ZkNameCoordinator implements NameCoordinator {
     }
 
     @Override
-    public void recordConsumeMsgId(NameConsumer consumer, NamePartition partition, long msgId) {
+    public void recordConsumeOffset(NameConsumer consumer, NamePartition partition, long msgId) {
         String consumePartitionPath = buildConsumePartitionPath(consumer.getGroup(), partition.getTopic(), partition.getId());
         if(!client.exists(consumePartitionPath)){
             client.createPersistent(consumePartitionPath, true);

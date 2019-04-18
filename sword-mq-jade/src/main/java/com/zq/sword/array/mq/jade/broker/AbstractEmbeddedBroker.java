@@ -6,7 +6,7 @@ import com.zq.sword.array.mq.jade.coordinator.NameCoordinator;
 import com.zq.sword.array.mq.jade.coordinator.data.NameDuplicatePartition;
 import com.zq.sword.array.mq.jade.coordinator.data.NamePartition;
 import com.zq.sword.array.mq.jade.producer.DefaultProduceDispatcher;
-import com.zq.sword.array.mq.jade.producer.DuplicatePartitionResource;
+import com.zq.sword.array.mq.jade.producer.DuplicateProducePartition;
 import com.zq.sword.array.mq.jade.producer.Producer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +63,7 @@ public abstract class AbstractEmbeddedBroker extends AbstractApplicationBroker i
                                         slavePartitions.add(slavePartition);
                                     }
                                 }
-                                return new DuplicatePartitionResource(part, slavePartitions);
+                                return new DuplicateProducePartition(part, slavePartitions);
                             }
 
                         }

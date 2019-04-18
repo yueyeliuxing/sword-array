@@ -3,18 +3,13 @@ package com.zq.sword.array.mq.jade.broker;
 import com.zq.sword.array.mq.jade.msg.LocatedMessage;
 import com.zq.sword.array.mq.jade.msg.Message;
 import com.zq.sword.array.mq.jade.msg.MsgReq;
+import com.zq.sword.array.mq.jade.msg.MsgResp;
 import com.zq.sword.array.network.rpc.client.NettyRpcClient;
 import com.zq.sword.array.network.rpc.client.RpcClient;
 import com.zq.sword.array.network.rpc.handler.TransferHandler;
 import com.zq.sword.array.network.rpc.message.Header;
 import com.zq.sword.array.network.rpc.message.MessageType;
 import com.zq.sword.array.network.rpc.message.TransferMessage;
-import com.zq.sword.array.stream.io.AbstractResourceInputStream;
-import com.zq.sword.array.stream.io.AbstractResourceOutputStream;
-import com.zq.sword.array.stream.io.ex.InputStreamOpenException;
-import com.zq.sword.array.stream.io.ex.OutputStreamOpenException;
-import com.zq.sword.array.stream.io.object.ObjectInputStream;
-import com.zq.sword.array.stream.io.object.ObjectOutputStream;
 import com.zq.sword.array.tasks.SingleTaskExecutor;
 import com.zq.sword.array.tasks.TaskExecutor;
 import io.netty.channel.ChannelHandler;
@@ -22,7 +17,7 @@ import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.*;
@@ -106,13 +101,48 @@ public class RpcPartition implements Partition {
     }
 
     @Override
-    public ObjectInputStream openInputStream() throws InputStreamOpenException {
-        return new RpcPartitionInputStream(sendMsgReqQueue, receiveMsgQueue);
+    public long append(Message message) {
+        sendMsgQueue.offer(message);
+        //返回偏移量
+        return 0;
     }
 
     @Override
-    public ObjectOutputStream openOutputStream() throws OutputStreamOpenException {
-        return new RpcPartitionOutputStream(sendMsgQueue);
+    public Message search(long offset) {
+        try{
+            sendMsgReqQueue.put(new MsgReq(id, offset, 1));
+            Object obj = receiveMsgQueue.poll(1, TimeUnit.SECONDS);
+            if(obj != null && obj instanceof Message){
+                return (Message) obj;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public List<Message> orderSearch(long offset, int num) {
+        List<Message> messages = new ArrayList<>();
+        try {
+            sendMsgReqQueue.put(new MsgReq(id, offset, num));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        while (true){
+            Object obj = null;
+            try {
+                obj = receiveMsgQueue.poll(1, TimeUnit.SECONDS);
+                if(obj != null && obj instanceof Message){
+                    messages.add((Message)obj);
+                }else {
+                    break;
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return messages;
     }
 
     @Override
@@ -124,100 +154,6 @@ public class RpcPartition implements Partition {
     public void close() {
         client.disconnect();
     }
-
-    /**
-     * 读取数据
-     */
-    private class RpcPartitionInputStream extends AbstractResourceInputStream implements ObjectInputStream {
-
-        private Logger logger = LoggerFactory.getLogger(RpcPartitionInputStream.class);
-
-        private SynchronousQueue<MsgReq> sendMsgReqQueue;
-
-        private BlockingQueue<Object> receiveMsgQueue;
-
-        private long msgId;
-
-        public RpcPartitionInputStream(SynchronousQueue<MsgReq> sendMsgReqQueue, BlockingQueue<Object> receiveMsgQueue) {
-            this.sendMsgReqQueue = sendMsgReqQueue;
-            this.receiveMsgQueue = receiveMsgQueue;
-        }
-
-        @Override
-        public void skip(long msgId) throws IOException {
-            this.msgId = msgId;
-        }
-
-        @Override
-        public Object readObject() throws IOException {
-            try {
-                sendMsgReqQueue.put(new MsgReq(id, msgId, 1));
-                Object obj = receiveMsgQueue.poll(1, TimeUnit.SECONDS);
-                if(obj != null && obj instanceof Message){
-                    return obj;
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        public void readObject(Object[] objs) throws IOException {
-            try {
-                sendMsgReqQueue.put(new MsgReq(id, msgId, objs.length));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            int i=0;
-            while (true){
-                Object obj = null;
-                try {
-                    obj = receiveMsgQueue.poll(1, TimeUnit.SECONDS);
-                    if(obj != null && obj instanceof Message){
-                        objs[i++] = obj;
-                    }else {
-                        return;
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        @Override
-        public void close() throws IOException {
-
-        }
-    }
-
-    /**
-     * 输出流
-     */
-    private class RpcPartitionOutputStream extends AbstractResourceOutputStream implements ObjectOutputStream {
-
-        private Queue<Object> sendMsgQueue;
-
-        public RpcPartitionOutputStream(Queue<Object> sendMsgQueue) {
-            this.sendMsgQueue = sendMsgQueue;
-        }
-
-        @Override
-        public void writeObject(Object obj) throws IOException {
-            sendMsgQueue.offer(obj);
-        }
-
-        @Override
-        public void writeObject(List<Object> objs) throws IOException {
-            sendMsgQueue.addAll(objs);
-        }
-
-        @Override
-        public void close() throws IOException {
-
-        }
-    }
-
 
     /**
      * 发送数据到远程broker
@@ -274,9 +210,9 @@ public class RpcPartition implements Partition {
 
             TransferMessage message = (TransferMessage)msg;
             if(message.getHeader() != null && message.getHeader().getType() == MessageType.SEND_MESSAGE_RESP.value()) {
-                Long msgId = (Long)message.getBody();
-                receiveMsgQueue.offer(msgId);
-                logger.info("获取已经消费的消息ID:{}", msgId);
+                MsgResp msgResp = (MsgResp)message.getBody();
+                receiveMsgQueue.offer(msgResp);
+                logger.info("获取已经消费的消息ID:{}", msgResp);
             }else if(message.getHeader() != null && message.getHeader().getType() == MessageType.RECEIVE_DATA_RESP.value()) {
                 List<Message> messages = (List<Message>)message.getBody();
                 receiveMsgQueue.addAll(messages);

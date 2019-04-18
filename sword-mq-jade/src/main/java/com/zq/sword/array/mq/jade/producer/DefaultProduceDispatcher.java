@@ -76,7 +76,7 @@ public class DefaultProduceDispatcher implements ProduceDispatcher{
     private PartitionAlloter createPartitionAlloter(PartitionSelectStrategy selectStrategy){
         return new PartitionAlloter() {
             @Override
-            public PartitionResource allotPartition(String topic) {
+            public ProducePartition allotPartition(String topic) {
                 List<NameDuplicatePartition> partitions =  partitionMapper.findPartition(topic);
                 return selectStrategy.select(partitions);
             }
@@ -91,7 +91,7 @@ public class DefaultProduceDispatcher implements ProduceDispatcher{
         return new PartitionSelectStrategy(){
 
             @Override
-            public PartitionResource select(List<NameDuplicatePartition> partitions) {
+            public ProducePartition select(List<NameDuplicatePartition> partitions) {
                 if(partitions != null && !partitions.isEmpty()){
                     int size = partitions.size();
                     int index = ThreadLocalRandom.current().nextInt(0, size);
@@ -101,7 +101,7 @@ public class DefaultProduceDispatcher implements ProduceDispatcher{
                         partition = new RpcPartition(namePartition.getId(), namePartition.getLocation(), namePartition.getTopic(), namePartition.getTag());
                         addPartition(partition);
                     }
-                    return new PartitionResource(partition);
+                    return new ProducePartition(partition);
                 }
                 return null;
             }
