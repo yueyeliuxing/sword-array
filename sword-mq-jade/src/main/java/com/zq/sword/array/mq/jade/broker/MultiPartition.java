@@ -39,7 +39,7 @@ public class MultiPartition implements Partition {
     /**
      * 数据存储
      */
-    private OffsetStorageEngine<Message> sequentialStorage;
+    private OffsetStorageEngine<Message> offsetStorageEngine;
 
     private volatile boolean isClose = false;
 
@@ -50,7 +50,7 @@ public class MultiPartition implements Partition {
         this.id = id;
         this.name = PARTITION_FILE_PREFIX + tag + "-" + id;
         this.partitionFile = new File(broker.getResourceLocation() + File.separator + topic + File.separator + name);
-        this.sequentialStorage = new OffsetFileStorageEngine(partitionFile.getPath(), Message.class);
+        this.offsetStorageEngine = new OffsetFileStorageEngine(partitionFile.getPath(), Message.class);
     }
 
     public MultiPartition(Broker broker, File partitionFile) {
@@ -61,7 +61,7 @@ public class MultiPartition implements Partition {
         this.topic = partitionFile.getParentFile().getName();
         this.tag = params[1];
         this.id = Long.parseLong(params[2]);
-        this.sequentialStorage = new OffsetFileStorageEngine(partitionFile.getPath(), Message.class);
+        this.offsetStorageEngine = new OffsetFileStorageEngine(partitionFile.getPath(), Message.class);
     }
 
     @Override
@@ -91,17 +91,17 @@ public class MultiPartition implements Partition {
 
     @Override
     public long append(Message message) {
-        return sequentialStorage.append(message);
+        return offsetStorageEngine.append(message);
     }
 
     @Override
     public Message search(long offset) {
-        return sequentialStorage.search(offset);
+        return offsetStorageEngine.search(offset);
     }
 
     @Override
     public List<Message> orderSearch(long offset, int num) {
-        return sequentialStorage.search(offset, num);
+        return offsetStorageEngine.search(offset, num);
     }
 
     @Override
