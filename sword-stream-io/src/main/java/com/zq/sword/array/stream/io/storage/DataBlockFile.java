@@ -77,7 +77,7 @@ public class DataBlockFile<T extends DataWritable> extends AbstractRWStore imple
      */
     public boolean isFull(){
         try {
-            return dataFile.size() >= FILE_SIZE_MAX_LIMIT;
+            return rwStore.size() >= FILE_SIZE_MAX_LIMIT;
         } catch (IOException e) {
             logger.error("文件出现异常", e);
             throw new RuntimeException(e.getMessage());
@@ -86,10 +86,10 @@ public class DataBlockFile<T extends DataWritable> extends AbstractRWStore imple
 
     /**
      * 设置下一个数据文件
-     * @param dataFile
+     * @param rwStore
      */
-    public void next(DataBlockFile dataFile){
-        next = dataFile;
+    public void next(DataBlockFile rwStore){
+        next = rwStore;
     }
 
     /**
@@ -109,7 +109,7 @@ public class DataBlockFile<T extends DataWritable> extends AbstractRWStore imple
         boolean isEnd = false;
         try {
             isEnd = available() <= 0;
-            data.read(dataFile);
+            data.read(rwStore);
         } catch (EOFException e) {
             return isEnd ? null : data;
         } catch (IOException e){
@@ -127,7 +127,7 @@ public class DataBlockFile<T extends DataWritable> extends AbstractRWStore imple
         for(int i = 0; i < num; i++){
             T data = ReflectUtils.newInstance(clazz);
             try{
-                data.read(dataFile);
+                data.read(rwStore);
                 datas.add(data);
             }catch (EOFException e){
                 //读到文件末尾
@@ -165,7 +165,7 @@ public class DataBlockFile<T extends DataWritable> extends AbstractRWStore imple
         writeBefore();
         if(datas != null && !datas.isEmpty()){
             for(T data : datas){
-                data.write(dataFile);
+                data.write(rwStore);
             }
         }
     }

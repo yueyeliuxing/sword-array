@@ -24,9 +24,9 @@ public class StroageTest {
     @Test
     public void testServer(){
 
-        kvStorageEngine.insert("zq".getBytes(), "123".getBytes());
+        kvStorageEngine.insert("zq3".getBytes(), "12321321".getBytes());
 
-        String value = new String(kvStorageEngine.find("zq".getBytes()));
+        String value = new String(kvStorageEngine.find("zq1".getBytes()));
         System.out.println(value);
     }
 

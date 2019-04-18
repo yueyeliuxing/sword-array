@@ -97,6 +97,11 @@ public class OffsetFileStorageEngine<T extends DataWritable> implements OffsetSt
 
             if(seqDataFile.isCurrent()){
                 currentDataFile = seqDataFile;
+                try{
+                    currentDataFile.position(currentDataFile.size());
+                }catch (IOException e){
+                    logger.error("设置文件位置出错", e);
+                }
             }
         }
     }
