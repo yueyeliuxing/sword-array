@@ -1,8 +1,8 @@
 package com.zq.sword.array.mq.jade.broker;
 
 import com.zq.sword.array.mq.jade.msg.Message;
-import com.zq.sword.array.stream.io.storage.SequentialFileStorage;
-import com.zq.sword.array.stream.io.storage.SequentialStorage;
+import com.zq.sword.array.stream.io.storage.OffsetFileStorageEngine;
+import com.zq.sword.array.stream.io.storage.OffsetStorageEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +39,7 @@ public class MultiPartition implements Partition {
     /**
      * 数据存储
      */
-    private SequentialStorage<Message> sequentialStorage;
+    private OffsetStorageEngine<Message> sequentialStorage;
 
     private volatile boolean isClose = false;
 
@@ -50,7 +50,7 @@ public class MultiPartition implements Partition {
         this.id = id;
         this.name = PARTITION_FILE_PREFIX + tag + "-" + id;
         this.partitionFile = new File(broker.getResourceLocation() + File.separator + topic + File.separator + name);
-        this.sequentialStorage = new SequentialFileStorage(partitionFile.getPath(), Message.class);
+        this.sequentialStorage = new OffsetFileStorageEngine(partitionFile.getPath(), Message.class);
     }
 
     public MultiPartition(Broker broker, File partitionFile) {
@@ -61,7 +61,7 @@ public class MultiPartition implements Partition {
         this.topic = partitionFile.getParentFile().getName();
         this.tag = params[1];
         this.id = Long.parseLong(params[2]);
-        this.sequentialStorage = new SequentialFileStorage(partitionFile.getPath(), Message.class);
+        this.sequentialStorage = new OffsetFileStorageEngine(partitionFile.getPath(), Message.class);
     }
 
     @Override

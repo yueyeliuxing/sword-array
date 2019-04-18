@@ -1,7 +1,7 @@
 package com.zq.sword.array.stream.io.storage.engine;
 
-import com.zq.sword.array.stream.io.storage.SequentialFileStorage;
-import com.zq.sword.array.stream.io.storage.SequentialStorage;
+import com.zq.sword.array.stream.io.storage.IndexableOffsetFileStorageEngine;
+import com.zq.sword.array.stream.io.storage.IndexableOffsetStorageEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,9 +11,9 @@ import org.slf4j.LoggerFactory;
  * @author: zhouqi1
  * @create: 2019-04-17 14:42
  **/
-public class SeqFileKVStorageEngine implements KVStorageEngine<byte[], byte[]> {
+public class KVFileStorageEngine implements KVStorageEngine<byte[], byte[]> {
 
-    private Logger logger = LoggerFactory.getLogger(SeqFileKVStorageEngine.class);
+    private Logger logger = LoggerFactory.getLogger(KVFileStorageEngine.class);
 
     /**
      * 删除的value
@@ -28,17 +28,17 @@ public class SeqFileKVStorageEngine implements KVStorageEngine<byte[], byte[]> {
     /**
      * 数据存储
      */
-    private SequentialStorage<KVData> sequentialStorage;
+    private IndexableOffsetStorageEngine<KVData> storageEngine;
 
-    public SeqFileKVStorageEngine(String storagePath) {
+    public KVFileStorageEngine(String storagePath) {
         this.storagePath = storagePath;
-        this.sequentialStorage = new SequentialFileStorage(storagePath, KVData.class);
+        this.storageEngine = new IndexableOffsetFileStorageEngine(storagePath, KVData.class);
 
     }
 
     @Override
     public boolean insert(byte[] key, byte[] value) {
-        sequentialStorage.append(new KVData(key, value));
+        storageEngine.append(new KVData(key, value));
         return true;
     }
 
@@ -54,7 +54,7 @@ public class SeqFileKVStorageEngine implements KVStorageEngine<byte[], byte[]> {
 
     @Override
     public byte[] find(byte[] key) {
-        KVData kvData = sequentialStorage.search("key", key);
+        KVData kvData = storageEngine.search("key", key);
         return kvData == null ? null : kvData.getValue();
     }
 }

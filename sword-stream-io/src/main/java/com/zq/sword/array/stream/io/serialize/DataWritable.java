@@ -17,14 +17,14 @@ public interface DataWritable {
     long length();
 
     /**
-     * 读入数据文件
-     * @param file
+     * 从存储中读取数据
+     * @param store
      */
-    void read(RWStore file) throws EOFException;
+    void read(RWStore store) throws EOFException;
 
     /**
-     * 写入数据
-     * @param file
+     * 写入到存储
+     * @param store
      */
-    void write(RWStore file);
+    void write(RWStore store);
 }

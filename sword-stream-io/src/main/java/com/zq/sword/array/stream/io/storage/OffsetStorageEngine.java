@@ -10,7 +10,7 @@ import java.util.List;
  * @author: zhouqi1
  * @create: 2019-04-18 09:09
  **/
-public interface SequentialStorage<T extends DataWritable> {
+public interface OffsetStorageEngine<T extends DataWritable> {
 
     /**
      * 追加数据
@@ -34,11 +34,4 @@ public interface SequentialStorage<T extends DataWritable> {
      */
     List<T> search(long offset, int num);
 
-    /**
-     * 通过指定的数据 索引key获取数据
-     * @param indexField 索引字段名称
-     * @param indexKey 索引字段值
-     * @return
-     */
-    T search(String indexField, byte[] indexKey);
 }

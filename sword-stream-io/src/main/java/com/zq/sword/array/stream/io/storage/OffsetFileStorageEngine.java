@@ -1,7 +1,6 @@
 package com.zq.sword.array.stream.io.storage;
 
-import com.zq.sword.array.common.utils.ByteUtils;
-import com.zq.sword.array.common.utils.ReflectUtils;
+import com.zq.sword.array.stream.io.serialize.DataWritable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,19 +20,14 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author: zhouqi1
  * @create: 2019-04-18 09:13
  **/
-public class SequentialFileStorage<T extends IndexableDataWritable> implements SequentialStorage<T>{
+public class OffsetFileStorageEngine<T extends DataWritable> implements OffsetStorageEngine<T> {
 
-    private Logger logger = LoggerFactory.getLogger(SequentialFileStorage.class);
+    private Logger logger = LoggerFactory.getLogger(OffsetFileStorageEngine.class);
 
     /**
      * 数据文件目录名称
      */
     public static final String DATA_FILE_DIR = "data";
-
-    /**
-     * 索引文件目录名称
-     */
-    public static final String INDEX_FILE_DIR = "index";
 
     /**
      * 存储路径
@@ -48,17 +42,12 @@ public class SequentialFileStorage<T extends IndexableDataWritable> implements S
     /**
      * 数据文件
      */
-    private Map<Long, SeqDataFile<T>> dataFiles;
+    private Map<Long, DataBlockFile<T>> dataFiles;
 
     /**
      * 当前数据文件
      */
-    private volatile SeqDataFile<T> currentDataFile;
-
-    /**
-     * 索引字段->索引文件映射
-     */
-    private Map<String, SeqIndexFile> indexFileMappings;
+    private volatile DataBlockFile<T> currentDataFile;
 
     /**
      * 文件读写锁
@@ -75,20 +64,19 @@ public class SequentialFileStorage<T extends IndexableDataWritable> implements S
      */
     private Lock readLock = lock.readLock();
 
-    public SequentialFileStorage(String storagePath, Class<T> dataType) {
+    public OffsetFileStorageEngine(String storagePath, Class<T> dataType) {
         this.storagePath = storagePath;
         this.dataType = dataType;
         this.dataFiles = new ConcurrentHashMap<>();
-        this.indexFileMappings = new ConcurrentHashMap<>();
 
         //加载数据结构
-        loadDataAndIndexFile();
+        initDataFiles();
     }
 
     /**
      * 加载
      */
-    private void loadDataAndIndexFile() {
+    private void initDataFiles() {
         String dataFileDirPath = getDataFileDir();
         File dataFile = new File(dataFileDirPath);
         if(!dataFile.exists()){
@@ -98,9 +86,9 @@ public class SequentialFileStorage<T extends IndexableDataWritable> implements S
         if(dataFiles == null){
             return;
         }
-        SeqDataFile<T> preDataFile = null;
+        DataBlockFile<T> preDataFile = null;
         for (File file : dataFiles){
-            SeqDataFile<T> seqDataFile = new SeqDataFile(file);
+            DataBlockFile<T> seqDataFile = new DataBlockFile(file);
             this.dataFiles.putIfAbsent(seqDataFile.sequence(), seqDataFile);
             if(preDataFile != null){
                 preDataFile.next(seqDataFile);
@@ -111,25 +99,6 @@ public class SequentialFileStorage<T extends IndexableDataWritable> implements S
                 currentDataFile = seqDataFile;
             }
         }
-
-        //加载索引数据
-        String indexFileDirPath = getIndexFileDir();
-        File indexFileDir = new File(dataFileDirPath);
-        if(!indexFileDir.exists()){
-            return;
-        }
-        File[] indexFiles = indexFileDir.listFiles();
-        if(indexFiles == null){
-            return;
-        }
-        for (File indexFile : indexFiles){
-            SeqIndexFile seqIndexFile = new SeqIndexFile(indexFile);
-            this.indexFileMappings.putIfAbsent(seqIndexFile.indexField(), seqIndexFile);
-        }
-    }
-
-    private String getIndexFileDir() {
-        return storagePath + File.separator + INDEX_FILE_DIR;
     }
 
     /**
@@ -140,6 +109,14 @@ public class SequentialFileStorage<T extends IndexableDataWritable> implements S
         return storagePath + File.separator + DATA_FILE_DIR;
     }
 
+    /**
+     * 获取存储路径
+     * @return
+     */
+    public String getStoragePath(){
+        return storagePath;
+    }
+
     @Override
     public long append(T data) {
         long offset;
@@ -147,28 +124,19 @@ public class SequentialFileStorage<T extends IndexableDataWritable> implements S
         try{
             //如果当前文件还没有创建 或者 当前文件已写满 需要重新创建
             if(currentDataFile == null || currentDataFile.isFull()){
-                SeqDataFile<T> preDataFile = currentDataFile;
-                currentDataFile = new SeqDataFile(getDataFileDir(), preDataFile == null ? "0" : preDataFile.size()+"");
+                DataBlockFile<T> preDataFile = currentDataFile;
+                currentDataFile = new DataBlockFile(getDataFileDir(), preDataFile == null ? "0" : preDataFile.size()+"");
                 dataFiles.put(currentDataFile.sequence(), currentDataFile);
                 if(currentDataFile.isFull()){
                     preDataFile.next(currentDataFile);
                 }
             }
-            offset = currentDataFile.position();
+            long position = currentDataFile.position();
             currentDataFile.writeObject(data);
+            offset = position + currentDataFile.sequence();
 
-            //添加索引文件
-            String[] indexFields =  data.indexMappings();
-            if(indexFields != null && indexFields.length > 0){
-                for (String indexField : indexFields){
-                    SeqIndexFile indexFile = indexFileMappings.get(indexField);
-                    if(indexFile == null){
-                        indexFile = new SeqIndexFile(getIndexFileDir(), indexField);
-                        indexFileMappings.put(indexField, indexFile);
-                    }
-                    indexFile.writeObject(new SeqIndex(ByteUtils.primitiveType2ByteArray(ReflectUtils.getFieldValue(data, indexField)), currentDataFile.sequence(), offset));
-                }
-            }
+            //数据追加到文件后处理工作
+            afterAppend(currentDataFile, position, data);
         }catch (IOException e){
             logger.error("写入文件异常", e);
             throw new RuntimeException(e);
@@ -178,9 +146,18 @@ public class SequentialFileStorage<T extends IndexableDataWritable> implements S
         return offset;
     }
 
+    /**
+     * 数据追加到文件后处理工作
+     * @param dataFile 数据写入的文件
+     * @param position 在当前文件中的位置
+     * @param data
+     */
+    public void afterAppend(DataBlockFile<T> dataFile, long position, T data){
+    }
+
     @Override
     public T search(long offset) {
-        SeqDataFile<T> dataFile = searchDataFile(offset);
+        DataBlockFile<T> dataFile = searchDataFile(offset);
         long currentFilePos = offset - dataFile.sequence();
         return doSearch(dataFile, currentFilePos);
     }
@@ -191,7 +168,7 @@ public class SequentialFileStorage<T extends IndexableDataWritable> implements S
      * @param currentFilePos
      * @return
      */
-    private T doSearch(SeqDataFile<T> dataFile, long currentFilePos){
+    private T doSearch(DataBlockFile<T> dataFile, long currentFilePos){
         T data = null;
         if(dataFile.isCurrent()){
             readLock.lock();
@@ -216,9 +193,9 @@ public class SequentialFileStorage<T extends IndexableDataWritable> implements S
      * @param offset
      * @return
      */
-    private SeqDataFile<T> searchDataFile(long offset) {
-        SeqDataFile<T> targetDataFile = null;
-        for(SeqDataFile<T> dataFile : dataFiles.values()){
+    private DataBlockFile<T> searchDataFile(long offset) {
+        DataBlockFile<T> targetDataFile = null;
+        for(DataBlockFile<T> dataFile : dataFiles.values()){
             if(offset >= dataFile.sequence()){
                 targetDataFile = dataFile;
                 break;
@@ -232,7 +209,7 @@ public class SequentialFileStorage<T extends IndexableDataWritable> implements S
 
     @Override
     public List<T> search(long offset, int num) {
-        SeqDataFile<T> dataFile = searchDataFile(offset);
+        DataBlockFile<T> dataFile = searchDataFile(offset);
         long currentFilePos = offset - dataFile.sequence();
         List<T> datas = new ArrayList<>(num);
         //如果是当前文件 那就剩余数据都从当前文件中读
@@ -265,21 +242,6 @@ public class SequentialFileStorage<T extends IndexableDataWritable> implements S
         return datas;
     }
 
-    @Override
-    public T search(String indexField, byte[] indexKey) {
-        SeqIndexFile indexFile = indexFileMappings.get(indexField);
-        if(indexFile == null){
-            throw new RuntimeException(String.format("%s is not index", indexField));
-        }
-        SeqIndex index = indexFile.readObject(indexKey);
-        if(index == null){
-            return null;
-        }
-        SeqDataFile<T> dataFile = dataFiles.get(index.getFileSeq());
-        long currentFilePos = index.getDataPos();
-        return doSearch(dataFile, currentFilePos);
-    }
-
     /**
      * 读取当前活跃文件
      * @param num
@@ -287,7 +249,7 @@ public class SequentialFileStorage<T extends IndexableDataWritable> implements S
      * @param dataFile
      * @return
      */
-    private void readCurrentLogDataFile(SeqDataFile<T> dataFile, long pos, int num, List<T> datas) {
+    private void readCurrentLogDataFile(DataBlockFile<T> dataFile, long pos, int num, List<T> datas) {
         readLock.lock();
         try{
             dataFile.position(pos);

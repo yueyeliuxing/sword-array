@@ -20,9 +20,9 @@ import java.io.IOException;
 @Data
 @ToString
 @NoArgsConstructor
-public class SeqIndex implements DataWritable {
+public class DataIndex implements DataWritable {
 
-    private Logger logger = LoggerFactory.getLogger(SeqIndex.class);
+    private Logger logger = LoggerFactory.getLogger(DataIndex.class);
 
     /**
      * 主键
@@ -39,7 +39,7 @@ public class SeqIndex implements DataWritable {
      */
     private long dataPos;
 
-    public SeqIndex(byte[] key, long fileSeq, long dataPos) {
+    public DataIndex(byte[] key, long fileSeq, long dataPos) {
         this.key = new String(key);
         this.fileSeq = fileSeq;
         this.dataPos = dataPos;
@@ -51,16 +51,16 @@ public class SeqIndex implements DataWritable {
     }
 
     @Override
-    public void read(RWStore file) throws EOFException {
+    public void read(RWStore store) throws EOFException {
         try {
-            int keySize = file.readInt();
+            int keySize = store.readInt();
             if(keySize > 0){
                 byte[] keyArray = new byte[keySize];
-                file.read(keyArray);
+                store.read(keyArray);
                 key = new String(keyArray);
             }
-            fileSeq = file.readLong();
-            dataPos = file.readLong();
+            fileSeq = store.readLong();
+            dataPos = store.readLong();
         } catch (EOFException e){
             throw e;
         }catch (IOException e) {
@@ -69,15 +69,15 @@ public class SeqIndex implements DataWritable {
     }
 
     @Override
-    public void write(RWStore file) {
+    public void write(RWStore store) {
         try {
             int keySize = key == null ? 0 : key.length();
-            file.writeInt(keySize);
+            store.writeInt(keySize);
             if(keySize > 0){
-                file.write(key.getBytes());
+                store.write(key.getBytes());
             }
-            file.writeLong(fileSeq);
-            file.writeLong(dataPos);
+            store.writeLong(fileSeq);
+            store.writeLong(dataPos);
         } catch (IOException e) {
             logger.error("写文件 IO 异常", e);
         }

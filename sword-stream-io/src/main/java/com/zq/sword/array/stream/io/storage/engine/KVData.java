@@ -54,23 +54,23 @@ public class KVData implements IndexableDataWritable {
     }
 
     @Override
-    public void read(RWStore file) throws EOFException{
+    public void read(RWStore store) throws EOFException{
         try {
-            int keySize = file.readInt();
+            int keySize = store.readInt();
             if(keySize > 0){
                 key = new byte[keySize];
-                file.read(key);
+                store.read(key);
             }
-            int valueSize = file.readInt();
+            int valueSize = store.readInt();
             if(valueSize > 0){
                 value = new byte[valueSize];
-                file.read(value);
+                store.read(value);
             }
-            timestamp = file.readLong();
-            int crcSize = file.readInt();
+            timestamp = store.readLong();
+            int crcSize = store.readInt();
             if(crcSize > 0){
                 byte[] crcBytes = new byte[crcSize];
-                file.read(crcBytes);
+                store.read(crcBytes);
                 crc = new String(crcBytes);
             }
         }catch (EOFException e){
@@ -81,23 +81,23 @@ public class KVData implements IndexableDataWritable {
     }
 
     @Override
-    public void write(RWStore file) {
+    public void write(RWStore store) {
         try {
             int keySize = key == null ? 0 : key.length;
-            file.writeInt(keySize);
+            store.writeInt(keySize);
             if(keySize > 0){
-                file.write(key);
+                store.write(key);
             }
             int valueSize = value == null ? 0 : value.length;
-            file.writeInt(valueSize);
+            store.writeInt(valueSize);
             if(valueSize > 0){
-                file.write(value);
+                store.write(value);
             }
-            file.writeLong(timestamp);
+            store.writeLong(timestamp);
             int crcSize = crc == null ? 0 : crc.length();
-            file.writeInt(crcSize);
+            store.writeInt(crcSize);
             if(crcSize > 0){
-                file.write(crc.getBytes());
+                store.write(crc.getBytes());
             }
         } catch (IOException e) {
             logger.error("写文件 IO 异常", e);

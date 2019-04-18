@@ -1,6 +1,7 @@
 package com.zq.sword.array.stream.io.storage;
 
 import com.zq.sword.array.common.utils.ReflectUtils;
+import com.zq.sword.array.stream.io.serialize.AbstractRWStore;
 import com.zq.sword.array.stream.io.serialize.RWStore;
 import com.zq.sword.array.stream.io.serialize.DataWritable;
 import org.slf4j.Logger;
@@ -18,9 +19,9 @@ import java.util.List;
  * @author: zhouqi1
  * @create: 2019-04-17 14:49
  **/
-public class SeqDataFile<T extends DataWritable> extends DataFileDecorator implements RWStore {
+public class DataBlockFile<T extends DataWritable> extends AbstractRWStore implements RWStore {
 
-    private Logger logger = LoggerFactory.getLogger(SeqDataFile.class);
+    private Logger logger = LoggerFactory.getLogger(DataBlockFile.class);
 
     public static final String OLD_FILE_TYPE_TAG = "old";
 
@@ -41,16 +42,16 @@ public class SeqDataFile<T extends DataWritable> extends DataFileDecorator imple
     /**
      * 写一个文件
      */
-    private SeqDataFile next;
+    private DataBlockFile next;
 
-    public SeqDataFile(File file) {
+    public DataBlockFile(File file) {
         super(new OSDataFile(file));
         String[] params = file.getName().split("\\.");
         this.sequence = Long.parseLong(params[0]);
         this.isCurrent = params[1].equalsIgnoreCase(CURRENT_FILE_TYPE_TAG);
     }
 
-    public SeqDataFile(String fileParentPath, String fileName) {
+    public DataBlockFile(String fileParentPath, String fileName) {
         this(new File(fileParentPath + File.separator + fileName + "." + CURRENT_FILE_TYPE_TAG));
     }
 
@@ -87,7 +88,7 @@ public class SeqDataFile<T extends DataWritable> extends DataFileDecorator imple
      * 设置下一个数据文件
      * @param dataFile
      */
-    public void next(SeqDataFile dataFile){
+    public void next(DataBlockFile dataFile){
         next = dataFile;
     }
 
@@ -95,7 +96,7 @@ public class SeqDataFile<T extends DataWritable> extends DataFileDecorator imple
      * 返回下一个数据文件
      * @return
      */
-    public SeqDataFile next(){
+    public DataBlockFile next(){
         return next;
     }
 

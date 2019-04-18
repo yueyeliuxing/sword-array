@@ -1,6 +1,4 @@
-package com.zq.sword.array.stream.io.storage;
-
-import com.zq.sword.array.stream.io.serialize.RWStore;
+package com.zq.sword.array.stream.io.serialize;
 
 import java.io.IOException;
 
@@ -10,27 +8,27 @@ import java.io.IOException;
  * @author: zhouqi1
  * @create: 2019-04-17 16:03
  **/
-public abstract class DataFileDecorator implements RWStore {
+public abstract class AbstractRWStore implements RWStore {
     
-    protected RWStore dataFile;
+    protected RWStore rwStore;
 
-    public DataFileDecorator(RWStore dataFile) {
-        this.dataFile = dataFile;
+    public AbstractRWStore(RWStore rwStore) {
+        this.rwStore = rwStore;
     }
 
     @Override
     public void position(long pos) throws IOException {
-        dataFile.position(pos);
+        rwStore.position(pos);
     }
 
     @Override
     public long position() throws IOException {
-        return dataFile.position();
+        return rwStore.position();
     }
 
     @Override
     public long size() throws IOException {
-        return dataFile.size();
+        return rwStore.size();
     }
 
     /**
@@ -43,36 +41,36 @@ public abstract class DataFileDecorator implements RWStore {
     @Override
     public int readInt() throws IOException {
         readBefore();
-        return dataFile.readInt();
+        return rwStore.readInt();
     }
 
     @Override
     public long readLong() throws IOException {
         readBefore();
-        return dataFile.readLong();
+        return rwStore.readLong();
     }
 
     @Override
     public int read() throws IOException {
         readBefore();
-        return dataFile.read();
+        return rwStore.read();
     }
 
     @Override
     public int read(byte[] data) throws IOException {
         readBefore();
-        return dataFile.read(data);
+        return rwStore.read(data);
     }
 
     @Override
     public int read(byte[] data, int offset, int len) throws IOException {
         readBefore();
-        return dataFile.read(data, offset, len);
+        return rwStore.read(data, offset, len);
     }
 
     @Override
     public long available() throws IOException {
-        return dataFile.available();
+        return rwStore.available();
     }
 
     /**
@@ -85,35 +83,35 @@ public abstract class DataFileDecorator implements RWStore {
     @Override
     public void writeInt(int data) throws IOException {
         writeBefore();
-        dataFile.writeInt(data);
+        rwStore.writeInt(data);
     }
 
     @Override
     public void writeLong(long data) throws IOException {
         writeBefore();
-        dataFile.writeLong(data);
+        rwStore.writeLong(data);
     }
 
     @Override
     public void writeBytes(byte[] data) throws IOException {
         writeBefore();
-        dataFile.writeBytes(data);
+        rwStore.writeBytes(data);
     }
 
     @Override
     public void write(byte[] data) throws IOException {
         writeBefore();
-        dataFile.write(data);
+        rwStore.write(data);
     }
 
     @Override
     public void write(byte[] data, int offset, int len) throws IOException {
         writeBefore();
-        dataFile.write(data, offset, len);
+        rwStore.write(data, offset, len);
     }
     
     @Override
     public void close() throws IOException {
-        dataFile.close();
+        rwStore.close();
     }
 }

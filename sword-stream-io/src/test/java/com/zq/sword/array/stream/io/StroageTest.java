@@ -1,7 +1,7 @@
 package com.zq.sword.array.stream.io;
 
 import com.zq.sword.array.stream.io.storage.engine.KVStorageEngine;
-import com.zq.sword.array.stream.io.storage.engine.SeqFileKVStorageEngine;
+import com.zq.sword.array.stream.io.storage.engine.KVFileStorageEngine;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,7 +18,7 @@ public class StroageTest {
 
     @Before
     public void setUp(){
-        kvStorageEngine = new SeqFileKVStorageEngine("E:\\storage");
+        kvStorageEngine = new KVFileStorageEngine("E:\\storage");
     }
 
     @Test

@@ -57,30 +57,30 @@ public class Message implements Serializable, DataWritable{
     }
 
     @Override
-    public void read(RWStore file) throws EOFException {
+    public void read(RWStore store) throws EOFException {
         try{
-            msgId = file.readLong();
-            int topicLen = file.readInt();
+            msgId = store.readLong();
+            int topicLen = store.readInt();
             if(topicLen > 0){
                 byte[] topicBytes = new byte[topicLen];
-                file.read(topicBytes);
+                store.read(topicBytes);
                 topic = new String(topicBytes);
             }
 
-            int tagLen = file.readInt();
+            int tagLen = store.readInt();
             if(tagLen > 0){
                 byte[] tagBytes = new byte[tagLen];
-                file.read(tagBytes);
+                store.read(tagBytes);
                 tag = new String(tagBytes);
             }
 
-            int len = file.readInt();
+            int len = store.readInt();
             if(len > 0){
                 byte[] bodyBytes = new byte[len];
-                file.read(bodyBytes);
+                store.read(bodyBytes);
                 body = bodyBytes;
             }
-            timestamp = file.readLong();
+            timestamp = store.readLong();
         }catch (EOFException e){
             throw e;
         }catch (IOException e){
@@ -90,22 +90,22 @@ public class Message implements Serializable, DataWritable{
     }
 
     @Override
-    public void write(RWStore file) {
+    public void write(RWStore store) {
         try{
-            file.writeLong(msgId);
-            file.writeInt(topic.length());
+            store.writeLong(msgId);
+            store.writeInt(topic.length());
             if(topic.length() > 0){
-                file.write(topic.getBytes());
+                store.write(topic.getBytes());
             }
-            file.writeInt(tag.length());
+            store.writeInt(tag.length());
             if(tag.length() > 0){
-                file.write(tag.getBytes());
+                store.write(tag.getBytes());
             }
-            file.writeInt(body.length);
+            store.writeInt(body.length);
             if(body.length > 0){
-                file.write(body);
+                store.write(body);
             }
-            file.writeLong(timestamp);
+            store.writeLong(timestamp);
         }catch (IOException e){
             logger.error("写入文件错误", e);
         }
