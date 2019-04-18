@@ -25,12 +25,12 @@ public class DataIndexFile extends AbstractRWStore implements RWStore {
 
     public static final String INDEX_FILE_NAME = ".index";
 
-    private Map<String, DataIndex> seqIndexCache;
+    private Map<String, DataIndex> dataIndexCache;
 
     public DataIndexFile(File file) {
         super(new OSDataFile(file));
         this.file = file;
-        this.seqIndexCache = new ConcurrentHashMap<>();
+        this.dataIndexCache = new ConcurrentHashMap<>();
 
         //加载索引数据到内存
         loadIndexsFromDataFile();
@@ -45,7 +45,7 @@ public class DataIndexFile extends AbstractRWStore implements RWStore {
                 DataIndex seqIndex = new DataIndex();
                 try{
                     seqIndex.read(rwStore);
-                    seqIndexCache.putIfAbsent(seqIndex.getKey(), seqIndex);
+                    dataIndexCache.putIfAbsent(seqIndex.getKey(), seqIndex);
                 }catch (EOFException e){
                     break;
                 }
@@ -72,7 +72,7 @@ public class DataIndexFile extends AbstractRWStore implements RWStore {
      * @return
      */
     public DataIndex readObject(byte[] key){
-        return seqIndexCache.get(new String(key));
+        return dataIndexCache.get(new String(key));
     }
 
     /**
@@ -94,7 +94,7 @@ public class DataIndexFile extends AbstractRWStore implements RWStore {
         if(logs != null && logs.length > 0){
             for(DataIndex log : logs){
                 log.write(rwStore);
-                seqIndexCache.put(log.getKey(), log);
+                dataIndexCache.put(log.getKey(), log);
             }
         }
     }
