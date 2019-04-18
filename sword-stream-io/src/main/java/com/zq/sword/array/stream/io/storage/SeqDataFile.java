@@ -1,6 +1,7 @@
 package com.zq.sword.array.stream.io.storage;
 
 import com.zq.sword.array.common.utils.ReflectUtils;
+import com.zq.sword.array.stream.io.serialize.DataWritable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

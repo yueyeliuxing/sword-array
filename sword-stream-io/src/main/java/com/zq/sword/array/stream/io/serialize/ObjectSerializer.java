@@ -1,4 +1,4 @@
-package com.zq.sword.array.stream.io.object;
+package com.zq.sword.array.stream.io.serialize;
 
 /**
  * @program: sword-array

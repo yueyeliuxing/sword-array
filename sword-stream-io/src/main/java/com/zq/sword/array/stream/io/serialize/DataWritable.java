@@ -1,4 +1,6 @@
-package com.zq.sword.array.stream.io.storage;
+package com.zq.sword.array.stream.io.serialize;
+
+import com.zq.sword.array.stream.io.storage.DataFile;
 
 import java.io.EOFException;
 

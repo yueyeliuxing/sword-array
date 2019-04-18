@@ -1,5 +1,6 @@
 package com.zq.sword.array.stream.io.storage;
 
+import com.zq.sword.array.stream.io.serialize.DataWritable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;

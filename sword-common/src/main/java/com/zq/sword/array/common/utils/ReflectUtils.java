@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * @program: sword-array
@@ -43,6 +44,20 @@ public class ReflectUtils {
         try {
             return (T) clazz.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
+            logger.error("反射失败", e);
+            return null;
+        }
+    }
+
+    /**
+     * 创建数据实体
+     * @param clazz
+     * @return
+     */
+    public static  <T> T newInstance(Class<T> clazz, Class<?>[] paramTypes, Object[] params){
+        try {
+            return (T) clazz.getConstructor(paramTypes).newInstance(params);
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             logger.error("反射失败", e);
             return null;
         }
