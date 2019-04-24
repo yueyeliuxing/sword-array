@@ -1,6 +1,6 @@
-package com.zq.sword.array.stream.io.storage;
+package com.zq.sword.array.stream.io.file;
 
-import com.zq.sword.array.stream.io.serialize.DataWritable;
+import com.zq.sword.array.stream.io.DataWritable;
 
 import java.util.List;
 
@@ -10,21 +10,27 @@ import java.util.List;
  * @author: zhouqi1
  * @create: 2019-04-18 09:09
  **/
-public interface OffsetStorageEngine<T extends DataWritable> {
+public interface OffsetSeqFile<T extends DataWritable> {
+
+    /**
+     * 得到存储路径
+     * @return
+     */
+    String getStoragePath();
 
     /**
      * 追加数据
      * @param data 数据
      * @return 数据所在的偏移量
      */
-    long append(T data);
+    long write(T data);
 
     /**
      * 通过偏移量搜索指定的数据
      * @param offset 偏移量
      * @return 数据
      */
-    T search(long offset);
+    T read(long offset);
 
     /**
      * 通过指定偏移量顺序搜索指定数量的数据集合
@@ -32,6 +38,6 @@ public interface OffsetStorageEngine<T extends DataWritable> {
      * @param num 数量
      * @return 数据集合
      */
-    List<T> search(long offset, int num);
+    List<T> read(long offset, int num);
 
 }

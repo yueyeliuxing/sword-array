@@ -1,6 +1,7 @@
 package com.zq.sword.array.stream.io.storage;
 
-import com.zq.sword.array.stream.io.serialize.RWStore;
+import com.zq.sword.array.stream.io.RWStore;
+import com.zq.sword.array.stream.io.file.IndexableDataWritable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.slf4j.Logger;

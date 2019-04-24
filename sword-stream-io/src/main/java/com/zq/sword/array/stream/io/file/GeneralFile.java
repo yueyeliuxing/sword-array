@@ -1,6 +1,6 @@
-package com.zq.sword.array.stream.io.storage;
+package com.zq.sword.array.stream.io.file;
 
-import com.zq.sword.array.stream.io.serialize.RWStore;
+import com.zq.sword.array.stream.io.RWStore;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,14 +15,14 @@ import java.nio.channels.FileLock;
  * @author: zhouqi1
  * @create: 2019-04-17 15:29
  **/
-public class OSDataFile implements RWStore {
+public class GeneralFile implements RWStore {
 
     /**
      * 对应的文件
      */
     private RandomAccessFile file;
 
-    public OSDataFile(File file) {
+    public GeneralFile(File file) {
         boolean fileExists = false;
         while (!fileExists){
             try {

@@ -1,7 +1,7 @@
-package com.zq.sword.array.stream.io.storage;
+package com.zq.sword.array.stream.io.file;
 
-import com.zq.sword.array.stream.io.serialize.RWStore;
-import com.zq.sword.array.stream.io.serialize.DataWritable;
+import com.zq.sword.array.stream.io.RWStore;
+import com.zq.sword.array.stream.io.DataWritable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -20,9 +20,9 @@ import java.io.IOException;
 @Data
 @ToString
 @NoArgsConstructor
-public class DataIndex implements DataWritable {
+public class Index implements DataWritable {
 
-    private Logger logger = LoggerFactory.getLogger(DataIndex.class);
+    private Logger logger = LoggerFactory.getLogger(Index.class);
 
     /**
      * 主键
@@ -30,24 +30,18 @@ public class DataIndex implements DataWritable {
     private String key;
 
     /**
-     * 文件编号
-     */
-    private long fileSeq;
-
-    /**
      * 数据在文件的位置
      */
-    private long dataPos;
+    private long offset;
 
-    public DataIndex(byte[] key, long fileSeq, long dataPos) {
+    public Index(byte[] key, long offset) {
         this.key = new String(key);
-        this.fileSeq = fileSeq;
-        this.dataPos = dataPos;
+        this.offset = offset;
     }
 
     @Override
     public long length() {
-        return 4 + (key == null ? 0 : key.length()) + 8 + 8;
+        return 4 + (key == null ? 0 : key.length()) + 8;
     }
 
     @Override
@@ -59,8 +53,7 @@ public class DataIndex implements DataWritable {
                 store.read(keyArray);
                 key = new String(keyArray);
             }
-            fileSeq = store.readLong();
-            dataPos = store.readLong();
+            offset = store.readLong();
         } catch (EOFException e){
             throw e;
         }catch (IOException e) {
@@ -76,8 +69,7 @@ public class DataIndex implements DataWritable {
             if(keySize > 0){
                 store.write(key.getBytes());
             }
-            store.writeLong(fileSeq);
-            store.writeLong(dataPos);
+            store.writeLong(offset);
         } catch (IOException e) {
             logger.error("写文件 IO 异常", e);
         }

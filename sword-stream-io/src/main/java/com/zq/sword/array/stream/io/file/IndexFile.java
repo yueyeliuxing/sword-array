@@ -1,7 +1,7 @@
-package com.zq.sword.array.stream.io.storage;
+package com.zq.sword.array.stream.io.file;
 
-import com.zq.sword.array.stream.io.serialize.AbstractRWStore;
-import com.zq.sword.array.stream.io.serialize.RWStore;
+import com.zq.sword.array.stream.io.AbstractRWStore;
+import com.zq.sword.array.stream.io.RWStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,18 +17,18 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author: zhouqi1
  * @create: 2019-04-17 14:49
  **/
-public class DataIndexFile extends AbstractRWStore implements RWStore {
+public class IndexFile extends AbstractRWStore implements RWStore {
 
-    private Logger logger = LoggerFactory.getLogger(DataIndexFile.class);
+    private Logger logger = LoggerFactory.getLogger(IndexFile.class);
 
     private File file;
 
     public static final String INDEX_FILE_NAME = ".index";
 
-    private Map<String, DataIndex> dataIndexCache;
+    private Map<String, Index> dataIndexCache;
 
-    public DataIndexFile(File file) {
-        super(new OSDataFile(file));
+    public IndexFile(File file) {
+        super(new GeneralFile(file));
         this.file = file;
         this.dataIndexCache = new ConcurrentHashMap<>();
 
@@ -42,7 +42,7 @@ public class DataIndexFile extends AbstractRWStore implements RWStore {
         try{
             rwStore.position(0);
             while (rwStore.available() > 0){
-                DataIndex seqIndex = new DataIndex();
+                Index seqIndex = new Index();
                 try{
                     seqIndex.read(rwStore);
                     dataIndexCache.putIfAbsent(seqIndex.getKey(), seqIndex);
@@ -55,7 +55,7 @@ public class DataIndexFile extends AbstractRWStore implements RWStore {
         }
     }
 
-    public DataIndexFile(String fileParentPath, String fileName) {
+    public IndexFile(String fileParentPath, String fileName) {
         this(new File(fileParentPath + File.separator + fileName + INDEX_FILE_NAME));
     }
 
@@ -71,7 +71,7 @@ public class DataIndexFile extends AbstractRWStore implements RWStore {
      * 读一个logIndex
      * @return
      */
-    public DataIndex readObject(byte[] key){
+    public Index readObject(byte[] key){
         return dataIndexCache.get(new String(key));
     }
 
@@ -79,9 +79,9 @@ public class DataIndexFile extends AbstractRWStore implements RWStore {
      * 写入log
      * @param index
      */
-    public void writeObject(DataIndex index){
+    public void writeObject(Index index){
         writeBefore();
-        DataIndex[] logs = {index};
+        Index[] logs = {index};
         writeObject(logs);
     }
 
@@ -89,10 +89,10 @@ public class DataIndexFile extends AbstractRWStore implements RWStore {
      * logs
      * @param logs
      */
-    public void writeObject(DataIndex[] logs){
+    public void writeObject(Index[] logs){
         writeBefore();
         if(logs != null && logs.length > 0){
-            for(DataIndex log : logs){
+            for(Index log : logs){
                 log.write(rwStore);
                 dataIndexCache.put(log.getKey(), log);
             }

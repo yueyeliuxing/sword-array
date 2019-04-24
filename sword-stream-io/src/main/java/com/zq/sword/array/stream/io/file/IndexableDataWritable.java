@@ -1,6 +1,6 @@
-package com.zq.sword.array.stream.io.storage;
+package com.zq.sword.array.stream.io.file;
 
-import com.zq.sword.array.stream.io.serialize.DataWritable;
+import com.zq.sword.array.stream.io.DataWritable;
 
 /**
  * @program: sword-array

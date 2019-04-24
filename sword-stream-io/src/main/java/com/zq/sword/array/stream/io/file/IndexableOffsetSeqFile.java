@@ -1,4 +1,4 @@
-package com.zq.sword.array.stream.io.storage;
+package com.zq.sword.array.stream.io.file;
 
 /**
  * @program: sword-array
@@ -6,7 +6,7 @@ package com.zq.sword.array.stream.io.storage;
  * @author: zhouqi1
  * @create: 2019-04-18 09:09
  **/
-public interface IndexableOffsetStorageEngine<T extends IndexableDataWritable> extends OffsetStorageEngine<T> {
+public interface IndexableOffsetSeqFile<T extends IndexableDataWritable> extends OffsetSeqFile<T> {
 
     /**
      * 通过指定的数据 索引key获取数据
@@ -14,5 +14,5 @@ public interface IndexableOffsetStorageEngine<T extends IndexableDataWritable> e
      * @param indexKey 索引字段值
      * @return
      */
-    T search(String indexField, byte[] indexKey);
+    T read(String indexField, byte[] indexKey);
 }

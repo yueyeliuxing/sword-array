@@ -1,12 +1,13 @@
-package com.zq.sword.array.stream.io.storage;
+package com.zq.sword.array.stream.io.file;
 
-import com.zq.sword.array.stream.io.serialize.DataWritable;
+import com.zq.sword.array.stream.io.DataWritable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,9 +21,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author: zhouqi1
  * @create: 2019-04-18 09:13
  **/
-public class OffsetFileStorageEngine<T extends DataWritable> implements OffsetStorageEngine<T> {
+public class OffsetBlockFile<T extends DataWritable> implements OffsetSeqFile<T> {
 
-    private Logger logger = LoggerFactory.getLogger(OffsetFileStorageEngine.class);
+    private Logger logger = LoggerFactory.getLogger(OffsetBlockFile.class);
+
+    private static final Map<String, OffsetBlockFile> blockFiles = new HashMap<>();
 
     /**
      * 数据文件目录名称
@@ -42,12 +45,12 @@ public class OffsetFileStorageEngine<T extends DataWritable> implements OffsetSt
     /**
      * 数据文件
      */
-    private Map<Long, DataBlockFile<T>> dataFiles;
+    private Map<Long, OffsetFileBlock<T>> dataFiles;
 
     /**
      * 当前数据文件
      */
-    private volatile DataBlockFile<T> currentDataFile;
+    private volatile OffsetFileBlock<T> currentDataFile;
 
     /**
      * 文件读写锁
@@ -64,7 +67,15 @@ public class OffsetFileStorageEngine<T extends DataWritable> implements OffsetSt
      */
     private Lock readLock = lock.readLock();
 
-    public OffsetFileStorageEngine(String storagePath, Class<T> dataType) {
+    public static synchronized OffsetBlockFile get(String storagePath, Class<?> dataType){
+        OffsetBlockFile blockFile = blockFiles.get(storagePath);
+        if(blockFile == null){
+            blockFile = new OffsetBlockFile(storagePath, dataType);
+        }
+        return blockFile;
+    }
+
+    private OffsetBlockFile(String storagePath, Class<T> dataType) {
         this.storagePath = storagePath;
         this.dataType = dataType;
         this.dataFiles = new ConcurrentHashMap<>();
@@ -86,9 +97,9 @@ public class OffsetFileStorageEngine<T extends DataWritable> implements OffsetSt
         if(dataFiles == null){
             return;
         }
-        DataBlockFile<T> preDataFile = null;
+        OffsetFileBlock<T> preDataFile = null;
         for (File file : dataFiles){
-            DataBlockFile<T> seqDataFile = new DataBlockFile(file);
+            OffsetFileBlock<T> seqDataFile = new OffsetFileBlock(file);
             this.dataFiles.putIfAbsent(seqDataFile.sequence(), seqDataFile);
             if(preDataFile != null){
                 preDataFile.next(seqDataFile);
@@ -118,19 +129,20 @@ public class OffsetFileStorageEngine<T extends DataWritable> implements OffsetSt
      * 获取存储路径
      * @return
      */
+    @Override
     public String getStoragePath(){
         return storagePath;
     }
 
     @Override
-    public long append(T data) {
+    public long write(T data) {
         long offset;
         writeLock.lock();
         try{
             //如果当前文件还没有创建 或者 当前文件已写满 需要重新创建
             if(currentDataFile == null || currentDataFile.isFull()){
-                DataBlockFile<T> preDataFile = currentDataFile;
-                currentDataFile = new DataBlockFile(getDataFileDir(), preDataFile == null ? "0" : preDataFile.size()+"");
+                OffsetFileBlock<T> preDataFile = currentDataFile;
+                currentDataFile = new OffsetFileBlock(getDataFileDir(), preDataFile == null ? "0" : preDataFile.size()+"");
                 dataFiles.put(currentDataFile.sequence(), currentDataFile);
                 if(currentDataFile.isFull()){
                     preDataFile.next(currentDataFile);
@@ -157,12 +169,12 @@ public class OffsetFileStorageEngine<T extends DataWritable> implements OffsetSt
      * @param position 在当前文件中的位置
      * @param data
      */
-    public void afterAppend(DataBlockFile<T> dataFile, long position, T data){
+    public void afterAppend(OffsetFileBlock<T> dataFile, long position, T data){
     }
 
     @Override
-    public T search(long offset) {
-        DataBlockFile<T> dataFile = searchDataFile(offset);
+    public T read(long offset) {
+        OffsetFileBlock<T> dataFile = searchDataFile(offset);
         long currentFilePos = offset - dataFile.sequence();
         return doSearch(dataFile, currentFilePos);
     }
@@ -173,7 +185,7 @@ public class OffsetFileStorageEngine<T extends DataWritable> implements OffsetSt
      * @param currentFilePos
      * @return
      */
-    private T doSearch(DataBlockFile<T> dataFile, long currentFilePos){
+    private T doSearch(OffsetFileBlock<T> dataFile, long currentFilePos){
         T data = null;
         if(dataFile.isCurrent()){
             readLock.lock();
@@ -198,9 +210,9 @@ public class OffsetFileStorageEngine<T extends DataWritable> implements OffsetSt
      * @param offset
      * @return
      */
-    private DataBlockFile<T> searchDataFile(long offset) {
-        DataBlockFile<T> targetDataFile = null;
-        for(DataBlockFile<T> dataFile : dataFiles.values()){
+    private OffsetFileBlock<T> searchDataFile(long offset) {
+        OffsetFileBlock<T> targetDataFile = null;
+        for(OffsetFileBlock<T> dataFile : dataFiles.values()){
             if(offset >= dataFile.sequence()){
                 targetDataFile = dataFile;
                 break;
@@ -213,8 +225,8 @@ public class OffsetFileStorageEngine<T extends DataWritable> implements OffsetSt
     }
 
     @Override
-    public List<T> search(long offset, int num) {
-        DataBlockFile<T> dataFile = searchDataFile(offset);
+    public List<T> read(long offset, int num) {
+        OffsetFileBlock<T> dataFile = searchDataFile(offset);
         long currentFilePos = offset - dataFile.sequence();
         List<T> datas = new ArrayList<>(num);
         //如果是当前文件 那就剩余数据都从当前文件中读
@@ -254,7 +266,7 @@ public class OffsetFileStorageEngine<T extends DataWritable> implements OffsetSt
      * @param dataFile
      * @return
      */
-    private void readCurrentLogDataFile(DataBlockFile<T> dataFile, long pos, int num, List<T> datas) {
+    private void readCurrentLogDataFile(OffsetFileBlock<T> dataFile, long pos, int num, List<T> datas) {
         readLock.lock();
         try{
             dataFile.position(pos);

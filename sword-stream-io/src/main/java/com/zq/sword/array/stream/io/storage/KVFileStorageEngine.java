@@ -1,5 +1,7 @@
 package com.zq.sword.array.stream.io.storage;
 
+import com.zq.sword.array.stream.io.file.IndexableOffsetBlockFile;
+import com.zq.sword.array.stream.io.file.IndexableOffsetSeqFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,24 +21,18 @@ public class KVFileStorageEngine implements KVStorageEngine<byte[], byte[]> {
     public static final byte[] DELETE_VALUE = {'-','-', '-'};
 
     /**
-     * 存储路径
-     */
-    private String storagePath;
-
-    /**
      * 数据存储
      */
-    private IndexableOffsetStorageEngine<KVData> storageEngine;
+    private IndexableOffsetSeqFile<KVData> dataFile;
 
     public KVFileStorageEngine(String storagePath) {
-        this.storagePath = storagePath;
-        this.storageEngine = new IndexableOffsetFileStorageEngine(storagePath, KVData.class);
+        this.dataFile = IndexableOffsetBlockFile.get(storagePath, KVData.class);
 
     }
 
     @Override
     public boolean insert(byte[] key, byte[] value) {
-        storageEngine.append(new KVData(key, value));
+        dataFile.write(new KVData(key, value));
         return true;
     }
 
@@ -52,7 +48,7 @@ public class KVFileStorageEngine implements KVStorageEngine<byte[], byte[]> {
 
     @Override
     public byte[] find(byte[] key) {
-        KVData kvData = storageEngine.search("key", key);
+        KVData kvData = dataFile.read("key", key);
         return kvData == null ? null : kvData.getValue();
     }
 }

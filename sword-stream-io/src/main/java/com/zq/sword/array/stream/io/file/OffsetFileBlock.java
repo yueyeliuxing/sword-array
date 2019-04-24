@@ -1,9 +1,9 @@
-package com.zq.sword.array.stream.io.storage;
+package com.zq.sword.array.stream.io.file;
 
 import com.zq.sword.array.common.utils.ReflectUtils;
-import com.zq.sword.array.stream.io.serialize.AbstractRWStore;
-import com.zq.sword.array.stream.io.serialize.RWStore;
-import com.zq.sword.array.stream.io.serialize.DataWritable;
+import com.zq.sword.array.stream.io.AbstractRWStore;
+import com.zq.sword.array.stream.io.RWStore;
+import com.zq.sword.array.stream.io.DataWritable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,9 +19,9 @@ import java.util.List;
  * @author: zhouqi1
  * @create: 2019-04-17 14:49
  **/
-public class DataBlockFile<T extends DataWritable> extends AbstractRWStore implements RWStore {
+public class OffsetFileBlock<T extends DataWritable> extends AbstractRWStore implements RWStore {
 
-    private Logger logger = LoggerFactory.getLogger(DataBlockFile.class);
+    private Logger logger = LoggerFactory.getLogger(OffsetFileBlock.class);
 
     public static final String OLD_FILE_TYPE_TAG = "old";
 
@@ -42,16 +42,16 @@ public class DataBlockFile<T extends DataWritable> extends AbstractRWStore imple
     /**
      * 写一个文件
      */
-    private DataBlockFile next;
+    private OffsetFileBlock next;
 
-    public DataBlockFile(File file) {
-        super(new OSDataFile(file));
+    public OffsetFileBlock(File file) {
+        super(new GeneralFile(file));
         String[] params = file.getName().split("\\.");
         this.sequence = Long.parseLong(params[0]);
         this.isCurrent = params[1].equalsIgnoreCase(CURRENT_FILE_TYPE_TAG);
     }
 
-    public DataBlockFile(String fileParentPath, String fileName) {
+    public OffsetFileBlock(String fileParentPath, String fileName) {
         this(new File(fileParentPath + File.separator + fileName + "." + CURRENT_FILE_TYPE_TAG));
     }
 
@@ -88,7 +88,7 @@ public class DataBlockFile<T extends DataWritable> extends AbstractRWStore imple
      * 设置下一个数据文件
      * @param rwStore
      */
-    public void next(DataBlockFile rwStore){
+    public void next(OffsetFileBlock rwStore){
         next = rwStore;
     }
 
@@ -96,7 +96,7 @@ public class DataBlockFile<T extends DataWritable> extends AbstractRWStore imple
      * 返回下一个数据文件
      * @return
      */
-    public DataBlockFile next(){
+    public OffsetFileBlock next(){
         return next;
     }
 
