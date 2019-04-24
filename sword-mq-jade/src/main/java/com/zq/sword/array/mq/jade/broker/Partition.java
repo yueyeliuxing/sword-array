@@ -19,28 +19,10 @@ public interface Partition {
     long id();
 
     /**
-     * 标签
-     * @return
-     */
-    String tag();
-
-    /**
      * 名称
      * @return
      */
     String name();
-
-    /**
-     * 路径
-     * @return
-     */
-    String path();
-
-    /**
-     * topic 配置
-     * @return
-     */
-    String topic();
 
     /**
      * 追加消息

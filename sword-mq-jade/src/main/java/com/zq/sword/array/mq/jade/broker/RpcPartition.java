@@ -28,16 +28,9 @@ import java.util.concurrent.*;
  * @author: zhouqi1
  * @create: 2019-01-16 19:32
  **/
-public class RpcPartition implements Partition {
+public class RpcPartition extends AbstractPartition implements Partition {
 
-    private long id;
-
-    //ip:port
-    private String location;
-
-    private String topic;
-
-    private String tag;
+    private Broker broker;
 
     /**
      * 发送消息队列
@@ -58,11 +51,9 @@ public class RpcPartition implements Partition {
 
     private TaskExecutor taskExecutor;
 
-    public RpcPartition(long id, String location, String topic, String tag) {
-        this.id = id;
-        this.location = location;
-        this.topic = topic;
-        this.tag = tag;
+    public RpcPartition(Broker broker, long id, String location) {
+        super(id);
+        this.broker = broker;
         String[] ps = location.split(":");
         this.taskExecutor = new SingleTaskExecutor();
         this.sendMsgQueue = new LinkedBlockingQueue<>();
@@ -76,31 +67,6 @@ public class RpcPartition implements Partition {
     }
 
     @Override
-    public long id() {
-        return id;
-    }
-
-    @Override
-    public String tag() {
-        return tag;
-    }
-
-    @Override
-    public String name() {
-        return location;
-    }
-
-    @Override
-    public String path() {
-        return null;
-    }
-
-    @Override
-    public String topic() {
-        return topic;
-    }
-
-    @Override
     public long append(Message message) {
         sendMsgQueue.offer(message);
         //返回偏移量
@@ -110,7 +76,7 @@ public class RpcPartition implements Partition {
     @Override
     public Message search(long offset) {
         try{
-            sendMsgReqQueue.put(new MsgReq(id, offset, 1));
+            sendMsgReqQueue.put(new MsgReq(id(), offset, 1));
             Object obj = receiveMsgQueue.poll(1, TimeUnit.SECONDS);
             if(obj != null && obj instanceof Message){
                 return (Message) obj;
@@ -125,7 +91,7 @@ public class RpcPartition implements Partition {
     public List<Message> orderSearch(long offset, int num) {
         List<Message> messages = new ArrayList<>();
         try {
-            sendMsgReqQueue.put(new MsgReq(id, offset, num));
+            sendMsgReqQueue.put(new MsgReq(id(), offset, num));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -235,7 +201,7 @@ public class RpcPartition implements Partition {
                 Object obj = sendMsgQueue.poll();
                 logger.info("定时获取消息数据，request->{} queue: {}", obj, sendMsgQueue);
                 if(obj != null){
-                    TransferMessage transferMessage = buildSendMessageReq(new LocatedMessage(id, (Message)obj));
+                    TransferMessage transferMessage = buildSendMessageReq(new LocatedMessage(id(), (Message)obj));
                     System.out.println("Client send message to server : --> " + transferMessage);
                     ctx.writeAndFlush(transferMessage);
                 }else {

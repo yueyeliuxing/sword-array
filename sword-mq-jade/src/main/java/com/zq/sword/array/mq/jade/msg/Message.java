@@ -1,7 +1,7 @@
 package com.zq.sword.array.mq.jade.msg;
 
-import com.zq.sword.array.stream.io.serialize.RWStore;
-import com.zq.sword.array.stream.io.serialize.DataWritable;
+import com.zq.sword.array.stream.io.RWStore;
+import com.zq.sword.array.stream.io.DataWritable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
