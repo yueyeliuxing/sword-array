@@ -1,4 +1,4 @@
-package com.zq.sword.array.zpiper.server.piper.protocol.dto;
+package com.zq.sword.array.zpiper.server.piper.cluster.protocol.dto;
 
 import lombok.Data;
 import lombok.ToString;

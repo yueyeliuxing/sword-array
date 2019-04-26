@@ -1,20 +1,14 @@
 package com.zq.sword.array.zpiper.server.piper;
 
-import com.zq.sword.array.data.storage.DataEntry;
 import com.zq.sword.array.data.storage.DataPartitionSystem;
-import com.zq.sword.array.data.storage.Partition;
 import com.zq.sword.array.data.storage.PartitionSystem;
+import com.zq.sword.array.zpiper.server.piper.cluster.JobControlCluster;
+import com.zq.sword.array.zpiper.server.piper.cluster.PartitionTransferCluster;
+import com.zq.sword.array.zpiper.server.piper.cluster.protocol.PiperNameProtocol;
+import com.zq.sword.array.zpiper.server.piper.cluster.protocol.PiperServiceProtocol;
 import com.zq.sword.array.zpiper.server.piper.config.PiperConfig;
-import com.zq.sword.array.zpiper.server.piper.job.JobControlCluster;
-import com.zq.sword.array.zpiper.server.piper.protocol.BrokerMsgProcessor;
-import com.zq.sword.array.zpiper.server.piper.protocol.PiperNameProtocol;
-import com.zq.sword.array.zpiper.server.piper.protocol.PiperServiceProtocol;
-import com.zq.sword.array.zpiper.server.piper.protocol.dto.DataEntryReq;
-import com.zq.sword.array.zpiper.server.piper.protocol.dto.LocatedDataEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 /**
  * @program: sword-array
@@ -45,6 +39,11 @@ public class RedisPiper implements Piper{
      */
     private JobControlCluster jobEnvCluster;
 
+    /**
+     * 分片数据传输
+     */
+    private PartitionTransferCluster partitionTransferCluster;
+
 
     public RedisPiper(PiperConfig config) {
         this.namePiper = config.namePiper();
@@ -52,6 +51,7 @@ public class RedisPiper implements Piper{
         this.partitionSystem = DataPartitionSystem.get(config.dataStorePath());
         this.piperNameProtocol = createPiperNameProtocol(config);
         this.jobEnvCluster = new JobControlCluster(piperNameProtocol, partitionSystem);
+        this.partitionTransferCluster = new PartitionTransferCluster(piperServiceProtocol, partitionSystem);
     }
 
     /**
@@ -71,23 +71,6 @@ public class RedisPiper implements Piper{
      */
     private PiperServiceProtocol createPiperServiceProtocol(String piperLocation){
         PiperServiceProtocol piperServiceProtocol = new PiperServiceProtocol(piperLocation);
-        piperServiceProtocol.setBrokerMsgProcessor(new BrokerMsgProcessor() {
-            @Override
-            public List<DataEntry> obtainMessages(DataEntryReq req) {
-                Partition partition = partitionSystem.getPartition(req.getPartGroup(), req.getPartName());
-                if(partition == null){
-                    logger.warn("查询的分片不存在, group:{} name:{}", req.getPartGroup(), req.getPartName());
-                    return null;
-                }
-                return partition.orderGet(req.getOffset(), req.getReqSize());
-            }
-
-            @Override
-            public void handleLocatedMessage(LocatedDataEntry locatedMessage) {
-                Partition partition = partitionSystem.getOrNewPartition(locatedMessage.getPartGroup(), locatedMessage.getPartName());
-                partition.append(locatedMessage.getEntry());
-            }
-        });
         return piperServiceProtocol;
     }
 

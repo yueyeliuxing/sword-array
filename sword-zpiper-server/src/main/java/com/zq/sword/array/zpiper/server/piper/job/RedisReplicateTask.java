@@ -16,8 +16,8 @@ import com.zq.sword.array.redis.replicator.SlaveRedisReplicator;
 import com.zq.sword.array.redis.replicator.listener.RedisReplicatorListener;
 import com.zq.sword.array.tasks.SingleTaskExecutor;
 import com.zq.sword.array.tasks.TaskExecutor;
-import com.zq.sword.array.zpiper.server.piper.protocol.InterPiperProtocol;
-import com.zq.sword.array.zpiper.server.piper.protocol.dto.LocatedDataEntry;
+import com.zq.sword.array.zpiper.server.piper.cluster.protocol.InterPiperProtocol;
+import com.zq.sword.array.zpiper.server.piper.cluster.protocol.dto.LocatedDataEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

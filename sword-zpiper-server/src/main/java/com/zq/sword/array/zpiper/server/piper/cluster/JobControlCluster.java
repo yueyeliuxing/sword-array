@@ -1,11 +1,12 @@
-package com.zq.sword.array.zpiper.server.piper.job;
+package com.zq.sword.array.zpiper.server.piper.cluster;
 
 import com.zq.sword.array.common.event.HotspotEvent;
 import com.zq.sword.array.common.event.HotspotEventListener;
 import com.zq.sword.array.data.storage.PartitionSystem;
-import com.zq.sword.array.zpiper.server.piper.protocol.PiperNameProtocol;
-import com.zq.sword.array.zpiper.server.piper.protocol.dto.JobCommand;
-import com.zq.sword.array.zpiper.server.piper.protocol.dto.JobType;
+import com.zq.sword.array.zpiper.server.piper.job.*;
+import com.zq.sword.array.zpiper.server.piper.cluster.protocol.PiperNameProtocol;
+import com.zq.sword.array.zpiper.server.piper.cluster.protocol.dto.JobCommand;
+import com.zq.sword.array.zpiper.server.piper.cluster.protocol.dto.JobType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,7 +98,7 @@ public class JobControlCluster {
     /**
      * Job健康监控器
      */
-    private class JobTaskMonitor implements TaskMonitor{
+    private class JobTaskMonitor implements TaskMonitor {
 
         @Override
         public void monitor(TaskHealth health) {

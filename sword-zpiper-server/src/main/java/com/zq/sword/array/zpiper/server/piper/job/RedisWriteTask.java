@@ -18,9 +18,9 @@ import com.zq.sword.array.redis.writer.DefaultRedisWriter;
 import com.zq.sword.array.redis.writer.RedisWriter;
 import com.zq.sword.array.tasks.AbstractThreadActuator;
 import com.zq.sword.array.tasks.Actuator;
-import com.zq.sword.array.zpiper.server.piper.protocol.InterPiperProtocol;
-import com.zq.sword.array.zpiper.server.piper.protocol.dto.DataEntryReq;
-import com.zq.sword.array.zpiper.server.piper.protocol.dto.LocatedDataEntry;
+import com.zq.sword.array.zpiper.server.piper.cluster.protocol.InterPiperProtocol;
+import com.zq.sword.array.zpiper.server.piper.cluster.protocol.dto.DataEntryReq;
+import com.zq.sword.array.zpiper.server.piper.cluster.protocol.dto.LocatedDataEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

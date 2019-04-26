@@ -1,4 +1,4 @@
-package com.zq.sword.array.zpiper.server.piper.protocol;
+package com.zq.sword.array.zpiper.server.piper.cluster.protocol;
 
 import com.zq.sword.array.data.storage.DataEntry;
 import com.zq.sword.array.network.rpc.handler.TransferHandler;
@@ -7,8 +7,8 @@ import com.zq.sword.array.network.rpc.message.MessageType;
 import com.zq.sword.array.network.rpc.message.TransferMessage;
 import com.zq.sword.array.network.rpc.server.NettyRpcServer;
 import com.zq.sword.array.tasks.Actuator;
-import com.zq.sword.array.zpiper.server.piper.protocol.dto.LocatedDataEntry;
-import com.zq.sword.array.zpiper.server.piper.protocol.dto.DataEntryReq;
+import com.zq.sword.array.zpiper.server.piper.cluster.protocol.dto.LocatedDataEntry;
+import com.zq.sword.array.zpiper.server.piper.cluster.protocol.dto.DataEntryReq;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
@@ -32,7 +32,7 @@ public class PiperServiceProtocol implements Actuator{
     /**
      * broker消息处理器
      */
-    private BrokerMsgProcessor brokerMsgProcessor;
+    private DataPartitionProcessor brokerMsgProcessor;
 
     public PiperServiceProtocol(String piperLocation) {
         String[] params = piperLocation.split(":");
@@ -56,7 +56,7 @@ public class PiperServiceProtocol implements Actuator{
      * 设置Broker 消息处理器
      * @param brokerMsgProcessor
      */
-    public void setBrokerMsgProcessor(BrokerMsgProcessor brokerMsgProcessor){
+    public void setDataPartitionProcessor(DataPartitionProcessor brokerMsgProcessor){
         this.brokerMsgProcessor = brokerMsgProcessor;
     }
 
@@ -89,11 +89,11 @@ public class PiperServiceProtocol implements Actuator{
             logger.info("receive msg request : {}", message);
             if(message.getHeader() != null && message.getHeader().getType() == MessageType.RECEIVE_DATA_REQ.value()) {
                 DataEntryReq msgReq = (DataEntryReq)message.getBody();
-                List<DataEntry> msgs  = brokerMsgProcessor.obtainMessages(msgReq);
+                List<DataEntry> msgs  = brokerMsgProcessor.obtainDataEntries(msgReq);
                 ctx.writeAndFlush(buildReceiveMessageResp(msgs));
             }else if(message.getHeader() != null && message.getHeader().getType() == MessageType.SEND_MESSAGE_REQ.value()) {
                 LocatedDataEntry locatedMessage = (LocatedDataEntry)message.getBody();
-                brokerMsgProcessor.handleLocatedMessage(locatedMessage);
+                brokerMsgProcessor.handleLocatedEntry(locatedMessage);
                 ctx.writeAndFlush(buildSendMessageResp(locatedMessage.getMessage()));
             }else {
                 ctx.fireChannelRead(msg);
