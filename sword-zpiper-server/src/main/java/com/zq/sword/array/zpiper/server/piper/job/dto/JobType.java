@@ -1,4 +1,4 @@
-package com.zq.sword.array.zpiper.server.piper.cluster.protocol.dto;
+package com.zq.sword.array.zpiper.server.piper.job.dto;
 
 /**
  * @program: sword-array
@@ -36,12 +36,12 @@ public enum JobType {
     /**
      * 增加任务复制piper
      */
-    REPLICATE_PIPERS_CHANGE((byte)5),
+    BACKUP_PIPERS_CHANGE((byte)5),
 
     /**
-     * 增加任务目标piper
+     * 消费piper改变
      */
-    TARGET_PIPERS_CHANGE((byte)6),
+    CONSUME_PIPERS_CHANGE((byte)6),
     ;
 
     private byte type;

@@ -3,6 +3,7 @@ package com.zq.sword.array.zpiper.server.piper.job;
 import com.zq.sword.array.redis.command.RedisCommand;
 import com.zq.sword.array.redis.handler.CycleDisposeHandler;
 import com.zq.sword.array.redis.handler.SimpleCycleDisposeHandler;
+import com.zq.sword.array.zpiper.server.piper.cluster.JobControlCluster;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,13 +36,15 @@ public class JobSystem {
 
     /**
      * 创建Job
-     * @param config
+     * @param jobEnv
+     * @param jobRuntimeStorage
+     * @param monitor
      */
-    public void createJob(JobConfig config, TaskMonitor monitor){
+    public void createJob(JobEnv jobEnv, JobRuntimeStorage jobRuntimeStorage, TaskMonitor monitor){
         CycleDisposeHandler<RedisCommand> cycleDisposeHandler = new SimpleCycleDisposeHandler();
-        Job job = new Job(config.getJobEnv().getName());
-        job.setReplicateTask(new RedisReplicateTask(config.getJobEnv(), cycleDisposeHandler, config.getPartitionSystem()));
-        job.setWriteTask(new RedisWriteTask(config.getJobEnv(), config.getPartitionSystem(), cycleDisposeHandler));
+        Job job = new Job(jobEnv.getName());
+        job.setReplicateTask(new RedisReplicateTask(jobEnv, cycleDisposeHandler, jobRuntimeStorage));
+        job.setWriteTask(new RedisWriteTask(jobEnv, jobRuntimeStorage, cycleDisposeHandler));
         job.setTaskMonitor(monitor);;
         jobs.put(job.name(), job);
     }

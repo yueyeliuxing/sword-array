@@ -1,4 +1,4 @@
-package com.zq.sword.array.zpiper.server.piper.cluster.protocol.dto;
+package com.zq.sword.array.zpiper.server.piper.job.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,14 +15,17 @@ import java.io.Serializable;
 @Data
 @ToString
 @NoArgsConstructor
-public class DataEntryResp implements Serializable{
+public class ReplicateDataId implements Serializable{
 
-    private long seq;
+    private String piperGroup;
+
+    private String jobName;
 
     private long offset;
 
-    public DataEntryResp(long seq, long offset) {
-        this.seq = seq;
+    public ReplicateDataId(String piperGroup, String jobName, long offset) {
+        this.piperGroup = piperGroup;
+        this.jobName = jobName;
         this.offset = offset;
     }
 }

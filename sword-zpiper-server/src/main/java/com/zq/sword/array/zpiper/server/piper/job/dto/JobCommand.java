@@ -1,4 +1,4 @@
-package com.zq.sword.array.zpiper.server.piper.cluster.protocol.dto;
+package com.zq.sword.array.zpiper.server.piper.job.dto;
 
 import lombok.Data;
 import lombok.ToString;
@@ -38,35 +38,35 @@ public class JobCommand implements Serializable{
     private String sourceRedis;
 
     /**
-     * 数据需复制到的其他Piper
+     * 备份的piper
      */
-    private List<String> replicatePipers;
+    private List<String> backupPipers;
 
     /**
-     * 目标piper  PiperGroup|PiperLocation
+     * 消费的piper  PiperGroup|PiperLocation
      * 从目标piper获取数据
      */
-    private List<String> targetPipers;
+    private List<String> consumePipers;
 
     /**
      * 新增的复制piper
      */
-    private List<String> incrementReplicatePipers;
+    private List<String> incrementBackupPipers;
 
     /**
      * 减少的复制piper
      */
-    private List<String> decreaseReplicatePipers;
+    private List<String> decreaseBackupPipers;
 
     /**
      * 新增的目标piper
      */
-    private List<String> incrementTargetPipers;
+    private List<String> incrementConsumePipers;
 
     /**
      * 减少的目标piper
      */
-    private List<String> decreaseTargetPipers;
+    private List<String> decreaseConsumePipers;
 
 
 }

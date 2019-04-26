@@ -1,9 +1,6 @@
 package com.zq.sword.array.zpiper.server.piper;
 
-import com.zq.sword.array.data.storage.DataPartitionSystem;
-import com.zq.sword.array.data.storage.PartitionSystem;
 import com.zq.sword.array.zpiper.server.piper.cluster.JobControlCluster;
-import com.zq.sword.array.zpiper.server.piper.cluster.PartitionTransferCluster;
 import com.zq.sword.array.zpiper.server.piper.cluster.protocol.PiperNameProtocol;
 import com.zq.sword.array.zpiper.server.piper.cluster.protocol.PiperServiceProtocol;
 import com.zq.sword.array.zpiper.server.piper.config.PiperConfig;
@@ -22,8 +19,6 @@ public class RedisPiper implements Piper{
 
     protected NamePiper namePiper;
 
-    private PartitionSystem partitionSystem;
-
     /**
      * Piper服务提供通信
      */
@@ -39,19 +34,12 @@ public class RedisPiper implements Piper{
      */
     private JobControlCluster jobEnvCluster;
 
-    /**
-     * 分片数据传输
-     */
-    private PartitionTransferCluster partitionTransferCluster;
-
 
     public RedisPiper(PiperConfig config) {
         this.namePiper = config.namePiper();
         this.piperServiceProtocol = createPiperServiceProtocol(config.piperLocation());
-        this.partitionSystem = DataPartitionSystem.get(config.dataStorePath());
         this.piperNameProtocol = createPiperNameProtocol(config);
-        this.jobEnvCluster = new JobControlCluster(piperNameProtocol, partitionSystem);
-        this.partitionTransferCluster = new PartitionTransferCluster(piperServiceProtocol, partitionSystem);
+        this.jobEnvCluster = new JobControlCluster(piperNameProtocol, piperServiceProtocol, config.dataStorePath());
     }
 
     /**

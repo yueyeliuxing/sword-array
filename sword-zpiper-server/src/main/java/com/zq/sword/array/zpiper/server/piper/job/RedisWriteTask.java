@@ -1,12 +1,5 @@
 package com.zq.sword.array.zpiper.server.piper.job;
 
-import com.zq.sword.array.common.event.HotspotEvent;
-import com.zq.sword.array.common.event.HotspotEventListener;
-import com.zq.sword.array.data.storage.DataEntry;
-import com.zq.sword.array.data.storage.Partition;
-import com.zq.sword.array.data.storage.PartitionSystem;
-import com.zq.sword.array.id.IdGenerator;
-import com.zq.sword.array.id.SnowFlakeIdGenerator;
 import com.zq.sword.array.redis.command.CommandMetadata;
 import com.zq.sword.array.redis.command.RedisCommand;
 import com.zq.sword.array.redis.command.RedisCommandDeserializer;
@@ -16,17 +9,19 @@ import com.zq.sword.array.redis.interceptor.CommandInterceptor;
 import com.zq.sword.array.redis.util.RedisConfig;
 import com.zq.sword.array.redis.writer.DefaultRedisWriter;
 import com.zq.sword.array.redis.writer.RedisWriter;
-import com.zq.sword.array.tasks.AbstractThreadActuator;
-import com.zq.sword.array.tasks.Actuator;
-import com.zq.sword.array.zpiper.server.piper.cluster.protocol.InterPiperProtocol;
-import com.zq.sword.array.zpiper.server.piper.cluster.protocol.dto.DataEntryReq;
-import com.zq.sword.array.zpiper.server.piper.cluster.protocol.dto.LocatedDataEntry;
+import com.zq.sword.array.zpiper.server.piper.cluster.JobDataBackupCluster;
+import com.zq.sword.array.zpiper.server.piper.cluster.JobDataConsumeCluster;
+import com.zq.sword.array.zpiper.server.piper.job.dto.ConsumeNextOffset;
+import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateData;
+import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateDataReq;
+import com.zq.sword.array.zpiper.server.piper.job.processor.ConsumeDataRespProcessor;
+import com.zq.sword.array.zpiper.server.piper.job.processor.WriteTaskBackupProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+
+import static com.zq.sword.array.zpiper.server.piper.cluster.JobDataConsumeCluster.*;
 
 /**
  * @program: sword-array
@@ -39,116 +34,99 @@ public class RedisWriteTask extends AbstractTask implements WriteTask {
     private Logger logger = LoggerFactory.getLogger(RedisWriteTask.class);
 
     private static final String TASK_NAME = "write-task";
-    private static final String CONSUME_DATA_GROUP = "part-consume";
-
-    private IdGenerator idGenerator;
 
     private JobEnv jobEnv;
 
-    private PartitionSystem partitionSystem;
+    private JobRuntimeStorage jobRuntimeStorage;
 
     private RedisWriter redisWriter;
 
-    private Map<String, PartitionConsumer> partitionConsumers;
+    private JobDataBackupCluster jobDataBackupCluster;
 
-
+    private JobDataConsumeCluster jobDataConsumeCluster;
 
     private volatile boolean isCanReq = true;
 
-    public RedisWriteTask(JobEnv jobEnv, PartitionSystem partitionSystem, CycleDisposeHandler<RedisCommand> cycleDisposeHandler) {
+    public RedisWriteTask(JobEnv jobEnv, JobRuntimeStorage jobRuntimeStorage, CycleDisposeHandler<RedisCommand> cycleDisposeHandler) {
         super(TASK_NAME);
         this.jobEnv = jobEnv;
-        this.partitionSystem = partitionSystem;
-
-        idGenerator = new SnowFlakeIdGenerator();
+        this.jobRuntimeStorage = jobRuntimeStorage;
 
         //设置redis 写入器
         redisWriter = new DefaultRedisWriter(new RedisConfig(jobEnv.getSourceRedis()));
         redisWriter.addCommandInterceptor(new CycleCommandAddInterceptor(cycleDisposeHandler));
 
-        this.partitionConsumers = new ConcurrentHashMap<>();
-        assignTargetPartitionConsumers(jobEnv);
-
-
-    }
-
-    /**
-     * 为目标分片创建消费者
-     * @param jobEnv
-     */
-    private void assignTargetPartitionConsumers(JobEnv jobEnv) {
-        //得到其他pipergroup的Piper远程分片 消费数据
-        List<String> targetPiperLocations = jobEnv.getTargetPipers(new PiperChangeListener() {
+        this.jobDataBackupCluster = JobDataBackupCluster.get(jobEnv.getName());
+        this.jobDataBackupCluster.setWriteTaskBackupProcessor(new WriteTaskBackupProcessor() {
             @Override
-            public void increment(List<String> piperLocations) {
-                if(piperLocations != null && !piperLocations.isEmpty()){
-                    for (String targetPiperLocation : piperLocations){
-                        PartitionConsumer consumer = createPartitionConsumer(targetPiperLocation);
-                        partitionConsumers.put(targetPiperLocation, consumer);
-                    }
-                }
-            }
+            public void backupConsumeNextOffset(ConsumeNextOffset consumeNextOffset) {
 
-            @Override
-            public void decrease(List<String> piperLocations) {
-                if(piperLocations != null && !piperLocations.isEmpty()){
-                    for (String targetPiperLocation : piperLocations){
-                        PartitionConsumer consumer = partitionConsumers.get(targetPiperLocation);
-                        consumer.stop();
-                        partitionConsumers.remove(targetPiperLocation);
-                    }
-                }
             }
         });
-        if(targetPiperLocations != null && !targetPiperLocations.isEmpty()){
-            for (String targetPiperLocation : targetPiperLocations){
-                PartitionConsumer consumer = createPartitionConsumer(targetPiperLocation);
-                partitionConsumers.put(targetPiperLocation, consumer);
-            }
-        }
-    }
 
-
-    /**
-     * 创建InterPiperClient
-     * @param piperLocation
-     * @return
-     */
-    private InterPiperProtocol.InterPiperClient createInterPiperClient(String piperLocation) {
-        InterPiperProtocol.InterPiperClient interPiperClient = InterPiperProtocol.getInstance().getOrNewInterPiperClient(piperLocation);
-        interPiperClient.addMessageObtainEventListener(new HotspotEventListener<List<LocatedDataEntry>>() {
+        this.jobDataConsumeCluster = get(jobEnv.getName());
+        this.jobDataConsumeCluster.setPartitionConsumerBuilder(new PartitionConsumerBuilder() {
             @Override
-            public void listen(HotspotEvent<List<LocatedDataEntry>> dataEvent) {
-                List<LocatedDataEntry> locatedEntrys = dataEvent.getData();
+            public JobDataConsumeCluster.PartitionConsumer build(String consumePiperLocation) {
+                return null;
+            }
+        });
+        this.jobDataConsumeCluster.setConsumeDataRespProcessor(new ConsumeDataRespProcessor() {
+            @Override
+            public void consumeReplicateData(List<ReplicateData> replicateDatas) {
                 //消费消息
-                logger.info("接收消息->{}", locatedEntrys);
-                if(locatedEntrys != null && !locatedEntrys.isEmpty()){
-                    for (LocatedDataEntry locatedEntry : locatedEntrys){
-                        redisWriter.write(new RedisCommandDeserializer().deserialize(locatedEntry.getEntry().getBody()), metadata -> {
+                logger.info("接收消息->{}", replicateDatas);
+                if(replicateDatas != null && !replicateDatas.isEmpty()){
+                    for (ReplicateData replicateData : replicateDatas){
+                        redisWriter.write(new RedisCommandDeserializer().deserialize(replicateData.getData()), metadata -> {
                             if(metadata.getException() != null){
                                 logger.error("写入redis出错", metadata.getException());
                             }
                         });
 
+                        ConsumeNextOffset consumeNextOffset = new ConsumeNextOffset(replicateData.getPiperGroup(), replicateData.getJobName(), replicateData.getNextOffset());
                         //更新分片消费信息
-                        Partition partition = partitionSystem.getOrNewPartition(CONSUME_DATA_GROUP, locatedEntry.getPartName());
-                        DataEntry dataEntry = partition.get(0);
-                        if(dataEntry == null){
-                            dataEntry = new DataEntry();
-                            dataEntry.setTag(CONSUME_DATA_GROUP);
-                        }
-                        dataEntry.setSeq(idGenerator.nextId());
-                        dataEntry.setBody(dataEntry.getBody() == null ? "0".getBytes() :
-                                String.valueOf(Long.parseLong(new String(dataEntry.getBody())) + locatedEntry.getEntry().length()).getBytes());
-                        dataEntry.setTimestamp(System.currentTimeMillis());
-                        partition.append(dataEntry);
+                        jobRuntimeStorage.writeConsumeNextOffset(consumeNextOffset);
+
+                        //异步发送数据到备份机器上
+                        jobDataBackupCluster.backupConsumeNextOffset(consumeNextOffset);
                     }
                 }
                 //数据消费完 可以继续请求数据了
                 isCanReq = true;
             }
         });
-        return interPiperClient;
+
+
+    }
+
+    /**
+     * 数据消费者
+     */
+    public class ReplicateDataConsumer extends JobDataConsumeCluster.PartitionConsumer {
+
+        public ReplicateDataConsumer(String targetPiperLocation) {
+            super(targetPiperLocation);
+        }
+
+
+        @Override
+        public void run() {
+            logger.info("消费者开始消费消息");
+            while (!isClose && !Thread.currentThread().isInterrupted()) {
+                if (isCanReq) {
+                    long offset = jobRuntimeStorage.getConsumeNextOffset(jobEnv.getPiperGroup(), jobEnv.getName());
+                    logger.info("消费者消费offset->{}, piperGroup->{} jobName->{}", offset, jobEnv.getPiperGroup(), jobEnv.getName());
+                    consumeReplicateDataReq(new ReplicateDataReq(jobEnv.getPiperGroup(), jobEnv.getName(), offset, 1));
+                    isCanReq = false;
+                    try {
+                        Thread.sleep(5);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -175,74 +153,31 @@ public class RedisWriteTask extends AbstractTask implements WriteTask {
     @Override
     public void run() {
         redisWriter.start();
-        for(PartitionConsumer partitionConsumer : partitionConsumers.values()){
-            partitionConsumer.start();
-        }
+        jobDataConsumeCluster.start(new DefaultConsumeCall());
         super.run();
     }
 
-    private PartitionConsumer createPartitionConsumer(String targetPiperLocation) {
-        String[] groupLocations = targetPiperLocation.split("\\|");
-        InterPiperProtocol.InterPiperClient interPiperClient = createInterPiperClient(groupLocations[1]);
-        return new PartitionConsumer(interPiperClient, createPartName(groupLocations[0]));
-    }
-
     /**
-     * 相同规则生成制定的partId
-     * @param targetGroup
-     * @return
+     * 执行回调
      */
-    private String createPartName(String targetGroup) {
-        return String.format("%s:%s", targetGroup, jobEnv.getName());
-    }
+    private class DefaultConsumeCall implements JobDataConsumeCluster.ConsumeCall{
 
-    /**
-     * 消息消费者
-     */
-    private class PartitionConsumer extends AbstractThreadActuator implements Actuator {
+        @Override
+        public void call(JobDataConsumeCluster.PartitionConsumer partitionConsumer) {
 
-        private Logger logger = LoggerFactory.getLogger(PartitionConsumer.class);
-
-        private InterPiperProtocol.InterPiperClient interPiperClient;
-        private String  partName;
-
-        public PartitionConsumer(InterPiperProtocol.InterPiperClient interPiperClient, String  partName) {
-            this.interPiperClient = interPiperClient;
-            this.partName = partName;
         }
 
         @Override
-        public void run() {
-            //更新分片消费信息
-            Partition partition = partitionSystem.getOrNewPartition(CONSUME_DATA_GROUP, partName);
-            logger.info("消费者开始消费消息");
-            while (!isClose && !Thread.currentThread().isInterrupted()) {
+        public void done() {
 
-                if(isCanReq){
-                    long offset = 0;
-                    DataEntry dataEntry = partition.get(0);
-                    if(dataEntry != null){
-                        offset = Long.parseLong(new String(dataEntry.getBody()));
-                    }
-                    logger.info("消费者消费offset->{}, partition->{}", offset, partName);
-                    interPiperClient.sendMessageReq(new DataEntryReq(RedisReplicateTask.DATA_GROUP, partName, offset, 1));
-                    isCanReq = false;
-                    try {
-                        Thread.sleep(5);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
         }
     }
+
 
     @Override
     public void stop() {
         super.stop();
         redisWriter.stop();
-        for(PartitionConsumer partitionConsumer : partitionConsumers.values()){
-            partitionConsumer.stop();
-        }
+        jobDataConsumeCluster.close();
     }
 }

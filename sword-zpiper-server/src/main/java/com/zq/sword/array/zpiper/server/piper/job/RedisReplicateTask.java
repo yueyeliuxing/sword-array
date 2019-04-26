@@ -1,11 +1,6 @@
 package com.zq.sword.array.zpiper.server.piper.job;
 
 
-import com.zq.sword.array.data.storage.DataEntry;
-import com.zq.sword.array.data.storage.Partition;
-import com.zq.sword.array.data.storage.PartitionSystem;
-import com.zq.sword.array.id.IdGenerator;
-import com.zq.sword.array.id.SnowFlakeIdGenerator;
 import com.zq.sword.array.redis.command.RedisCommand;
 import com.zq.sword.array.redis.command.RedisCommandSerializer;
 import com.zq.sword.array.redis.handler.CycleDisposeHandler;
@@ -14,15 +9,12 @@ import com.zq.sword.array.redis.interceptor.CommandInterceptor;
 import com.zq.sword.array.redis.replicator.DefaultSlaveRedisReplicator;
 import com.zq.sword.array.redis.replicator.SlaveRedisReplicator;
 import com.zq.sword.array.redis.replicator.listener.RedisReplicatorListener;
-import com.zq.sword.array.tasks.SingleTaskExecutor;
-import com.zq.sword.array.tasks.TaskExecutor;
-import com.zq.sword.array.zpiper.server.piper.cluster.protocol.InterPiperProtocol;
-import com.zq.sword.array.zpiper.server.piper.cluster.protocol.dto.LocatedDataEntry;
+import com.zq.sword.array.zpiper.server.piper.cluster.JobDataBackupCluster;
+import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateData;
+import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateDataId;
+import com.zq.sword.array.zpiper.server.piper.job.processor.ReplicateTaskBackupProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @program: sword-array
@@ -36,57 +28,33 @@ public class RedisReplicateTask extends AbstractTask implements ReplicateTask {
 
     private static final String TASK_NAME = "replicate-task";
 
-    public static final String DATA_GROUP = "commands";
-
     private JobEnv jobEnv;
-
-    private IdGenerator idGenerator;
 
     private SlaveRedisReplicator redisReplicator;
 
-    private PartitionSystem partitionSystem;
+    private JobRuntimeStorage jobRuntimeStorage;
 
-    private TaskExecutor taskExecutor;
+    private JobDataBackupCluster jobDataBackupCluster;
 
-    private List<String> replicatePiperLocations;
-
-    public RedisReplicateTask(JobEnv jobEnv, CycleDisposeHandler<RedisCommand> cycleDisposeHandler, PartitionSystem partitionSystem)  {
+    public RedisReplicateTask(JobEnv jobEnv, CycleDisposeHandler<RedisCommand> cycleDisposeHandler, JobRuntimeStorage jobRuntimeStorage)  {
         super(TASK_NAME);
         this.jobEnv = jobEnv;
 
-        idGenerator = new SnowFlakeIdGenerator();
-
         //设置redis 复制器
-        redisReplicator = new DefaultSlaveRedisReplicator(jobEnv.getSourceRedis());
+        redisReplicator = new DefaultSlaveRedisReplicator(this.jobEnv.getSourceRedis());
         redisReplicator.addCommandInterceptor(new CycleCommandFilterInterceptor(cycleDisposeHandler));
         redisReplicator.addRedisReplicatorListener(new RedisCommandListener());
 
-        this.partitionSystem = partitionSystem;
+        this.jobRuntimeStorage = jobRuntimeStorage;
 
-        this.taskExecutor = new SingleTaskExecutor(3);
-
-        this.replicatePiperLocations = new CopyOnWriteArrayList<>();
-        assignReplicatePiperLocations(jobEnv);
-    }
-
-    /**
-     * 为需要复制的piper赋值
-     * @param jobEnv
-     */
-    private void assignReplicatePiperLocations(JobEnv jobEnv) {
-        List<String> replicatePiperLocations = jobEnv.getReplicatePipers(new PiperChangeListener() {
-            //增加了复制机器
-            @Override
-            public void increment(List<String> piperLocations) {
-                RedisReplicateTask.this.replicatePiperLocations.addAll(piperLocations);
-            }
+        this.jobDataBackupCluster = JobDataBackupCluster.get(jobEnv.getName());
+        this.jobDataBackupCluster.setReplicateTaskBackupProcessor(new ReplicateTaskBackupProcessor() {
 
             @Override
-            public void decrease(List<String> piperLocations) {
-                RedisReplicateTask.this.replicatePiperLocations.removeAll(piperLocations);
+            public void backupReplicateData(ReplicateDataId replicateDataId) {
+
             }
         });
-        this.replicatePiperLocations.addAll(replicatePiperLocations);
     }
 
     /**
@@ -121,37 +89,12 @@ public class RedisReplicateTask extends AbstractTask implements ReplicateTask {
         @Override
         public void receive(RedisCommand command) {
             logger.info("接收到命令，时间：{}", System.currentTimeMillis());
-            DataEntry message = new DataEntry();
-            message.setSeq(idGenerator.nextId());
-            message.setTag(command.getType()+"");
-            message.setBody(redisCommandSerializer.serialize(command));
-            message.setTimestamp(System.currentTimeMillis());
-            handleMessage(message);
+            byte[] data = redisCommandSerializer.serialize(command);
+            long offset = jobRuntimeStorage.writeReplicateData(new ReplicateData(jobEnv.getPiperGroup(), jobEnv.getName(), data));
+
+            //异步发送数据到备份机器上
+            jobDataBackupCluster.backupReplicateData(new ReplicateData(jobEnv.getPiperGroup(), jobEnv.getName(), offset, data));
         }
-    }
-
-    /**
-     * 消息处理
-     * @param message
-     */
-    private void handleMessage(DataEntry message) {
-        //本机接受数据
-        Partition partition = partitionSystem.getOrNewPartition(DATA_GROUP, createPartName());
-        partition.append(message);
-
-        //异步发送数据到备份机器上
-        if(replicatePiperLocations != null && !replicatePiperLocations.isEmpty()){
-            for (String replicatePiperLocation : replicatePiperLocations){
-                taskExecutor.execute(()->{
-                    InterPiperProtocol.InterPiperClient interPiperClient = InterPiperProtocol.getInstance().getOrNewInterPiperClient(replicatePiperLocation);
-                    interPiperClient.sendMessage(new LocatedDataEntry(partition.group(), partition.name(), message));
-                });
-            }
-        }
-    }
-
-    private String createPartName() {
-        return String.format("%s-%s", jobEnv.getPiperGroup(), jobEnv.getName());
     }
 
     @Override

@@ -17,11 +17,14 @@ public enum MessageType {
     HEARTBEAT_REQ((byte)5),
     HEARTBEAT_RESP((byte)6),
 
-    SEND_MESSAGE_REQ((byte)7),
-    SEND_MESSAGE_RESP((byte)8),
+    SEND_REPLICATE_DATA_REQ((byte)7),
+    SEND_REPLICATE_DATA_RESP((byte)8),
 
-    RECEIVE_DATA_REQ((byte)9),
-    RECEIVE_DATA_RESP((byte)10),
+    RECEIVE_REPLICATE_DATA_REQ((byte)9),
+    RECEIVE_REPLICATE_DATA_RESP((byte)10),
+
+    SEND_CONSUME_NEXT_OFFSET_REQ((byte)7),
+    SEND_CONSUME_NEXT_OFFSET_RESP((byte)8),
 
     JOB_COMMAND_REQ((byte)11),
     JOB_COMMAND_RESP((byte)12),

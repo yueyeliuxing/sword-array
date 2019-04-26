@@ -1,14 +1,16 @@
 package com.zq.sword.array.zpiper.server.piper.cluster.protocol;
 
-import com.zq.sword.array.data.storage.DataEntry;
 import com.zq.sword.array.network.rpc.handler.TransferHandler;
 import com.zq.sword.array.network.rpc.message.Header;
 import com.zq.sword.array.network.rpc.message.MessageType;
 import com.zq.sword.array.network.rpc.message.TransferMessage;
 import com.zq.sword.array.network.rpc.server.NettyRpcServer;
 import com.zq.sword.array.tasks.Actuator;
-import com.zq.sword.array.zpiper.server.piper.cluster.protocol.dto.LocatedDataEntry;
-import com.zq.sword.array.zpiper.server.piper.cluster.protocol.dto.DataEntryReq;
+import com.zq.sword.array.zpiper.server.piper.job.processor.ReplicateDataReqProcessor;
+import com.zq.sword.array.zpiper.server.piper.job.dto.ConsumeNextOffset;
+import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateData;
+import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateDataId;
+import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateDataReq;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
@@ -32,7 +34,7 @@ public class PiperServiceProtocol implements Actuator{
     /**
      * broker消息处理器
      */
-    private DataPartitionProcessor brokerMsgProcessor;
+    private ReplicateDataReqProcessor replicateDataReqProcessor;
 
     public PiperServiceProtocol(String piperLocation) {
         String[] params = piperLocation.split(":");
@@ -56,8 +58,8 @@ public class PiperServiceProtocol implements Actuator{
      * 设置Broker 消息处理器
      * @param brokerMsgProcessor
      */
-    public void setDataPartitionProcessor(DataPartitionProcessor brokerMsgProcessor){
-        this.brokerMsgProcessor = brokerMsgProcessor;
+    public void setJobRuntimeStorageProcessor(ReplicateDataReqProcessor brokerMsgProcessor){
+        this.replicateDataReqProcessor = brokerMsgProcessor;
     }
 
     @Override
@@ -87,23 +89,28 @@ public class PiperServiceProtocol implements Actuator{
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
             TransferMessage message = (TransferMessage)msg;
             logger.info("receive msg request : {}", message);
-            if(message.getHeader() != null && message.getHeader().getType() == MessageType.RECEIVE_DATA_REQ.value()) {
-                DataEntryReq msgReq = (DataEntryReq)message.getBody();
-                List<DataEntry> msgs  = brokerMsgProcessor.obtainDataEntries(msgReq);
+            if(message.getHeader() != null && message.getHeader().getType() == MessageType.RECEIVE_REPLICATE_DATA_REQ.value()) {
+                ReplicateDataReq msgReq = (ReplicateDataReq)message.getBody();
+                List<ReplicateData> msgs  = replicateDataReqProcessor.obtainReplicateData(msgReq);
                 ctx.writeAndFlush(buildReceiveMessageResp(msgs));
-            }else if(message.getHeader() != null && message.getHeader().getType() == MessageType.SEND_MESSAGE_REQ.value()) {
-                LocatedDataEntry locatedMessage = (LocatedDataEntry)message.getBody();
-                brokerMsgProcessor.handleLocatedEntry(locatedMessage);
-                ctx.writeAndFlush(buildSendMessageResp(locatedMessage.getMessage()));
+            }else if(message.getHeader() != null && message.getHeader().getType() == MessageType.SEND_REPLICATE_DATA_REQ.value()) {
+                ReplicateData replicateData = (ReplicateData)message.getBody();
+                replicateDataReqProcessor.writeReplicateData(replicateData);
+                ctx.writeAndFlush(buildSendReplicateDataResp(new ReplicateDataId(replicateData.getPiperGroup(),
+                        replicateData.getPiperGroup(), replicateData.getOffset())));
+            }else if(message.getHeader() != null && message.getHeader().getType() == MessageType.SEND_CONSUME_NEXT_OFFSET_REQ.value()) {
+                ConsumeNextOffset consumeNextOffset = (ConsumeNextOffset)message.getBody();
+                replicateDataReqProcessor.writeConsumeNextOffset(consumeNextOffset);
+                ctx.writeAndFlush(buildSendConsumeNextOffsetResp(consumeNextOffset));
             }else {
                 ctx.fireChannelRead(msg);
             }
         }
 
-        private TransferMessage buildReceiveMessageResp(List<DataEntry> msgs) {
+        private TransferMessage buildReceiveMessageResp(List<ReplicateData> msgs) {
             TransferMessage message = new TransferMessage();
             Header header = new Header();
-            header.setType(MessageType.RECEIVE_DATA_RESP.value());
+            header.setType(MessageType.RECEIVE_REPLICATE_DATA_RESP.value());
             message.setHeader(header);
             if(msgs != null){
                 message.setBody(msgs);
@@ -111,14 +118,21 @@ public class PiperServiceProtocol implements Actuator{
             return message;
         }
 
-        private TransferMessage buildSendMessageResp(DataEntry msg) {
+        private TransferMessage buildSendReplicateDataResp(ReplicateDataId replicateDataId) {
             TransferMessage message = new TransferMessage();
             Header header = new Header();
-            header.setType(MessageType.SEND_MESSAGE_RESP.value());
+            header.setType(MessageType.SEND_REPLICATE_DATA_RESP.value());
             message.setHeader(header);
-            if(msg != null){
-                message.setBody(msg.getSeq());
-            }
+            message.setBody(replicateDataId);
+            return message;
+        }
+
+        private TransferMessage buildSendConsumeNextOffsetResp(ConsumeNextOffset consumeNextOffset) {
+            TransferMessage message = new TransferMessage();
+            Header header = new Header();
+            header.setType(MessageType.SEND_CONSUME_NEXT_OFFSET_RESP.value());
+            message.setHeader(header);
+            message.setBody(consumeNextOffset);
             return message;
         }
     }

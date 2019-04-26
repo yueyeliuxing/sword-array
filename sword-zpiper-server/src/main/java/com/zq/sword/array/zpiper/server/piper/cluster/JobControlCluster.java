@@ -2,14 +2,15 @@ package com.zq.sword.array.zpiper.server.piper.cluster;
 
 import com.zq.sword.array.common.event.HotspotEvent;
 import com.zq.sword.array.common.event.HotspotEventListener;
-import com.zq.sword.array.data.storage.PartitionSystem;
-import com.zq.sword.array.zpiper.server.piper.job.*;
+import com.zq.sword.array.zpiper.server.piper.job.processor.ReplicateDataReqProcessor;
 import com.zq.sword.array.zpiper.server.piper.cluster.protocol.PiperNameProtocol;
-import com.zq.sword.array.zpiper.server.piper.cluster.protocol.dto.JobCommand;
-import com.zq.sword.array.zpiper.server.piper.cluster.protocol.dto.JobType;
+import com.zq.sword.array.zpiper.server.piper.cluster.protocol.PiperServiceProtocol;
+import com.zq.sword.array.zpiper.server.piper.job.dto.*;
+import com.zq.sword.array.zpiper.server.piper.job.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,26 +22,36 @@ import java.util.concurrent.ConcurrentHashMap;
  **/
 public class JobControlCluster {
 
+    private Logger logger = LoggerFactory.getLogger(JobControlCluster.class);
+
     /**
      * Job环境集群处理
      */
     private PiperNameProtocol piperNameProtocol;
 
     /**
+     * 本Piper服务通信
+     */
+    private PiperServiceProtocol piperServiceProtocol;
+
+    /**
      * 数据分片存储系统
      */
-    private PartitionSystem partitionSystem;
+    private JobRuntimeStorage jobRuntimeStorage;
 
     private JobSystem jobSystem;
 
-    private Map<String, JobEnv> jobEnvs;
+    private Map<String, JobDataBackupCluster> jobDataBackupClusters;
 
-    public JobControlCluster(PiperNameProtocol piperNameProtocol, PartitionSystem partitionSystem) {
+    public JobControlCluster(PiperNameProtocol piperNameProtocol, PiperServiceProtocol piperServiceProtocol, String jobRuntimeStoragePath) {
         this.piperNameProtocol = piperNameProtocol;
-        this.piperNameProtocol.addJobCommandListener(new JobCommandEventListener());
-        this.partitionSystem = partitionSystem;
+        this.piperServiceProtocol = piperServiceProtocol;
+        this.jobRuntimeStorage = new JobRuntimeStorage(jobRuntimeStoragePath);
         this.jobSystem = JobSystem.getInstance();
-        this.jobEnvs = new ConcurrentHashMap<>();
+        this.jobDataBackupClusters = new ConcurrentHashMap<>();
+
+        this.piperNameProtocol.addJobCommandListener(new JobCommandEventListener());
+        this.piperServiceProtocol.setJobRuntimeStorageProcessor(new DefaultReplicateDataReqProcessor());
     }
 
     /**
@@ -58,19 +69,31 @@ public class JobControlCluster {
                 return;
             }
             Job job = null;
-            JobEnv jobEnv = null;
+            JobDataBackupCluster jobDataBackupCluster = null;
             switch (jobType){
                 case JOB_NEW:
-                    jobEnv = new JobEnv(jobCommand.getName(), jobCommand.getPiperGroup(),
-                            jobCommand.getSourceRedis(), jobCommand.getReplicatePipers(), jobCommand.getTargetPipers());
-                    jobSystem.createJob(new JobConfig(jobEnv, partitionSystem), new JobTaskMonitor());
-                    jobEnvs.put(jobCommand.getName(), jobEnv);
+                    //创建备份器
+                    jobDataBackupCluster = new JobDataBackupCluster(jobCommand.getName(),
+                            jobCommand.getBackupPipers(), piperNameProtocol);
+                    jobDataBackupClusters.put(jobCommand.getName(), jobDataBackupCluster);
+
+                    //创建Job
+                    jobSystem.createJob(new JobEnv(jobCommand.getName(), jobCommand.getPiperGroup(),
+                            jobCommand.getSourceRedis()), jobRuntimeStorage, new JobTaskMonitor());
                     break;
                 case JOB_START:
                     jobSystem.startJob(jobCommand.getName());
                     break;
                 case JOB_DESTROY:
+                    //销毁job
                     jobSystem.destroyJob(jobCommand.getName());
+
+                    //关闭备份器
+                    jobDataBackupCluster = jobDataBackupClusters.get(jobCommand.getName());
+                    if(jobDataBackupCluster != null){
+                        jobDataBackupCluster.close();
+                        jobDataBackupClusters.remove(jobCommand.getName());
+                    }
                     break;
                 case REPLICATE_TASK_RESTART:
                     job = jobSystem.getJob(jobCommand.getName());
@@ -79,14 +102,6 @@ public class JobControlCluster {
                 case WRITE_TASK_RESTART:
                     job = jobSystem.getJob(jobCommand.getName());
                     job.restartWriteTask();
-                    break;
-                case REPLICATE_PIPERS_CHANGE:
-                    jobEnv = jobEnvs.get(jobCommand.getName());
-                    jobEnv.emitterReplicatePiperChangeEvent(jobCommand.getIncrementReplicatePipers(), jobCommand.getIncrementTargetPipers());
-                    break;
-                case TARGET_PIPERS_CHANGE:
-                    jobEnv = jobEnvs.get(jobCommand.getName());
-                    jobEnv.emitterTargetPiperChangeEvent(jobCommand.getIncrementTargetPipers(), jobCommand.getDecreaseTargetPipers());
                     break;
                 default:
                     break;
@@ -103,6 +118,26 @@ public class JobControlCluster {
         @Override
         public void monitor(TaskHealth health) {
             piperNameProtocol.reportJobHealth(health);
+        }
+    }
+
+    /**
+     * 默认的Job运行时存储处理器
+     */
+    private class DefaultReplicateDataReqProcessor implements ReplicateDataReqProcessor {
+        @Override
+        public List<ReplicateData> obtainReplicateData(ReplicateDataReq req) {
+            return jobRuntimeStorage.readReplicateData(req);
+        }
+
+        @Override
+        public void writeReplicateData(ReplicateData replicateData) {
+            JobControlCluster.this.jobRuntimeStorage.writeReplicateData(replicateData);
+        }
+
+        @Override
+        public void writeConsumeNextOffset(ConsumeNextOffset consumeNextOffset) {
+            JobControlCluster.this.jobRuntimeStorage.writeConsumeNextOffset(consumeNextOffset);
         }
     }
 }
