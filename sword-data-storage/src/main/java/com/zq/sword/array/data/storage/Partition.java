@@ -23,6 +23,14 @@ public interface Partition {
     String group();
 
     /**
+     * 在指定偏移处写入数据
+     * @param offset
+     * @param entry
+     * @return
+     */
+    long add(long offset, DataEntry entry);
+
+    /**
      * 追加消息 末尾追加
      * @param entry
      * @return

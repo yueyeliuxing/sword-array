@@ -184,6 +184,15 @@ public class DataPartitionSystem implements PartitionSystem {
     }
 
     @Override
+    public Partition getOrNewPartition(String group, String partName) {
+        Partition partition = getPartition(group, partName);
+        if(partition == null){
+            partition = createPartition(group, partName);
+        }
+        return partition;
+    }
+
+    @Override
     public Partition move(Partition partition, String group) {
         return move(partition, group, partition.name());
     }

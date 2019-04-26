@@ -17,6 +17,10 @@ public class SingleTaskExecutor implements TaskExecutor {
         executor = Executors.newFixedThreadPool(1);
     }
 
+    public SingleTaskExecutor(int num) {
+        executor = Executors.newFixedThreadPool(num);
+    }
+
     @Override
     public void execute(Task task) {
         executor.submit(()->{task.execute();});

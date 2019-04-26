@@ -75,9 +75,7 @@ public class NettyRpcClient implements RpcClient {
                     });
             logger.info("连接服务：{}:{}", host, port);
             ChannelFuture future = b.connect(host, port).sync();
-
             channel = future.channel();
-            channel.closeFuture().sync();
         }catch (Exception e){
             group.shutdownGracefully();
             logger.error("sync error", e);
@@ -101,6 +99,13 @@ public class NettyRpcClient implements RpcClient {
     }
 
     @Override
+    public void write(Object msg) {
+        if(!isClose()){
+            channel.writeAndFlush(msg);
+        }
+    }
+
+    @Override
     public void disconnect() {
         if(channel != null && channel.isOpen()){
             channel.close();
@@ -108,11 +113,6 @@ public class NettyRpcClient implements RpcClient {
         if(group != null){
             group.shutdownGracefully();
         }
-    }
-
-    @Override
-    public void reconnect() {
-        connect();
     }
 
     @Override

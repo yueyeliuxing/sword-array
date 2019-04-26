@@ -22,7 +22,21 @@ public abstract class AbstractThreadActuator implements Actuator {
         thread = new Thread(()->{
             run();
         });
+        thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
+                handleEx(e);
+            }
+        });
         thread.start();
+    }
+
+    /**
+     * 处理异常
+     * @param e
+     */
+    public void handleEx(Throwable e){
+
     }
 
     public abstract void run();

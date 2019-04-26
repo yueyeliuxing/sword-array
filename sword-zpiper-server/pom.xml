@@ -75,19 +75,13 @@
 
 		<dependency>
 			<groupId>com.zq.sword</groupId>
-			<artifactId>sword-mq-jade</artifactId>
+			<artifactId>sword-data-storage</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.zq.sword</groupId>
 			<artifactId>sword-data-structure</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.zq.sword</groupId>
-			<artifactId>sword-config-lemna</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

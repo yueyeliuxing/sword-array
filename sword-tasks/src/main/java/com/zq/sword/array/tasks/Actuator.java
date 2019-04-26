@@ -14,7 +14,7 @@ public interface Actuator {
     void start();
 
     /**
-     * 关闭
+     * 暂停
      */
     void stop();
 }

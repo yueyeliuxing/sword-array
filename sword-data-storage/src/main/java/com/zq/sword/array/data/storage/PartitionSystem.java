@@ -57,6 +57,14 @@ public interface PartitionSystem {
     Partition createPartition(String group, String partName);
 
     /**
+     * 得到指定ID的分片数据
+     * @param group
+     * @param partName
+     * @return
+     */
+    Partition getOrNewPartition(String group, String partName);
+
+    /**
      * 把指定分片移动到其他分组
      * @param partition 分片
      * @param group 指定分组

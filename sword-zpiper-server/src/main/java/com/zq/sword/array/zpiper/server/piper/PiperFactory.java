@@ -1,7 +1,5 @@
 package com.zq.sword.array.zpiper.server.piper;
 
-import com.zq.sword.array.zpiper.server.piper.cluster.data.NamePiper;
-import com.zq.sword.array.zpiper.server.piper.cluster.data.PiperType;
 import com.zq.sword.array.zpiper.server.piper.config.PiperConfig;
 
 /**
@@ -18,23 +16,6 @@ public class PiperFactory {
      * @return
      */
     public static Piper createPiper(PiperConfig piperConfig){
-        Piper piper = null;
-        NamePiper namePiper = piperConfig.namePiper();
-        PiperType type = namePiper.getType();
-        switch (type){
-            case X_SIMPLE:
-                piper = new RedisXPiper(piperConfig);
-                break;
-            case SIMPLE:
-                piper = new RedisPiper(piperConfig);
-                break;
-            case PROXY:
-                piper = new RedisProxyPiper(piperConfig);
-                break;
-            default:
-                break;
-
-        }
-        return piper;
+        return new RedisPiper(piperConfig);
     }
 }

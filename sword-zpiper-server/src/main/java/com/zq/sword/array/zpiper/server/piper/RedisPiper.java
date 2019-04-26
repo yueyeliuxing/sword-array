@@ -1,28 +1,24 @@
 package com.zq.sword.array.zpiper.server.piper;
 
-import com.zq.sword.array.id.IdGenerator;
-import com.zq.sword.array.id.SnowFlakeIdGenerator;
-import com.zq.sword.array.mq.jade.consumer.ConsumeStatus;
-import com.zq.sword.array.mq.jade.consumer.Consumer;
-import com.zq.sword.array.mq.jade.consumer.MessageListener;
-import com.zq.sword.array.mq.jade.msg.Message;
-import com.zq.sword.array.mq.jade.producer.Producer;
-import com.zq.sword.array.redis.command.CommandMetadata;
-import com.zq.sword.array.redis.command.RedisCommand;
-import com.zq.sword.array.redis.command.RedisCommandDeserializer;
-import com.zq.sword.array.redis.command.RedisCommandSerializer;
-import com.zq.sword.array.redis.handler.CycleDisposeHandler;
-import com.zq.sword.array.redis.handler.SimpleCycleDisposeHandler;
-import com.zq.sword.array.redis.interceptor.AbstractCommandInterceptor;
-import com.zq.sword.array.redis.interceptor.CommandInterceptor;
-import com.zq.sword.array.redis.replicator.DefaultSlaveRedisReplicator;
-import com.zq.sword.array.redis.replicator.SlaveRedisReplicator;
-import com.zq.sword.array.redis.replicator.listener.RedisReplicatorListener;
-import com.zq.sword.array.redis.writer.DefaultRedisWriter;
-import com.zq.sword.array.redis.writer.RedisWriter;
+import com.zq.sword.array.common.event.HotspotEvent;
+import com.zq.sword.array.common.event.HotspotEventListener;
+import com.zq.sword.array.data.storage.DataPartitionSystem;
+import com.zq.sword.array.data.storage.PartitionSystem;
+import com.zq.sword.array.data.storage.Partition;
+import com.zq.sword.array.zpiper.server.piper.protocol.dto.LocatedDataEntry;
+import com.zq.sword.array.data.storage.DataEntry;
+import com.zq.sword.array.zpiper.server.piper.protocol.dto.DataEntryReq;
 import com.zq.sword.array.zpiper.server.piper.config.PiperConfig;
+import com.zq.sword.array.zpiper.server.piper.job.*;
+import com.zq.sword.array.zpiper.server.piper.job.command.JobCommand;
+import com.zq.sword.array.zpiper.server.piper.job.command.JobType;
+import com.zq.sword.array.zpiper.server.piper.protocol.BrokerMsgProcessor;
+import com.zq.sword.array.zpiper.server.piper.protocol.PiperNameProtocol;
+import com.zq.sword.array.zpiper.server.piper.protocol.PiperServiceProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * @program: sword-array
@@ -30,144 +26,139 @@ import org.slf4j.LoggerFactory;
  * @author: zhouqi1
  * @create: 2019-01-23 15:50
  **/
-public class RedisPiper extends AbstractPiper implements Piper{
+public class RedisPiper implements Piper{
 
     private Logger logger = LoggerFactory.getLogger(RedisPiper.class);
 
-    protected Consumer consumer;
+    protected NamePiper namePiper;
 
-    protected Producer producer;
+    private PartitionSystem partitionSystem;
 
-    private IdGenerator idGenerator;
+    private JobSystem jobSystem;
 
-    private SlaveRedisReplicator redisReplicator;
+    /**
+     * Piper服务提供通信
+     */
+    private PiperServiceProtocol piperServiceProtocol;
 
-    private RedisWriter redisWriter;
+    /**
+     * 请求piperNamer的客户端
+     */
+    private PiperNameProtocol piperNameProtocol;
+
 
     public RedisPiper(PiperConfig config) {
-        super(config);
+        this.namePiper = config.namePiper();
+        this.piperServiceProtocol = createPiperServiceProtocol(config.piperLocation());
+        this.partitionSystem = DataPartitionSystem.get(config.dataStorePath());
+        this.piperNameProtocol = createPiperNameProtocol(config);
+        this.jobSystem = JobSystem.getInstance();
 
-        //创建生产者
-        this.producer = createProducer();
-
-        //创建消费者
-        this.consumer  = createConsumer(id()+"");
-        this.consumer.bindingMessageListener(new ReceiveMessageListener());
-
-        idGenerator = new SnowFlakeIdGenerator();
-
-        CycleDisposeHandler<RedisCommand> cycleDisposeHandler = new SimpleCycleDisposeHandler();
-
-        //设置redis 复制器
-        redisReplicator = new DefaultSlaveRedisReplicator(config.redisUri());
-        redisReplicator.addCommandInterceptor(new CycleCommandFilterInterceptor(cycleDisposeHandler));
-        redisReplicator.addRedisReplicatorListener(new RedisCommandListener());
-        //设置redis 写入器
-        redisWriter = new DefaultRedisWriter(config.redisConfig());
-        redisWriter.addCommandInterceptor(new CycleCommandAddInterceptor(cycleDisposeHandler));
     }
 
     /**
-     * 接收消息监听器
+     * 创建piper->namer的通信客户端
+     * @param config
+     * @return
      */
-    public class ReceiveMessageListener implements MessageListener {
+    private PiperNameProtocol createPiperNameProtocol(PiperConfig config) {
+        PiperNameProtocol piperNameProtocol = new PiperNameProtocol(config.namerLocation());
+        piperNameProtocol.addJobCommandListener(new JobCommandEventListener());
+        return piperNameProtocol;
+    }
 
-        @Override
-        public ConsumeStatus consume(Message message) {
-            try{
-                logger.info("接收消息->{}", message);
-                redisWriter.write(new RedisCommandDeserializer().deserialize(message.getBody()), metadata -> {
-                    if(metadata.getException() != null){
-                        logger.error("写入redis出错", metadata.getException());
-                    }
-                });
-            }catch (Exception e){
-                logger.error("接收消息发生异常", e);
-                return ConsumeStatus.CONSUME_FAIL;
+    /**
+     * 创建piper向外提供服务
+     * @param piperLocation
+     * @return
+     */
+    private PiperServiceProtocol createPiperServiceProtocol(String piperLocation){
+        PiperServiceProtocol piperServiceProtocol = new PiperServiceProtocol(piperLocation);
+        piperServiceProtocol.setBrokerMsgProcessor(new BrokerMsgProcessor() {
+            @Override
+            public List<DataEntry> obtainMessages(DataEntryReq req) {
+                Partition partition = partitionSystem.getPartition(req.getPartGroup(), req.getPartName());
+                if(partition == null){
+                    logger.warn("查询的分片不存在, group:{} name:{}", req.getPartGroup(), req.getPartName());
+                    return null;
+                }
+                return partition.orderGet(req.getOffset(), req.getReqSize());
             }
-            return ConsumeStatus.CONSUME_SUCCESS;
-        }
+
+            @Override
+            public void handleLocatedMessage(LocatedDataEntry locatedMessage) {
+                Partition partition = partitionSystem.getOrNewPartition(locatedMessage.getPartGroup(), locatedMessage.getPartName());
+                partition.append(locatedMessage.getEntry());
+            }
+        });
+        return piperServiceProtocol;
     }
 
     @Override
-    protected void doStartModule() {
-        producer.start();
-        consumer.start();
-        redisWriter.start();
-        redisReplicator.start();
+    public void start() {
+        piperServiceProtocol.start();
+        piperNameProtocol.start();
+
+        //向namer注册piper
+        piperNameProtocol.registerPiper(namePiper);
+
     }
 
     @Override
-    protected void doStopModule() {
-        producer.stop();
-        consumer.stop();
-        redisReplicator.stop();
-        redisWriter.stop();
+    public void stop() {
+        piperNameProtocol.stop();
+        piperServiceProtocol.stop();
     }
 
     /**
-     * redis 命令监听器
+     * 任务命令监听器
      */
-    private class RedisCommandListener implements RedisReplicatorListener {
+    private class JobCommandEventListener implements HotspotEventListener<JobCommand> {
 
-        private RedisCommandSerializer redisCommandSerializer = new RedisCommandSerializer();
+        private Logger logger = LoggerFactory.getLogger(JobCommandEventListener.class);
 
         @Override
-        public void receive(RedisCommand command) {
-            logger.info("接收到命令，时间：{}", System.currentTimeMillis());
-            Message message = new Message();
-            message.setMsgId(idGenerator.nextId());
-            message.setTopic(namePiper.getGroup());
-            message.setTag(command.getType()+"");
-            message.setBody(redisCommandSerializer.serialize(command));
-            message.setTimestamp(System.currentTimeMillis());
-            producer.sendMsg(message);
-        }
-    }
-
-    /**
-     * 循环命令过滤拦截器
-     */
-    private class CycleCommandFilterInterceptor extends AbstractCommandInterceptor implements CommandInterceptor {
-
-        private CycleDisposeHandler<RedisCommand> cycleDisposeHandler;
-
-        public CycleCommandFilterInterceptor(CycleDisposeHandler<RedisCommand> cycleDisposeHandler) {
-            this.cycleDisposeHandler = cycleDisposeHandler;
-        }
-
-        @Override
-        public RedisCommand interceptor(RedisCommand command) {
-            logger.info("命令比对->{}", command);
-            if(cycleDisposeHandler.isCycleData(command)){
-                logger.info("命令存在循环缓存->{}", command);
-                return null;
+        public void listen(HotspotEvent<JobCommand> dataEvent) {
+            JobCommand jobCommand = dataEvent.getData();
+            JobType jobType = JobType.toType(jobCommand.getType());
+            if(jobType == null){
+                return;
             }
-            return command;
+            Job job = null;
+            switch (jobType){
+                case JOB_NEW:
+                    jobSystem.createJob(new JobConfig(jobCommand,  namePiper, partitionSystem), new JobTaskMonitor());
+                    break;
+                case JOB_START:
+                    jobSystem.startJob(jobCommand.getName());
+                    break;
+                case JOB_DESTROY:
+                    jobSystem.destroyJob(jobCommand.getName());
+                    break;
+                case REPLICATE_TASK_RESTART:
+                    job = jobSystem.getJob(jobCommand.getName());
+                    job.restartReplicateTask();
+                    break;
+                case WRITE_TASK_RESTART:
+                    job = jobSystem.getJob(jobCommand.getName());
+                    job.restartWriteTask();
+                    break;
+                default:
+                    break;
+            }
+            logger.info("获取PiperNamer命令:{}", jobCommand);
         }
     }
-
 
     /**
-     * 循环命令添加拦截器
+     * Job健康监控器
      */
-    private class CycleCommandAddInterceptor extends AbstractCommandInterceptor implements CommandInterceptor {
-
-        private CycleDisposeHandler<RedisCommand> cycleDisposeHandler;
-
-        public CycleCommandAddInterceptor(CycleDisposeHandler<RedisCommand> cycleDisposeHandler) {
-            this.cycleDisposeHandler = cycleDisposeHandler;
-        }
+    private class JobTaskMonitor implements TaskMonitor{
 
         @Override
-        public void onAcknowledgment(CommandMetadata metadata) {
-            Exception exception = metadata.getException();
-            if(exception == null){
-                logger.info("命令写入循环缓存->{}", metadata.getCommand());
-                cycleDisposeHandler.addCycleData(metadata.getCommand());
-            }
+        public void monitor(TaskHealth health) {
+            piperNameProtocol.reportJobHealth(health);
         }
     }
-
 
 }

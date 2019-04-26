@@ -23,14 +23,13 @@ public enum MessageType {
     RECEIVE_DATA_REQ((byte)9),
     RECEIVE_DATA_RESP((byte)10),
 
-    POLL_T_RIGHT_DATA_BACKUP_REQ((byte)11),
-    POLL_T_RIGHT_DATA_BACKUP_RESP((byte)12),
+    JOB_COMMAND_REQ((byte)11),
+    JOB_COMMAND_RESP((byte)12),
 
-    POLL_T_LEFT_DATA_BACKUP_REQ((byte)13),
-    POLL_T_LEFT_DATA_BACKUP_RESP((byte)14),
+    REGISTER_PIPER_REQ((byte)11),
+    REGISTER_PIPER_RESP((byte)12),
 
-    POLL_T_LEFT_DATA_DEL_BACKUP_REQ((byte)15),
-    POLL_T_LEFT_DATA_DEL_BACKUP_RESP((byte)16),
+    REPORT_JOB_HEALTH((byte)13),
     ;
 
     MessageType(byte value) {

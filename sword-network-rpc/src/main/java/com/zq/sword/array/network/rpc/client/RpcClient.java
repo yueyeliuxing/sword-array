@@ -21,15 +21,17 @@ public interface RpcClient {
      */
     void connect();
 
+
+    /**
+     * 写入数据
+     * @param msg
+     */
+    void write(Object msg);
+
     /**
      * 关闭
      */
     void disconnect();
-
-    /**
-     * 重启
-     */
-    void reconnect();
 
     /**
      * 是否关闭

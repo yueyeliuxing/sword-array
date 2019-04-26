@@ -72,7 +72,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.zq.sword</groupId>
-			<artifactId>sword-mq-jade</artifactId>
+			<artifactId>sword-data-storage</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/redis.clients/jedis -->

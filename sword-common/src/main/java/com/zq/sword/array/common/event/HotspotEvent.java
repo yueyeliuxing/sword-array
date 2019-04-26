@@ -19,6 +19,11 @@ public class HotspotEvent<T> {
 
     private T data;
 
+    public HotspotEvent(T data) {
+        this.type = type;
+        this.data = data;
+    }
+
     public HotspotEvent(HotspotEventType type, T data) {
         this.type = type;
         this.data = data;

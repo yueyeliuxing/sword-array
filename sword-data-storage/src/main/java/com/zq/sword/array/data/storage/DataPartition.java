@@ -47,6 +47,11 @@ public class DataPartition extends AbstractPartition implements Partition {
     }
 
     @Override
+    public long add(long offset, DataEntry entry) {
+        return dataFile.write(offset, entry);
+    }
+
+    @Override
     public long append(DataEntry entry) {
         return dataFile.write(entry);
     }
