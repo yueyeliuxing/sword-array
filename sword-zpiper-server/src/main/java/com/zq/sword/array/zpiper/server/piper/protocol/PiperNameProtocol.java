@@ -13,7 +13,7 @@ import com.zq.sword.array.network.rpc.message.TransferMessage;
 import com.zq.sword.array.tasks.Actuator;
 import com.zq.sword.array.zpiper.server.piper.NamePiper;
 import com.zq.sword.array.zpiper.server.piper.job.TaskHealth;
-import com.zq.sword.array.zpiper.server.piper.job.command.JobCommand;
+import com.zq.sword.array.zpiper.server.piper.protocol.dto.JobCommand;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;

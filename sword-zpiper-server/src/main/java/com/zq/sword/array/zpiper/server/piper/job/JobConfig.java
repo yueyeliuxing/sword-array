@@ -1,8 +1,6 @@
 package com.zq.sword.array.zpiper.server.piper.job;
 
 import com.zq.sword.array.data.storage.PartitionSystem;
-import com.zq.sword.array.zpiper.server.piper.NamePiper;
-import com.zq.sword.array.zpiper.server.piper.job.command.JobCommand;
 import lombok.Getter;
 
 /**
@@ -13,13 +11,11 @@ import lombok.Getter;
  **/
 @Getter
 public class JobConfig {
-    private JobCommand jobCommand;
-    private NamePiper namePiper;
-    private PartitionSystem broker;
+    private JobEnv jobEnv;
+    private PartitionSystem partitionSystem;
 
-    public JobConfig(JobCommand jobCommand, NamePiper namePiper, PartitionSystem broker) {
-        this.jobCommand = jobCommand;
-        this.namePiper = namePiper;
-        this.broker = broker;
+    public JobConfig(JobEnv jobEnv, PartitionSystem partitionSystem) {
+        this.jobEnv = jobEnv;
+        this.partitionSystem = partitionSystem;
     }
 }

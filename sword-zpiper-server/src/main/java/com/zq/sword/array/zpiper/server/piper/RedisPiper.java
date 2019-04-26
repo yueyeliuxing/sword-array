@@ -1,20 +1,16 @@
 package com.zq.sword.array.zpiper.server.piper;
 
-import com.zq.sword.array.common.event.HotspotEvent;
-import com.zq.sword.array.common.event.HotspotEventListener;
-import com.zq.sword.array.data.storage.DataPartitionSystem;
-import com.zq.sword.array.data.storage.PartitionSystem;
-import com.zq.sword.array.data.storage.Partition;
-import com.zq.sword.array.zpiper.server.piper.protocol.dto.LocatedDataEntry;
 import com.zq.sword.array.data.storage.DataEntry;
-import com.zq.sword.array.zpiper.server.piper.protocol.dto.DataEntryReq;
+import com.zq.sword.array.data.storage.DataPartitionSystem;
+import com.zq.sword.array.data.storage.Partition;
+import com.zq.sword.array.data.storage.PartitionSystem;
 import com.zq.sword.array.zpiper.server.piper.config.PiperConfig;
-import com.zq.sword.array.zpiper.server.piper.job.*;
-import com.zq.sword.array.zpiper.server.piper.job.command.JobCommand;
-import com.zq.sword.array.zpiper.server.piper.job.command.JobType;
+import com.zq.sword.array.zpiper.server.piper.job.JobControlCluster;
 import com.zq.sword.array.zpiper.server.piper.protocol.BrokerMsgProcessor;
 import com.zq.sword.array.zpiper.server.piper.protocol.PiperNameProtocol;
 import com.zq.sword.array.zpiper.server.piper.protocol.PiperServiceProtocol;
+import com.zq.sword.array.zpiper.server.piper.protocol.dto.DataEntryReq;
+import com.zq.sword.array.zpiper.server.piper.protocol.dto.LocatedDataEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,8 +30,6 @@ public class RedisPiper implements Piper{
 
     private PartitionSystem partitionSystem;
 
-    private JobSystem jobSystem;
-
     /**
      * Piper服务提供通信
      */
@@ -46,14 +40,18 @@ public class RedisPiper implements Piper{
      */
     private PiperNameProtocol piperNameProtocol;
 
+    /**
+     * 分布式任务执行器
+     */
+    private JobControlCluster jobEnvCluster;
+
 
     public RedisPiper(PiperConfig config) {
         this.namePiper = config.namePiper();
         this.piperServiceProtocol = createPiperServiceProtocol(config.piperLocation());
         this.partitionSystem = DataPartitionSystem.get(config.dataStorePath());
         this.piperNameProtocol = createPiperNameProtocol(config);
-        this.jobSystem = JobSystem.getInstance();
-
+        this.jobEnvCluster = new JobControlCluster(piperNameProtocol, partitionSystem);
     }
 
     /**
@@ -63,7 +61,6 @@ public class RedisPiper implements Piper{
      */
     private PiperNameProtocol createPiperNameProtocol(PiperConfig config) {
         PiperNameProtocol piperNameProtocol = new PiperNameProtocol(config.namerLocation());
-        piperNameProtocol.addJobCommandListener(new JobCommandEventListener());
         return piperNameProtocol;
     }
 
@@ -109,56 +106,4 @@ public class RedisPiper implements Piper{
         piperNameProtocol.stop();
         piperServiceProtocol.stop();
     }
-
-    /**
-     * 任务命令监听器
-     */
-    private class JobCommandEventListener implements HotspotEventListener<JobCommand> {
-
-        private Logger logger = LoggerFactory.getLogger(JobCommandEventListener.class);
-
-        @Override
-        public void listen(HotspotEvent<JobCommand> dataEvent) {
-            JobCommand jobCommand = dataEvent.getData();
-            JobType jobType = JobType.toType(jobCommand.getType());
-            if(jobType == null){
-                return;
-            }
-            Job job = null;
-            switch (jobType){
-                case JOB_NEW:
-                    jobSystem.createJob(new JobConfig(jobCommand,  namePiper, partitionSystem), new JobTaskMonitor());
-                    break;
-                case JOB_START:
-                    jobSystem.startJob(jobCommand.getName());
-                    break;
-                case JOB_DESTROY:
-                    jobSystem.destroyJob(jobCommand.getName());
-                    break;
-                case REPLICATE_TASK_RESTART:
-                    job = jobSystem.getJob(jobCommand.getName());
-                    job.restartReplicateTask();
-                    break;
-                case WRITE_TASK_RESTART:
-                    job = jobSystem.getJob(jobCommand.getName());
-                    job.restartWriteTask();
-                    break;
-                default:
-                    break;
-            }
-            logger.info("获取PiperNamer命令:{}", jobCommand);
-        }
-    }
-
-    /**
-     * Job健康监控器
-     */
-    private class JobTaskMonitor implements TaskMonitor{
-
-        @Override
-        public void monitor(TaskHealth health) {
-            piperNameProtocol.reportJobHealth(health);
-        }
-    }
-
 }

@@ -39,9 +39,9 @@ public class JobSystem {
      */
     public void createJob(JobConfig config, TaskMonitor monitor){
         CycleDisposeHandler<RedisCommand> cycleDisposeHandler = new SimpleCycleDisposeHandler();
-        Job job = new Job(config.getJobCommand().getName());
-        job.setReplicateTask(new RedisReplicateTask(config.getJobCommand(),  config.getNamePiper(), cycleDisposeHandler, config.getBroker()));
-        job.setWriteTask(new RedisWriteTask(config.getJobCommand(), config.getBroker(), cycleDisposeHandler));
+        Job job = new Job(config.getJobEnv().getName());
+        job.setReplicateTask(new RedisReplicateTask(config.getJobEnv(), cycleDisposeHandler, config.getPartitionSystem()));
+        job.setWriteTask(new RedisWriteTask(config.getJobEnv(), config.getPartitionSystem(), cycleDisposeHandler));
         job.setTaskMonitor(monitor);;
         jobs.put(job.name(), job);
     }

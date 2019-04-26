@@ -18,15 +18,15 @@ import com.zq.sword.array.redis.writer.DefaultRedisWriter;
 import com.zq.sword.array.redis.writer.RedisWriter;
 import com.zq.sword.array.tasks.AbstractThreadActuator;
 import com.zq.sword.array.tasks.Actuator;
-import com.zq.sword.array.zpiper.server.piper.job.command.JobCommand;
 import com.zq.sword.array.zpiper.server.piper.protocol.InterPiperProtocol;
 import com.zq.sword.array.zpiper.server.piper.protocol.dto.DataEntryReq;
 import com.zq.sword.array.zpiper.server.piper.protocol.dto.LocatedDataEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @program: sword-array
@@ -43,29 +43,71 @@ public class RedisWriteTask extends AbstractTask implements WriteTask {
 
     private IdGenerator idGenerator;
 
-    private JobCommand jobCommand;
+    private JobEnv jobEnv;
 
     private PartitionSystem partitionSystem;
 
     private RedisWriter redisWriter;
 
-    private List<PartitionConsumer> partitionConsumers;
+    private Map<String, PartitionConsumer> partitionConsumers;
+
+
 
     private volatile boolean isCanReq = true;
 
-    public RedisWriteTask(JobCommand jobCommand, PartitionSystem partitionSystem, CycleDisposeHandler<RedisCommand> cycleDisposeHandler) {
+    public RedisWriteTask(JobEnv jobEnv, PartitionSystem partitionSystem, CycleDisposeHandler<RedisCommand> cycleDisposeHandler) {
         super(TASK_NAME);
-        this.jobCommand = jobCommand;
+        this.jobEnv = jobEnv;
         this.partitionSystem = partitionSystem;
 
         idGenerator = new SnowFlakeIdGenerator();
 
         //设置redis 写入器
-        redisWriter = new DefaultRedisWriter(new RedisConfig(jobCommand.getSourceRedis()));
+        redisWriter = new DefaultRedisWriter(new RedisConfig(jobEnv.getSourceRedis()));
         redisWriter.addCommandInterceptor(new CycleCommandAddInterceptor(cycleDisposeHandler));
 
-        this.partitionConsumers = new ArrayList<>();
+        this.partitionConsumers = new ConcurrentHashMap<>();
+        assignTargetPartitionConsumers(jobEnv);
+
+
     }
+
+    /**
+     * 为目标分片创建消费者
+     * @param jobEnv
+     */
+    private void assignTargetPartitionConsumers(JobEnv jobEnv) {
+        //得到其他pipergroup的Piper远程分片 消费数据
+        List<String> targetPiperLocations = jobEnv.getTargetPipers(new PiperChangeListener() {
+            @Override
+            public void increment(List<String> piperLocations) {
+                if(piperLocations != null && !piperLocations.isEmpty()){
+                    for (String targetPiperLocation : piperLocations){
+                        PartitionConsumer consumer = createPartitionConsumer(targetPiperLocation);
+                        partitionConsumers.put(targetPiperLocation, consumer);
+                    }
+                }
+            }
+
+            @Override
+            public void decrease(List<String> piperLocations) {
+                if(piperLocations != null && !piperLocations.isEmpty()){
+                    for (String targetPiperLocation : piperLocations){
+                        PartitionConsumer consumer = partitionConsumers.get(targetPiperLocation);
+                        consumer.stop();
+                        partitionConsumers.remove(targetPiperLocation);
+                    }
+                }
+            }
+        });
+        if(targetPiperLocations != null && !targetPiperLocations.isEmpty()){
+            for (String targetPiperLocation : targetPiperLocations){
+                PartitionConsumer consumer = createPartitionConsumer(targetPiperLocation);
+                partitionConsumers.put(targetPiperLocation, consumer);
+            }
+        }
+    }
+
 
     /**
      * 创建InterPiperClient
@@ -133,19 +175,16 @@ public class RedisWriteTask extends AbstractTask implements WriteTask {
     @Override
     public void run() {
         redisWriter.start();
-
-        //得到其他pipergroup的Piper远程分片 消费数据
-        List<String> targetPiperLocations = jobCommand.getTargetPipers();
-        if(targetPiperLocations != null && !targetPiperLocations.isEmpty()){
-            for (String targetPiperLocation : targetPiperLocations){
-                String[] groupLocations = targetPiperLocation.split("\\|");
-                InterPiperProtocol.InterPiperClient interPiperClient = createInterPiperClient(groupLocations[1]);
-                PartitionConsumer consumer = new PartitionConsumer(interPiperClient, createPartName(groupLocations[0]));
-                consumer.start();
-                partitionConsumers.add(consumer);
-            }
+        for(PartitionConsumer partitionConsumer : partitionConsumers.values()){
+            partitionConsumer.start();
         }
         super.run();
+    }
+
+    private PartitionConsumer createPartitionConsumer(String targetPiperLocation) {
+        String[] groupLocations = targetPiperLocation.split("\\|");
+        InterPiperProtocol.InterPiperClient interPiperClient = createInterPiperClient(groupLocations[1]);
+        return new PartitionConsumer(interPiperClient, createPartName(groupLocations[0]));
     }
 
     /**
@@ -154,7 +193,7 @@ public class RedisWriteTask extends AbstractTask implements WriteTask {
      * @return
      */
     private String createPartName(String targetGroup) {
-        return String.format("%s:%s", targetGroup, jobCommand.getName());
+        return String.format("%s:%s", targetGroup, jobEnv.getName());
     }
 
     /**
@@ -195,6 +234,15 @@ public class RedisWriteTask extends AbstractTask implements WriteTask {
                     }
                 }
             }
+        }
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+        redisWriter.stop();
+        for(PartitionConsumer partitionConsumer : partitionConsumers.values()){
+            partitionConsumer.stop();
         }
     }
 }

@@ -16,14 +16,13 @@ import com.zq.sword.array.redis.replicator.SlaveRedisReplicator;
 import com.zq.sword.array.redis.replicator.listener.RedisReplicatorListener;
 import com.zq.sword.array.tasks.SingleTaskExecutor;
 import com.zq.sword.array.tasks.TaskExecutor;
-import com.zq.sword.array.zpiper.server.piper.NamePiper;
-import com.zq.sword.array.zpiper.server.piper.job.command.JobCommand;
 import com.zq.sword.array.zpiper.server.piper.protocol.InterPiperProtocol;
 import com.zq.sword.array.zpiper.server.piper.protocol.dto.LocatedDataEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @program: sword-array
@@ -39,9 +38,7 @@ public class RedisReplicateTask extends AbstractTask implements ReplicateTask {
 
     public static final String DATA_GROUP = "commands";
 
-    private NamePiper namePiper;
-
-    private JobCommand jobCommand;
+    private JobEnv jobEnv;
 
     private IdGenerator idGenerator;
 
@@ -51,22 +48,45 @@ public class RedisReplicateTask extends AbstractTask implements ReplicateTask {
 
     private TaskExecutor taskExecutor;
 
-    public RedisReplicateTask(JobCommand jobCommand, NamePiper namePiper, CycleDisposeHandler<RedisCommand> cycleDisposeHandler, PartitionSystem partitionSystem)  {
-        super(TASK_NAME);
+    private List<String> replicatePiperLocations;
 
-        this.namePiper = namePiper;
-        this.jobCommand = jobCommand;
+    public RedisReplicateTask(JobEnv jobEnv, CycleDisposeHandler<RedisCommand> cycleDisposeHandler, PartitionSystem partitionSystem)  {
+        super(TASK_NAME);
+        this.jobEnv = jobEnv;
 
         idGenerator = new SnowFlakeIdGenerator();
 
         //设置redis 复制器
-        redisReplicator = new DefaultSlaveRedisReplicator(jobCommand.getSourceRedis());
+        redisReplicator = new DefaultSlaveRedisReplicator(jobEnv.getSourceRedis());
         redisReplicator.addCommandInterceptor(new CycleCommandFilterInterceptor(cycleDisposeHandler));
         redisReplicator.addRedisReplicatorListener(new RedisCommandListener());
 
         this.partitionSystem = partitionSystem;
 
         this.taskExecutor = new SingleTaskExecutor(3);
+
+        this.replicatePiperLocations = new CopyOnWriteArrayList<>();
+        assignReplicatePiperLocations(jobEnv);
+    }
+
+    /**
+     * 为需要复制的piper赋值
+     * @param jobEnv
+     */
+    private void assignReplicatePiperLocations(JobEnv jobEnv) {
+        List<String> replicatePiperLocations = jobEnv.getReplicatePipers(new PiperChangeListener() {
+            //增加了复制机器
+            @Override
+            public void increment(List<String> piperLocations) {
+                RedisReplicateTask.this.replicatePiperLocations.addAll(piperLocations);
+            }
+
+            @Override
+            public void decrease(List<String> piperLocations) {
+                RedisReplicateTask.this.replicatePiperLocations.removeAll(piperLocations);
+            }
+        });
+        this.replicatePiperLocations.addAll(replicatePiperLocations);
     }
 
     /**
@@ -120,7 +140,6 @@ public class RedisReplicateTask extends AbstractTask implements ReplicateTask {
         partition.append(message);
 
         //异步发送数据到备份机器上
-        List<String> replicatePiperLocations = jobCommand.getReplicatePipers();
         if(replicatePiperLocations != null && !replicatePiperLocations.isEmpty()){
             for (String replicatePiperLocation : replicatePiperLocations){
                 taskExecutor.execute(()->{
@@ -132,7 +151,7 @@ public class RedisReplicateTask extends AbstractTask implements ReplicateTask {
     }
 
     private String createPartName() {
-        return String.format("%s-%s", namePiper.getGroup(), jobCommand.getName());
+        return String.format("%s-%s", jobEnv.getPiperGroup(), jobEnv.getName());
     }
 
     @Override

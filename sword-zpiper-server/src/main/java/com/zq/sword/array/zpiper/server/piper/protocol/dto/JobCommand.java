@@ -1,4 +1,4 @@
-package com.zq.sword.array.zpiper.server.piper.job.command;
+package com.zq.sword.array.zpiper.server.piper.protocol.dto;
 
 import lombok.Data;
 import lombok.ToString;
@@ -18,7 +18,7 @@ public class JobCommand implements Serializable{
     private static final long serialVersionUID = -5126628039718820768L;
 
     /***
-     * 任务类型 0 创建 1 销毁任务
+     * 任务类型 {@linkplain JobType}
      */
     private byte type;
 
@@ -26,6 +26,11 @@ public class JobCommand implements Serializable{
      *  任务名称 唯一
      */
     private String name;
+
+    /**
+     * 源Group
+     */
+    private String piperGroup;
 
     /**
      * 源redis
@@ -43,6 +48,25 @@ public class JobCommand implements Serializable{
      */
     private List<String> targetPipers;
 
+    /**
+     * 新增的复制piper
+     */
+    private List<String> incrementReplicatePipers;
+
+    /**
+     * 减少的复制piper
+     */
+    private List<String> decreaseReplicatePipers;
+
+    /**
+     * 新增的目标piper
+     */
+    private List<String> incrementTargetPipers;
+
+    /**
+     * 减少的目标piper
+     */
+    private List<String> decreaseTargetPipers;
 
 
 }
