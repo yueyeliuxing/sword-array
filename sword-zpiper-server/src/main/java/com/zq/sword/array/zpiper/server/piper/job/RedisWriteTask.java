@@ -14,14 +14,14 @@ import com.zq.sword.array.zpiper.server.piper.cluster.JobDataConsumeCluster;
 import com.zq.sword.array.zpiper.server.piper.job.dto.ConsumeNextOffset;
 import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateData;
 import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateDataReq;
-import com.zq.sword.array.zpiper.server.piper.job.processor.ConsumeDataRespProcessor;
 import com.zq.sword.array.zpiper.server.piper.job.processor.WriteTaskBackupProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static com.zq.sword.array.zpiper.server.piper.cluster.JobDataConsumeCluster.*;
+import static com.zq.sword.array.zpiper.server.piper.cluster.JobDataConsumeCluster.PartitionConsumerBuilder;
+import static com.zq.sword.array.zpiper.server.piper.cluster.JobDataConsumeCluster.get;
 
 /**
  * @program: sword-array
@@ -45,8 +45,6 @@ public class RedisWriteTask extends AbstractTask implements WriteTask {
 
     private JobDataConsumeCluster jobDataConsumeCluster;
 
-    private volatile boolean isCanReq = true;
-
     public RedisWriteTask(JobEnv jobEnv, JobRuntimeStorage jobRuntimeStorage, CycleDisposeHandler<RedisCommand> cycleDisposeHandler) {
         super(TASK_NAME);
         this.jobEnv = jobEnv;
@@ -68,36 +66,9 @@ public class RedisWriteTask extends AbstractTask implements WriteTask {
         this.jobDataConsumeCluster.setPartitionConsumerBuilder(new PartitionConsumerBuilder() {
             @Override
             public JobDataConsumeCluster.PartitionConsumer build(String consumePiperLocation) {
-                return null;
+                return new ReplicateDataConsumer(consumePiperLocation);
             }
         });
-        this.jobDataConsumeCluster.setConsumeDataRespProcessor(new ConsumeDataRespProcessor() {
-            @Override
-            public void consumeReplicateData(List<ReplicateData> replicateDatas) {
-                //消费消息
-                logger.info("接收消息->{}", replicateDatas);
-                if(replicateDatas != null && !replicateDatas.isEmpty()){
-                    for (ReplicateData replicateData : replicateDatas){
-                        redisWriter.write(new RedisCommandDeserializer().deserialize(replicateData.getData()), metadata -> {
-                            if(metadata.getException() != null){
-                                logger.error("写入redis出错", metadata.getException());
-                            }
-                        });
-
-                        ConsumeNextOffset consumeNextOffset = new ConsumeNextOffset(replicateData.getPiperGroup(), replicateData.getJobName(), replicateData.getNextOffset());
-                        //更新分片消费信息
-                        jobRuntimeStorage.writeConsumeNextOffset(consumeNextOffset);
-
-                        //异步发送数据到备份机器上
-                        jobDataBackupCluster.backupConsumeNextOffset(consumeNextOffset);
-                    }
-                }
-                //数据消费完 可以继续请求数据了
-                isCanReq = true;
-            }
-        });
-
-
     }
 
     /**
@@ -105,10 +76,36 @@ public class RedisWriteTask extends AbstractTask implements WriteTask {
      */
     public class ReplicateDataConsumer extends JobDataConsumeCluster.PartitionConsumer {
 
+        private volatile boolean isCanReq = true;
+
         public ReplicateDataConsumer(String targetPiperLocation) {
-            super(targetPiperLocation);
+            super(jobEnv.getName(), targetPiperLocation);
         }
 
+
+        @Override
+        public void consumeReplicateData(List<ReplicateData> replicateDatas) {
+            //消费消息
+            logger.info("接收消息->{}", replicateDatas);
+            if(replicateDatas != null && !replicateDatas.isEmpty()){
+                for (ReplicateData replicateData : replicateDatas){
+                    redisWriter.write(new RedisCommandDeserializer().deserialize(replicateData.getData()), metadata -> {
+                        if(metadata.getException() != null){
+                            logger.error("写入redis出错", metadata.getException());
+                        }
+                    });
+
+                    ConsumeNextOffset consumeNextOffset = new ConsumeNextOffset(replicateData.getPiperGroup(), replicateData.getJobName(), replicateData.getNextOffset());
+                    //更新分片消费信息
+                    jobRuntimeStorage.writeConsumeNextOffset(consumeNextOffset);
+
+                    //异步发送数据到备份机器上
+                    jobDataBackupCluster.backupConsumeNextOffset(consumeNextOffset);
+                }
+            }
+            //数据消费完 可以继续请求数据了
+            isCanReq = true;
+        }
 
         @Override
         public void run() {
@@ -153,26 +150,8 @@ public class RedisWriteTask extends AbstractTask implements WriteTask {
     @Override
     public void run() {
         redisWriter.start();
-        jobDataConsumeCluster.start(new DefaultConsumeCall());
         super.run();
     }
-
-    /**
-     * 执行回调
-     */
-    private class DefaultConsumeCall implements JobDataConsumeCluster.ConsumeCall{
-
-        @Override
-        public void call(JobDataConsumeCluster.PartitionConsumer partitionConsumer) {
-
-        }
-
-        @Override
-        public void done() {
-
-        }
-    }
-
 
     @Override
     public void stop() {
