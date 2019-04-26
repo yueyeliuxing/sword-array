@@ -81,12 +81,6 @@
 
 		<dependency>
 			<groupId>com.zq.sword</groupId>
-			<artifactId>sword-data-structure</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.zq.sword</groupId>
 			<artifactId>sword-redis-replicator</artifactId>
 			<version>${project.version}</version>
 		</dependency>

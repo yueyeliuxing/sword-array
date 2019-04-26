@@ -21,9 +21,7 @@
 		<module>sword-tasks</module>
 		<module>sword-id-generator</module>
 		<module>sword-redis</module>
-		<module>sword-config-web</module>
 		<module>sword-stream-io</module>
-		<module>sword-data-structure</module>
 		<module>sword-data-storage</module>
 		<module>sword-redis-writer</module>
 		<module>sword-redis-replicator</module>
