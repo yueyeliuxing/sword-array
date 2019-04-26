@@ -1,4 +1,4 @@
-package com.zq.sword.array.data.center;
+package com.zq.sword.array.data.storage;
 
 import com.zq.sword.array.stream.io.RWStore;
 import com.zq.sword.array.stream.io.DataWritable;

@@ -1,4 +1,4 @@
-package com.zq.sword.array.data.center;
+package com.zq.sword.array.data.storage;
 
 import java.util.Collection;
 
