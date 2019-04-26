@@ -1,4 +1,4 @@
-package com.zq.sword.array.mq.jade.msg;
+package com.zq.sword.array.data.center;
 
 import com.zq.sword.array.stream.io.RWStore;
 import com.zq.sword.array.stream.io.DataWritable;
@@ -21,20 +21,15 @@ import java.io.Serializable;
 @Data
 @ToString
 @NoArgsConstructor
-public class Message implements Serializable, DataWritable{
+public class DataEntry implements Serializable, DataWritable{
 
     private static final long serialVersionUID = 2079397312819633699L;
 
-    private Logger logger = LoggerFactory.getLogger(Message.class);
+    private Logger logger = LoggerFactory.getLogger(DataEntry.class);
     /**
-     * 消息ID
+     * 序列号
      */
-    private long msgId;
-
-    /**
-     * 主题
-     */
-    private String topic;
+    private long seq;
 
     /**
      * 标签
@@ -53,19 +48,13 @@ public class Message implements Serializable, DataWritable{
 
     @Override
     public long length() {
-        return 8 + 4 + ( topic == null ? 0 : topic.length()) + 4 + ( tag == null ? 0 : tag.length()) + 4 + ( body == null ? 0 : body.length) + 8;
+        return 8 + 4 + ( tag == null ? 0 : tag.length()) + 4 + ( body == null ? 0 : body.length) + 8;
     }
 
     @Override
     public void read(RWStore store) throws EOFException {
         try{
-            msgId = store.readLong();
-            int topicLen = store.readInt();
-            if(topicLen > 0){
-                byte[] topicBytes = new byte[topicLen];
-                store.read(topicBytes);
-                topic = new String(topicBytes);
-            }
+            seq = store.readLong();
 
             int tagLen = store.readInt();
             if(tagLen > 0){
@@ -92,11 +81,8 @@ public class Message implements Serializable, DataWritable{
     @Override
     public void write(RWStore store) {
         try{
-            store.writeLong(msgId);
-            store.writeInt(topic.length());
-            if(topic.length() > 0){
-                store.write(topic.getBytes());
-            }
+            store.writeLong(seq);
+
             store.writeInt(tag.length());
             if(tag.length() > 0){
                 store.write(tag.getBytes());

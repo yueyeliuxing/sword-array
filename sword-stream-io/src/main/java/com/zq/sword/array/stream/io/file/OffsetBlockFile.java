@@ -5,7 +5,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,14 +31,9 @@ public class OffsetBlockFile<T extends DataWritable> implements OffsetSeqFile<T>
     private static final Map<String, OffsetBlockFile> blockFiles = new HashMap<>();
 
     /**
-     * 数据文件目录名称
-     */
-    public static final String DATA_FILE_DIR = "data";
-
-    /**
      * 存储路径
      */
-    private String storagePath;
+    private String filePath;
 
     /**
      * 数据类型
@@ -75,8 +73,8 @@ public class OffsetBlockFile<T extends DataWritable> implements OffsetSeqFile<T>
         return blockFile;
     }
 
-    private OffsetBlockFile(String storagePath, Class<T> dataType) {
-        this.storagePath = storagePath;
+    private OffsetBlockFile(String filePath, Class<T> dataType) {
+        this.filePath = filePath;
         this.dataType = dataType;
         this.dataFiles = new ConcurrentHashMap<>();
 
@@ -88,7 +86,7 @@ public class OffsetBlockFile<T extends DataWritable> implements OffsetSeqFile<T>
      * 加载
      */
     private void initDataFiles() {
-        String dataFileDirPath = getDataFileDir();
+        String dataFileDirPath = getFilePath();
         File dataFile = new File(dataFileDirPath);
         if(!dataFile.exists()){
             return;
@@ -118,20 +116,26 @@ public class OffsetBlockFile<T extends DataWritable> implements OffsetSeqFile<T>
     }
 
     /**
-     * 得到数据文件目录
-     * @return
-     */
-    private String getDataFileDir() {
-        return storagePath + File.separator + DATA_FILE_DIR;
-    }
-
-    /**
      * 获取存储路径
      * @return
      */
     @Override
-    public String getStoragePath(){
-        return storagePath;
+    public String getFilePath(){
+        return filePath;
+    }
+
+    @Override
+    public long write(long offset, T data) {
+        try{
+            OffsetFileBlock<T> dataFile = searchDataFile(offset);
+            long currentFilePos = offset - dataFile.sequence();
+            dataFile.position(currentFilePos);
+            dataFile.writeObject(data);
+        } catch (IOException e) {
+            logger.error("写入文件异常", e);
+            throw new RuntimeException(e);
+        }
+        return offset;
     }
 
     @Override
@@ -142,7 +146,7 @@ public class OffsetBlockFile<T extends DataWritable> implements OffsetSeqFile<T>
             //如果当前文件还没有创建 或者 当前文件已写满 需要重新创建
             if(currentDataFile == null || currentDataFile.isFull()){
                 OffsetFileBlock<T> preDataFile = currentDataFile;
-                currentDataFile = new OffsetFileBlock(getDataFileDir(), preDataFile == null ? "0" : preDataFile.size()+"");
+                currentDataFile = new OffsetFileBlock(getFilePath(), preDataFile == null ? "0" : preDataFile.size()+"");
                 dataFiles.put(currentDataFile.sequence(), currentDataFile);
                 if(currentDataFile.isFull()){
                     preDataFile.next(currentDataFile);
@@ -151,9 +155,6 @@ public class OffsetBlockFile<T extends DataWritable> implements OffsetSeqFile<T>
             long position = currentDataFile.position();
             currentDataFile.writeObject(data);
             offset = position + currentDataFile.sequence();
-
-            //数据追加到文件后处理工作
-            afterAppend(currentDataFile, position, data);
         }catch (IOException e){
             logger.error("写入文件异常", e);
             throw new RuntimeException(e);
@@ -161,15 +162,6 @@ public class OffsetBlockFile<T extends DataWritable> implements OffsetSeqFile<T>
             writeLock.unlock();
         }
         return offset;
-    }
-
-    /**
-     * 数据追加到文件后处理工作
-     * @param dataFile 数据写入的文件
-     * @param position 在当前文件中的位置
-     * @param data
-     */
-    public void afterAppend(OffsetFileBlock<T> dataFile, long position, T data){
     }
 
     @Override
@@ -259,6 +251,28 @@ public class OffsetBlockFile<T extends DataWritable> implements OffsetSeqFile<T>
         return datas;
     }
 
+    @Override
+    public void copyTo(OffsetSeqFile<T> targetFile) {
+        writeLock.lock();
+        try {
+            File currentOffsetFileDir = new File(getFilePath());
+            File[] dataFiles = currentOffsetFileDir.listFiles();
+            if(dataFiles == null){
+                return;
+            }
+            for (File file : dataFiles){
+                try(FileChannel inputChannel = new FileInputStream(file).getChannel();
+                    FileChannel outputChannel = new FileOutputStream(new File(targetFile.getFilePath() + File.pathSeparator + file.getName())).getChannel();) {
+                    outputChannel.transferFrom(inputChannel, 0, inputChannel.size());
+                } catch (Exception e){
+                    logger.error("文件copy错误", e);
+                }
+            }
+        }finally {
+            writeLock.unlock();
+        }
+    }
+
     /**
      * 读取当前活跃文件
      * @param num
@@ -282,6 +296,13 @@ public class OffsetBlockFile<T extends DataWritable> implements OffsetSeqFile<T>
         }finally {
             readLock.unlock();
         }
+    }
+
+    @Override
+    public void delete() {
+        blockFiles.remove(filePath);
+        File file = new File(filePath);
+        file.delete();
     }
 
 }

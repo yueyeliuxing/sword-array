@@ -1,4 +1,4 @@
-package com.zq.sword.array.mq.jade.broker;
+package com.zq.sword.array.data.center.broker;
 
 import org.junit.Test;
 

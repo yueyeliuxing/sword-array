@@ -81,7 +81,7 @@ public class IndexableOffsetBlockFile<T extends IndexableDataWritable> implement
     }
 
     private String getIndexFileDir() {
-        return getStoragePath() + File.separator + INDEX_FILE_DIR;
+        return getFilePath() + File.separator + INDEX_FILE_DIR;
     }
 
     @Override
@@ -98,13 +98,25 @@ public class IndexableOffsetBlockFile<T extends IndexableDataWritable> implement
     }
 
     @Override
-    public String getStoragePath() {
+    public String getFilePath() {
         return storagePath;
+    }
+
+    @Override
+    public long write(long offset, T data) {
+        dataFile.write(offset, data);
+        writeIndexFile(data, offset);
+        return offset;
     }
 
     @Override
     public long write(T data) {
         long offset = dataFile.write(data);
+        writeIndexFile(data, offset);
+        return offset;
+    }
+
+    private void writeIndexFile(T data, long offset) {
         //添加索引文件
         String[] indexFields =  data.indexMappings();
         if(indexFields != null && indexFields.length > 0){
@@ -117,7 +129,6 @@ public class IndexableOffsetBlockFile<T extends IndexableDataWritable> implement
                 indexFile.writeObject(new Index(ByteUtils.primitiveType2ByteArray(ReflectUtils.getFieldValue(data, indexField)), offset));
             }
         }
-        return 0;
     }
 
     @Override
@@ -128,5 +139,18 @@ public class IndexableOffsetBlockFile<T extends IndexableDataWritable> implement
     @Override
     public List<T> read(long offset, int num) {
         return dataFile.read(offset, num);
+    }
+
+    @Override
+    public void copyTo(OffsetSeqFile<T> file) {
+        dataFile.copyTo(file);
+    }
+
+    @Override
+    public void delete() {
+        blockFiles.remove(storagePath);
+        dataFile.delete();
+        File file = new File(storagePath);
+        file.delete();
     }
 }

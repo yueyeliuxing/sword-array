@@ -1,6 +1,4 @@
-package com.zq.sword.array.mq.jade.broker;
-
-import com.zq.sword.array.mq.jade.msg.Message;
+package com.zq.sword.array.data.center;
 
 import java.util.List;
 
@@ -13,30 +11,30 @@ import java.util.List;
 public interface Partition {
 
     /**
-     * id
-     * @return
-     */
-    long id();
-
-    /**
-     * 名称
+     * 分片名称
      * @return
      */
     String name();
 
     /**
-     * 追加消息
-     * @param message
+     * 分片所属的组
      * @return
      */
-    long append(Message message);
+    String group();
 
     /**
-     * 搜索指定偏移量的消息
+     * 追加消息 末尾追加
+     * @param entry
+     * @return
+     */
+    long append(DataEntry entry);
+
+    /**
+     * 搜索指定偏移量的数据
      * @param offset
      * @return
      */
-    Message search(long offset);
+    DataEntry get(long offset);
 
     /**
      * 从指定偏移量顺序搜寻指定数量的消息
@@ -44,16 +42,18 @@ public interface Partition {
      * @param num 指定数量
      * @return 消息
      */
-    List<Message> orderSearch(long offset, int num);
+    List<DataEntry> orderGet(long offset, int num);
 
     /**
-     * 关闭
-     */
-    void close();
-
-    /**
-     * 是否关闭
+     * 复制一个分片
+     * @param group
+     * @param name
      * @return
      */
-    boolean isClose();
+    Partition copy(String group, String name);
+
+    /**
+     * 销毁
+     */
+    void destroy();
 }

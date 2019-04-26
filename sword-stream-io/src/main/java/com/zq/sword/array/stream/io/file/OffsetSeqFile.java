@@ -16,10 +16,18 @@ public interface OffsetSeqFile<T extends DataWritable> {
      * 得到存储路径
      * @return
      */
-    String getStoragePath();
+    String getFilePath();
 
     /**
-     * 追加数据
+     * 末尾 追加数据
+     * @param offset 指定文件偏移量
+     * @param data 数据
+     * @return 数据所在的偏移量
+     */
+    long write(long offset, T data);
+
+    /**
+     * 末尾 追加数据
      * @param data 数据
      * @return 数据所在的偏移量
      */
@@ -39,5 +47,16 @@ public interface OffsetSeqFile<T extends DataWritable> {
      * @return 数据集合
      */
     List<T> read(long offset, int num);
+
+    /**
+     * 拷贝到另一个文件中
+     * @param file
+     */
+    void copyTo(OffsetSeqFile<T> file);
+
+    /***
+     * 删除
+     */
+    void delete();
 
 }

@@ -44,9 +44,9 @@
 		<relativePath>../</relativePath>
 	</parent>
 
-	<artifactId>sword-mq-jade</artifactId>
+	<artifactId>sword-data-storage</artifactId>
 	<packaging>jar</packaging>
-	<name>sword-mq-jade</name>
+	<name>sword-data-storage</name>
 
 
 	<dependencies>
