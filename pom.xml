@@ -25,7 +25,7 @@
 		<module>sword-redis-writer</module>
 		<module>sword-redis-replicator</module>
         <module>sword-network-rpc</module>
-		<module>sword-zpiper-server</module>
+		<module>sword-zpiper</module>
 	</modules>
 
 	<licenses>
