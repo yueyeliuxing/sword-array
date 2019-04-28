@@ -9,20 +9,16 @@ import com.zq.sword.array.redis.interceptor.CommandInterceptor;
 import com.zq.sword.array.redis.util.RedisConfig;
 import com.zq.sword.array.redis.writer.DefaultRedisWriter;
 import com.zq.sword.array.redis.writer.RedisWriter;
-import com.zq.sword.array.zpiper.server.piper.job.cluster.JobDataBackupCluster;
-import com.zq.sword.array.zpiper.server.piper.job.cluster.JobDataConsumeCluster;
 import com.zq.sword.array.zpiper.server.piper.job.dto.ConsumeNextOffset;
 import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateData;
 import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateDataReq;
-import com.zq.sword.array.zpiper.server.piper.job.processor.WriteTaskBackupProcessor;
 import com.zq.sword.array.zpiper.server.piper.job.storage.JobRuntimeStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static com.zq.sword.array.zpiper.server.piper.job.cluster.JobDataConsumeCluster.PartitionConsumerBuilder;
-import static com.zq.sword.array.zpiper.server.piper.job.cluster.JobDataConsumeCluster.get;
+import static com.zq.sword.array.zpiper.server.piper.job.JobDataConsumerPool.PartitionConsumerBuilder;
 
 /**
  * @program: sword-array
@@ -36,53 +32,48 @@ public class RedisWriteTask extends AbstractTask implements WriteTask {
 
     private static final String TASK_NAME = "write-task";
 
-    private JobEnv jobEnv;
+    private JobContext jobContext;
 
     private JobRuntimeStorage jobRuntimeStorage;
 
     private RedisWriter redisWriter;
 
-    private JobDataBackupCluster jobDataBackupCluster;
+    private JobDataConsumerPool jobDataConsumerPool;
 
-    private JobDataConsumeCluster jobDataConsumeCluster;
-
-    public RedisWriteTask(JobEnv jobEnv, JobRuntimeStorage jobRuntimeStorage, CycleDisposeHandler<RedisCommand> cycleDisposeHandler) {
+    public RedisWriteTask(JobContext jobContext, CycleDisposeHandler<RedisCommand> cycleDisposeHandler) {
         super(TASK_NAME);
-        this.jobEnv = jobEnv;
-        this.jobRuntimeStorage = jobRuntimeStorage;
+        this.jobContext = jobContext;
+        this.jobRuntimeStorage = jobContext.getJobRuntimeStorage();
 
         //设置redis 写入器
-        redisWriter = new DefaultRedisWriter(new RedisConfig(jobEnv.getSourceRedis()));
+        redisWriter = new DefaultRedisWriter(new RedisConfig(jobContext.getSourceRedis()));
         redisWriter.addCommandInterceptor(new CycleCommandAddInterceptor(cycleDisposeHandler));
 
-        //Job运行时数据本分处理器
-        this.jobDataBackupCluster = JobDataBackupCluster.get(jobEnv.getName());
-        this.jobDataBackupCluster.setWriteTaskBackupProcessor(new WriteTaskBackupProcessor() {
+        //创建Job运行时数据消费处理器
+        jobDataConsumerPool = new JobDataConsumerPool(jobContext.getConsumePipers());
+        jobDataConsumerPool.setPartitionConsumerBuilder(new PartitionConsumerBuilder() {
             @Override
-            public void backupConsumeNextOffset(ConsumeNextOffset consumeNextOffset) {
-
-            }
-        });
-
-        //Job任务运行 数据消费处理器
-        this.jobDataConsumeCluster = get(jobEnv.getName());
-        this.jobDataConsumeCluster.setPartitionConsumerBuilder(new PartitionConsumerBuilder() {
-            @Override
-            public JobDataConsumeCluster.DataConsumer build(String consumePiperLocation) {
+            public JobDataConsumerPool.DataConsumer build(String consumePiperLocation) {
                 return new ReplicateDataConsumer(consumePiperLocation);
             }
         });
+
+    }
+
+    @Override
+    public void flushJobConsumePipers(List<String> incrementConsumePipers, List<String> decreaseConsumePipers) {
+        this.jobDataConsumerPool.handleConsumePiperChange(incrementConsumePipers, decreaseConsumePipers);
     }
 
     /**
      * 数据消费者
      */
-    public class ReplicateDataConsumer extends JobDataConsumeCluster.DataConsumer {
+    public class ReplicateDataConsumer extends JobDataConsumerPool.DataConsumer {
 
         private volatile boolean isCanReq = true;
 
         public ReplicateDataConsumer(String targetPiperLocation) {
-            super(jobEnv.getName(), targetPiperLocation);
+            super(jobContext.getName(), targetPiperLocation);
         }
 
 
@@ -100,10 +91,7 @@ public class RedisWriteTask extends AbstractTask implements WriteTask {
 
                     ConsumeNextOffset consumeNextOffset = new ConsumeNextOffset(replicateData.getPiperGroup(), replicateData.getJobName(), replicateData.getNextOffset());
                     //更新分片消费信息
-                    jobRuntimeStorage.writeConsumeNextOffset(consumeNextOffset);
-
-                    //异步发送数据到备份机器上
-                    jobDataBackupCluster.backupConsumeNextOffset(consumeNextOffset);
+                    jobRuntimeStorage.writeConsumedNextOffset(consumeNextOffset);
                 }
             }
             //数据消费完 可以继续请求数据了
@@ -115,9 +103,9 @@ public class RedisWriteTask extends AbstractTask implements WriteTask {
             logger.info("消费者开始消费消息");
             while (!isClose && !Thread.currentThread().isInterrupted()) {
                 if (isCanReq) {
-                    long offset = jobRuntimeStorage.getConsumeNextOffset(jobEnv.getPiperGroup(), jobEnv.getName());
-                    logger.info("消费者消费offset->{}, piperGroup->{} jobName->{}", offset, jobEnv.getPiperGroup(), jobEnv.getName());
-                    consumeReplicateDataReq(new ReplicateDataReq(jobEnv.getPiperGroup(), jobEnv.getName(), offset, 1));
+                    long offset = jobRuntimeStorage.getConsumeNextOffset(jobContext.getPiperGroup(), jobContext.getName());
+                    logger.info("消费者消费offset->{}, piperGroup->{} jobName->{}", offset, jobContext.getPiperGroup(), jobContext.getName());
+                    consumeReplicateDataReq(new ReplicateDataReq(jobContext.getPiperGroup(), jobContext.getName(), offset, 1));
                     isCanReq = false;
                     try {
                         Thread.sleep(5);
@@ -153,6 +141,7 @@ public class RedisWriteTask extends AbstractTask implements WriteTask {
     @Override
     public void run() {
         redisWriter.start();
+        jobDataConsumerPool.start();
         super.run();
     }
 
@@ -160,6 +149,6 @@ public class RedisWriteTask extends AbstractTask implements WriteTask {
     public void stop() {
         super.stop();
         redisWriter.stop();
-        jobDataConsumeCluster.close();
+        jobDataConsumerPool.destroy();
     }
 }

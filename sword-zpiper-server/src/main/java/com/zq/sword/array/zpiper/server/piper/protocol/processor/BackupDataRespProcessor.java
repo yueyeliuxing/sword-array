@@ -1,6 +1,7 @@
-package com.zq.sword.array.zpiper.server.piper.job.processor;
+package com.zq.sword.array.zpiper.server.piper.protocol.processor;
 
 import com.zq.sword.array.zpiper.server.piper.job.dto.ConsumeNextOffset;
+import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateDataId;
 
 /**
  * @program: sword-array
@@ -8,7 +9,14 @@ import com.zq.sword.array.zpiper.server.piper.job.dto.ConsumeNextOffset;
  * @author: zhouqi1
  * @create: 2019-04-24 20:42
  **/
-public interface WriteTaskBackupProcessor {
+public interface BackupDataRespProcessor {
+
+    /**
+     * 接收到已备份的数据
+     * @param replicateDataId
+     * @return
+     */
+    void backupReplicateData(ReplicateDataId replicateDataId);
 
     /**
      * 接收到已经同步完成的消费偏移量

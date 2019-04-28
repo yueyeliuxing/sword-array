@@ -60,6 +60,11 @@
             <artifactId>sword-stream-io</artifactId>
 			<version>${project.version}</version>
         </dependency>
+		<dependency>
+			<groupId>com.zq.sword</groupId>
+			<artifactId>sword-tasks</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/redis.clients/jedis -->
 		<dependency>

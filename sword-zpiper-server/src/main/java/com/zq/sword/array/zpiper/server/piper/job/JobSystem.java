@@ -1,10 +1,6 @@
 package com.zq.sword.array.zpiper.server.piper.job;
 
-import com.zq.sword.array.redis.command.RedisCommand;
-import com.zq.sword.array.redis.handler.CycleDisposeHandler;
-import com.zq.sword.array.redis.handler.SimpleCycleDisposeHandler;
 import com.zq.sword.array.zpiper.server.piper.job.monitor.TaskMonitor;
-import com.zq.sword.array.zpiper.server.piper.job.storage.JobRuntimeStorage;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,16 +33,11 @@ public class JobSystem {
 
     /**
      * 创建Job
-     * @param jobEnv
-     * @param jobRuntimeStorage
-     * @param monitor
+     * @param context 任务上下文
+     * @param monitor 任务监听器
      */
-    public void createJob(JobEnv jobEnv, JobRuntimeStorage jobRuntimeStorage, TaskMonitor monitor){
-        CycleDisposeHandler<RedisCommand> cycleDisposeHandler = new SimpleCycleDisposeHandler();
-        Job job = new Job(jobEnv.getName());
-        job.setReplicateTask(new RedisReplicateTask(jobEnv, cycleDisposeHandler, jobRuntimeStorage));
-        job.setWriteTask(new RedisWriteTask(jobEnv, jobRuntimeStorage, cycleDisposeHandler));
-        job.setTaskMonitor(monitor);;
+    public void createJob(JobContext context, TaskMonitor monitor){
+        Job job = new Job(context);
         jobs.put(job.name(), job);
     }
 
@@ -71,7 +62,7 @@ public class JobSystem {
         if(job == null){
             throw new NullPointerException("job is not exits");
         }
-        job.stop();
+        job.destroy();
         jobs.remove(jobName);
     }
 

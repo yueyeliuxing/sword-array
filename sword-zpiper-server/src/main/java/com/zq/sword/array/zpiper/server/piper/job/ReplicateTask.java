@@ -7,4 +7,5 @@ package com.zq.sword.array.zpiper.server.piper.job;
  * @create: 2019-04-25 15:54
  **/
 public interface ReplicateTask extends Task {
+
 }

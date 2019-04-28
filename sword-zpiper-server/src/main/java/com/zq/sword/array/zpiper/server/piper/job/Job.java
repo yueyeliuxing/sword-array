@@ -1,6 +1,11 @@
 package com.zq.sword.array.zpiper.server.piper.job;
 
-import com.zq.sword.array.zpiper.server.piper.job.monitor.JobHealth;
+import com.zq.sword.array.redis.command.RedisCommand;
+import com.zq.sword.array.redis.handler.CycleDisposeHandler;
+import com.zq.sword.array.redis.handler.SimpleCycleDisposeHandler;
+import com.zq.sword.array.zpiper.server.piper.job.storage.ClusterJobRuntimeStorage;
+
+import java.util.List;
 
 /**
  * @program: sword-array
@@ -8,7 +13,17 @@ import com.zq.sword.array.zpiper.server.piper.job.monitor.JobHealth;
  * @author: zhouqi1
  * @create: 2019-04-24 16:31
  **/
-public class Job extends AbstractTask implements Task {
+public class Job {
+
+    /**
+     * 任务名称
+     */
+    private String name;
+
+    /**
+     * 任务数据备份处理器
+     */
+    private ClusterJobRuntimeStorage clusterJobRuntimeStorage;
 
     /**
      * 复制任务
@@ -20,34 +35,53 @@ public class Job extends AbstractTask implements Task {
      */
     private WriteTask writeTask;
 
-    public Job(String name) {
-        super(name);
+    public Job(JobContext jobContext) {
+        name = jobContext.getName();
+
+        //创建Job运行时数据备份存储
+        clusterJobRuntimeStorage = new ClusterJobRuntimeStorage(jobContext.getName(), jobContext.getBackupPipers(), jobContext.getJobRuntimeStorage());
+        jobContext.setJobRuntimeStorage(clusterJobRuntimeStorage);
+
+        CycleDisposeHandler<RedisCommand> cycleDisposeHandler = new SimpleCycleDisposeHandler();
+
+        //创建ReplicateTask
+        replicateTask = new RedisReplicateTask(jobContext, cycleDisposeHandler);
+
+        //创建WriteTask
+        writeTask = new RedisWriteTask(jobContext, cycleDisposeHandler);
     }
 
     /**
-     * 添加复制任务
-     * @param replicateTask
+     * 刷新任务备份piper
+     * @param incrementBackupPipers
+     * @param decreaseBackupPipers
      */
-    public void setReplicateTask(ReplicateTask replicateTask){
-        replicateTask.setTaskMonitor((taskHealth)->{
-            taskMonitor.monitor(new JobHealth(name(), taskHealth.getState(), taskHealth, null));
-        });
-        this.replicateTask = replicateTask;
+    public void flushJobBackupPipers(List<String> incrementBackupPipers, List<String> decreaseBackupPipers){
+        clusterJobRuntimeStorage.flushJobBackupPipers(incrementBackupPipers, decreaseBackupPipers);
     }
 
     /**
-     * 添加写入任务
-     * @param writeTask
+     * 刷新任务消费piper
+     * @param incrementConsumePipers
+     * @param decreaseConsumePipers
      */
-    public void setWriteTask(WriteTask writeTask){
-        writeTask.setTaskMonitor((taskHealth)->{
-            taskMonitor.monitor(new JobHealth(name(), taskHealth.getState(), null, taskHealth));
-        });
-        this.writeTask = writeTask;
+    public void flushJobConsumePipers(List<String> incrementConsumePipers, List<String> decreaseConsumePipers){
+        writeTask.flushJobConsumePipers(incrementConsumePipers, decreaseConsumePipers);
     }
 
-    @Override
-    public void run() {
+    /**
+     * 获取任务名称
+     * @return
+     */
+    public String name(){
+        return name;
+    }
+
+
+    /**
+     * 任务启动
+     */
+    public void start() {
         replicateTask.start();
         writeTask.start();
     }
@@ -56,6 +90,7 @@ public class Job extends AbstractTask implements Task {
      * 重启ReplicateTask
      */
     public void restartReplicateTask(){
+        replicateTask.stop();
         replicateTask.start();
     }
 
@@ -63,13 +98,16 @@ public class Job extends AbstractTask implements Task {
      * 重启WriteTask
      */
     public void restartWriteTask(){
-        replicateTask.start();
+        writeTask.stop();
+        writeTask.start();
     }
 
-    @Override
-    public void stop() {
+    /**
+     * 任务销毁
+     */
+    public void destroy() {
         replicateTask.stop();
         writeTask.stop();
-        super.stop();
+        clusterJobRuntimeStorage.destroy();
     }
 }

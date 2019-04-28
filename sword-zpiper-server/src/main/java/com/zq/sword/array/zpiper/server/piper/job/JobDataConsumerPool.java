@@ -1,16 +1,11 @@
-package com.zq.sword.array.zpiper.server.piper.job.cluster;
+package com.zq.sword.array.zpiper.server.piper.job;
 
-import com.zq.sword.array.common.event.HotspotEvent;
-import com.zq.sword.array.common.event.HotspotEventListener;
 import com.zq.sword.array.tasks.AbstractThreadActuator;
 import com.zq.sword.array.tasks.Actuator;
-import com.zq.sword.array.zpiper.server.piper.protocol.InterPiperProtocol;
-import com.zq.sword.array.zpiper.server.piper.protocol.PiperNameProtocol;
-import com.zq.sword.array.zpiper.server.piper.job.dto.JobCommand;
-import com.zq.sword.array.zpiper.server.piper.job.dto.JobType;
 import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateData;
 import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateDataReq;
-import com.zq.sword.array.zpiper.server.piper.job.processor.ConsumeDataRespProcessor;
+import com.zq.sword.array.zpiper.server.piper.protocol.processor.ConsumeDataRespProcessor;
+import com.zq.sword.array.zpiper.server.piper.protocol.InterPiperProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,38 +15,19 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @program: sword-array
- * @description: 任务数据集群备份器
+ * @description: 数据消费者池
  * @author: zhouqi1
  * @create: 2019-04-26 19:48
  **/
-public class JobDataConsumeCluster {
-
-    public static final Map<String, JobDataConsumeCluster> JOB_DATA_CONSUME_CLUSTERS = new ConcurrentHashMap<>();
-
-    private String jobName;
-
-    /**
-     * Job环境集群处理
-     */
-    private PiperNameProtocol piperNameProtocol;
+public class JobDataConsumerPool {
 
     private Map<String, DataConsumer> partitionConsumers;
 
     private PartitionConsumerBuilder partitionConsumerBuilder;
 
-    public synchronized static JobDataConsumeCluster get(String jobName){
-        return JOB_DATA_CONSUME_CLUSTERS.get(jobName);
-    }
-
-    public JobDataConsumeCluster(String jobName, List<String> consumePipers, PiperNameProtocol piperNameProtocol) {
-        this.jobName = jobName;
-        this.piperNameProtocol = piperNameProtocol;
-        this.piperNameProtocol.addJobCommandListener(new JobConsumeCommandEventListener());
-
+    public JobDataConsumerPool(List<String> consumePipers) {
         this.partitionConsumers = new ConcurrentHashMap<>();
         assignReplicateDataConsumers(consumePipers);
-
-        JOB_DATA_CONSUME_CLUSTERS.put(jobName, this);
     }
 
     /**
@@ -72,42 +48,24 @@ public class JobDataConsumeCluster {
     }
 
     /**
-     * 任务命令监听器
+     * 处理消费的piper改变
+     * @param incrementConsumePipers
+     * @param decreaseConsumePipers
      */
-    private class JobConsumeCommandEventListener implements HotspotEventListener<JobCommand> {
-
-        private Logger logger = LoggerFactory.getLogger(JobConsumeCommandEventListener.class);
-
-        @Override
-        public void listen(HotspotEvent<JobCommand> dataEvent) {
-            JobCommand jobCommand = dataEvent.getData();
-            JobType jobType = JobType.toType(jobCommand.getType());
-            if(jobType == null){
-                return;
+    public void handleConsumePiperChange(List<String> incrementConsumePipers,  List<String> decreaseConsumePipers){
+        if(incrementConsumePipers != null && !incrementConsumePipers.isEmpty()){
+            for (String consumePiperLocation : incrementConsumePipers){
+                DataConsumer consumer = newPartitionConsumer(consumePiperLocation);
+                partitionConsumers.put(consumePiperLocation, consumer);
             }
-            switch (jobType){
-                case CONSUME_PIPERS_CHANGE:
-                    List<String> incrementConsumePipers = jobCommand.getIncrementConsumePipers();
-                    if(incrementConsumePipers != null && !incrementConsumePipers.isEmpty()){
-                        for (String consumePiperLocation : incrementConsumePipers){
-                            DataConsumer consumer = newPartitionConsumer(consumePiperLocation);
-                            partitionConsumers.put(consumePiperLocation, consumer);
-                        }
-                    }
+        }
 
-                    List<String> decreaseConsumePipers = jobCommand.getDecreaseConsumePipers();
-                    if(decreaseConsumePipers != null && !decreaseConsumePipers.isEmpty()){
-                        for (String consumePiperLocation : decreaseConsumePipers){
-                            DataConsumer consumer = partitionConsumers.get(consumePiperLocation);
-                            consumer.stop();
-                            partitionConsumers.remove(consumePiperLocation);
-                        }
-                    }
-                    break;
-                default:
-                    break;
+        if(decreaseConsumePipers != null && !decreaseConsumePipers.isEmpty()){
+            for (String consumePiperLocation : decreaseConsumePipers){
+                DataConsumer consumer = partitionConsumers.get(consumePiperLocation);
+                consumer.stop();
+                partitionConsumers.remove(consumePiperLocation);
             }
-            logger.info("获取PiperNamer命令:{}", jobCommand);
         }
     }
 
@@ -167,9 +125,18 @@ public class JobDataConsumeCluster {
     }
 
     /**
+     * 开启
+     */
+    public void start(){
+        for(DataConsumer partitionConsumer : partitionConsumers.values()){
+            partitionConsumer.start();
+        }
+    }
+
+    /**
      * 关闭
      */
-    public void close(){
+    public void destroy(){
         for(DataConsumer partitionConsumer : partitionConsumers.values()){
             partitionConsumer.stop();
         }

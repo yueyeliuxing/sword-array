@@ -1,4 +1,4 @@
-package com.zq.sword.array.zpiper.server.piper.job.processor;
+package com.zq.sword.array.zpiper.server.piper.protocol.processor;
 
 import com.zq.sword.array.zpiper.server.piper.job.dto.ConsumeNextOffset;
 import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateData;

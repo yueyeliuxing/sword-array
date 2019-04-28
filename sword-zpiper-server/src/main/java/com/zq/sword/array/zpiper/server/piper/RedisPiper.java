@@ -1,6 +1,6 @@
 package com.zq.sword.array.zpiper.server.piper;
 
-import com.zq.sword.array.zpiper.server.piper.job.cluster.JobControlCluster;
+import com.zq.sword.array.zpiper.server.piper.job.JobController;
 import com.zq.sword.array.zpiper.server.piper.protocol.PiperNameProtocol;
 import com.zq.sword.array.zpiper.server.piper.protocol.PiperServiceProtocol;
 import com.zq.sword.array.zpiper.server.piper.config.PiperConfig;
@@ -32,14 +32,14 @@ public class RedisPiper implements Piper{
     /**
      * 分布式任务执行器
      */
-    private JobControlCluster jobEnvCluster;
+    private JobController jobEnvCluster;
 
 
     public RedisPiper(PiperConfig config) {
         this.namePiper = config.namePiper();
         this.piperServiceProtocol = createPiperServiceProtocol(config.piperLocation());
         this.piperNameProtocol = createPiperNameProtocol(config);
-        this.jobEnvCluster = new JobControlCluster(piperNameProtocol, piperServiceProtocol, config.dataStorePath());
+        this.jobEnvCluster = new JobController(piperNameProtocol, piperServiceProtocol, config.dataStorePath());
     }
 
     /**

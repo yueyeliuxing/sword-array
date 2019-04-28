@@ -1,9 +1,5 @@
 package com.zq.sword.array.zpiper.server.piper.protocol;
 
-import com.zq.sword.array.common.event.DefaultHotspotEventEmitter;
-import com.zq.sword.array.common.event.HotspotEvent;
-import com.zq.sword.array.common.event.HotspotEventEmitter;
-import com.zq.sword.array.common.event.HotspotEventListener;
 import com.zq.sword.array.network.rpc.client.NettyRpcClient;
 import com.zq.sword.array.network.rpc.client.RpcClient;
 import com.zq.sword.array.network.rpc.handler.TransferHandler;
@@ -12,8 +8,9 @@ import com.zq.sword.array.network.rpc.message.MessageType;
 import com.zq.sword.array.network.rpc.message.TransferMessage;
 import com.zq.sword.array.tasks.Actuator;
 import com.zq.sword.array.zpiper.server.piper.NamePiper;
-import com.zq.sword.array.zpiper.server.piper.job.monitor.TaskHealth;
 import com.zq.sword.array.zpiper.server.piper.job.dto.JobCommand;
+import com.zq.sword.array.zpiper.server.piper.job.monitor.TaskHealth;
+import com.zq.sword.array.zpiper.server.piper.protocol.processor.JobCommandProcessor;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
@@ -36,24 +33,22 @@ public class PiperNameProtocol implements Actuator{
     private RpcClient rpcClient;
 
     /**
-     * 时间发射器
+     * Job命令处理器
      */
-    private HotspotEventEmitter<JobCommand> eventEmitter;
+    private JobCommandProcessor jobCommandProcessor;
 
     public PiperNameProtocol(String namerLocation) {
         String[] ps = namerLocation.split(":");
         rpcClient = new NettyRpcClient(ps[0], Integer.parseInt(ps[1]));
         rpcClient.registerTransferHandler(new Piper2NamerMsgHandler());
-
-        eventEmitter = new DefaultHotspotEventEmitter();
     }
 
     /**
-     * 添加任务命令监听器
-     * @param jobCommandEventListener
+     * 添加Job任务命令处理器
+     * @param jobCommandProcessor
      */
-    public void addJobCommandListener(HotspotEventListener<JobCommand> jobCommandEventListener){
-        eventEmitter.registerEventListener(jobCommandEventListener);
+    public void setJobCommandProcessor(JobCommandProcessor jobCommandProcessor){
+        this.jobCommandProcessor = jobCommandProcessor;
     }
 
     /**
@@ -125,7 +120,8 @@ public class PiperNameProtocol implements Actuator{
             TransferMessage message = (TransferMessage)msg;
             if(message.getHeader() != null && message.getHeader().getType() == MessageType.JOB_COMMAND_RESP.value()) {
                 JobCommand jobCommand = (JobCommand)message.getBody();
-                eventEmitter.emitter(new HotspotEvent(jobCommand));
+                //监听器接收Job命令
+                jobCommandProcessor.accept(jobCommand);
             }else {
                 ctx.fireChannelRead(msg);
             }

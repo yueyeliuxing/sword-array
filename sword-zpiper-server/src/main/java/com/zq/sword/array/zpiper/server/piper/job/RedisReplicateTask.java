@@ -9,10 +9,7 @@ import com.zq.sword.array.redis.interceptor.CommandInterceptor;
 import com.zq.sword.array.redis.replicator.DefaultSlaveRedisReplicator;
 import com.zq.sword.array.redis.replicator.SlaveRedisReplicator;
 import com.zq.sword.array.redis.replicator.listener.RedisReplicatorListener;
-import com.zq.sword.array.zpiper.server.piper.job.cluster.JobDataBackupCluster;
 import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateData;
-import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateDataId;
-import com.zq.sword.array.zpiper.server.piper.job.processor.ReplicateTaskBackupProcessor;
 import com.zq.sword.array.zpiper.server.piper.job.storage.JobRuntimeStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,33 +26,22 @@ public class RedisReplicateTask extends AbstractTask implements ReplicateTask {
 
     private static final String TASK_NAME = "replicate-task";
 
-    private JobEnv jobEnv;
+    private JobContext context;
 
     private SlaveRedisReplicator redisReplicator;
 
     private JobRuntimeStorage jobRuntimeStorage;
 
-    private JobDataBackupCluster jobDataBackupCluster;
-
-    public RedisReplicateTask(JobEnv jobEnv, CycleDisposeHandler<RedisCommand> cycleDisposeHandler, JobRuntimeStorage jobRuntimeStorage)  {
+    public RedisReplicateTask(JobContext context, CycleDisposeHandler<RedisCommand> cycleDisposeHandler)  {
         super(TASK_NAME);
-        this.jobEnv = jobEnv;
+        this.context = context;
 
         //设置redis 复制器
-        redisReplicator = new DefaultSlaveRedisReplicator(this.jobEnv.getSourceRedis());
+        redisReplicator = new DefaultSlaveRedisReplicator(this.context.getSourceRedis());
         redisReplicator.addCommandInterceptor(new CycleCommandFilterInterceptor(cycleDisposeHandler));
         redisReplicator.addRedisReplicatorListener(new RedisCommandListener());
 
-        this.jobRuntimeStorage = jobRuntimeStorage;
-
-        this.jobDataBackupCluster = JobDataBackupCluster.get(jobEnv.getName());
-        this.jobDataBackupCluster.setReplicateTaskBackupProcessor(new ReplicateTaskBackupProcessor() {
-
-            @Override
-            public void backupReplicateData(ReplicateDataId replicateDataId) {
-
-            }
-        });
+        this.jobRuntimeStorage = context.getJobRuntimeStorage();
     }
 
     /**
@@ -91,10 +77,8 @@ public class RedisReplicateTask extends AbstractTask implements ReplicateTask {
         public void receive(RedisCommand command) {
             logger.info("接收到命令，时间：{}", System.currentTimeMillis());
             byte[] data = redisCommandSerializer.serialize(command);
-            long offset = jobRuntimeStorage.writeReplicateData(new ReplicateData(jobEnv.getPiperGroup(), jobEnv.getName(), data));
+            long offset = jobRuntimeStorage.writeReplicateData(new ReplicateData(context.getPiperGroup(), context.getName(), data));
 
-            //异步发送数据到备份机器上
-            jobDataBackupCluster.backupReplicateData(new ReplicateData(jobEnv.getPiperGroup(), jobEnv.getName(), offset, data));
         }
     }
 

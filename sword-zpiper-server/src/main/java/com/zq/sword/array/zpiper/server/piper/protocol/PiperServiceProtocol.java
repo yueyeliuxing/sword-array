@@ -6,7 +6,7 @@ import com.zq.sword.array.network.rpc.message.MessageType;
 import com.zq.sword.array.network.rpc.message.TransferMessage;
 import com.zq.sword.array.network.rpc.server.NettyRpcServer;
 import com.zq.sword.array.tasks.Actuator;
-import com.zq.sword.array.zpiper.server.piper.job.processor.ReplicateDataReqProcessor;
+import com.zq.sword.array.zpiper.server.piper.protocol.processor.ReplicateDataReqProcessor;
 import com.zq.sword.array.zpiper.server.piper.job.dto.ConsumeNextOffset;
 import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateData;
 import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateDataId;
