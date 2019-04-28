@@ -9,6 +9,7 @@ import com.zq.sword.array.id.SnowFlakeIdGenerator;
 import com.zq.sword.array.zpiper.server.piper.job.dto.ConsumeNextOffset;
 import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateData;
 import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateDataReq;
+import com.zq.sword.array.zpiper.server.piper.protocol.processor.ReplicateDataReqProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +22,7 @@ import java.util.List;
  * @author: zhouqi1
  * @create: 2019-04-26 16:19
  **/
-public class LocalJobRuntimeStorage implements JobRuntimeStorage {
+public class LocalJobRuntimeStorage implements JobRuntimeStorage, ReplicateDataReqProcessor {
 
     private Logger logger = LoggerFactory.getLogger(LocalJobRuntimeStorage.class);
 
@@ -53,7 +54,8 @@ public class LocalJobRuntimeStorage implements JobRuntimeStorage {
         message.setBody(replicateData.getData());
         message.setTimestamp(System.currentTimeMillis());
         //本机接受数据
-        Partition partition = partitionSystem.getOrNewPartition(getJobDataPartGroup(replicateData.getJobName()), buildPartName(replicateData.getPiperGroup(), replicateData.getJobName()));
+        Partition partition = partitionSystem.getOrNewPartition(getJobDataPartGroup(replicateData.getJobName()),
+                buildPartName(replicateData.getPiperGroup(), replicateData.getJobName()));
         return partition.append(message);
     }
 
@@ -65,7 +67,8 @@ public class LocalJobRuntimeStorage implements JobRuntimeStorage {
     @Override
     public List<ReplicateData> readReplicateData(ReplicateDataReq req){
         List<ReplicateData> replicateData = new ArrayList<>();
-        Partition partition = partitionSystem.getPartition(getJobDataPartGroup(req.getJobName()), buildPartName(req.getPiperGroup(), req.getJobName()));
+        Partition partition = partitionSystem.getPartition(getJobDataPartGroup(req.getJobName()),
+                buildPartName(req.getPiperGroup(), req.getJobName()));
         if(partition == null){
             logger.warn("查询的分片不存在, group:{} name:{}", req.getPiperGroup(), req.getJobName());
             return null;
@@ -129,7 +132,8 @@ public class LocalJobRuntimeStorage implements JobRuntimeStorage {
     @Override
     public void writeConsumedNextOffset(ConsumeNextOffset consumeNextOffset){
         //更新分片消费信息
-        Partition partition = partitionSystem.getOrNewPartition(getJobDataConsumeGroup(consumeNextOffset.getJobName()), buildPartName(consumeNextOffset.getPiperGroup(), consumeNextOffset.getJobName()));
+        Partition partition = partitionSystem.getOrNewPartition(getJobDataConsumeGroup(consumeNextOffset.getJobName()),
+                buildPartName(consumeNextOffset.getPiperGroup(), consumeNextOffset.getJobName()));
         DataEntry dataEntry = partition.get(0);
         if(dataEntry == null){
             dataEntry = new DataEntry();
@@ -140,5 +144,20 @@ public class LocalJobRuntimeStorage implements JobRuntimeStorage {
                 String.valueOf(consumeNextOffset.getNextOffset()).getBytes());
         dataEntry.setTimestamp(System.currentTimeMillis());
         partition.append(dataEntry);
+    }
+
+    @Override
+    public List<ReplicateData> handleReplicateDataReq(ReplicateDataReq req) {
+        return readReplicateData(req);
+    }
+
+    @Override
+    public void handleReplicateData(ReplicateData replicateData) {
+        writeReplicateData(replicateData);
+    }
+
+    @Override
+    public void handleConsumeNextOffset(ConsumeNextOffset consumeNextOffset) {
+        writeConsumedNextOffset(consumeNextOffset);
     }
 }

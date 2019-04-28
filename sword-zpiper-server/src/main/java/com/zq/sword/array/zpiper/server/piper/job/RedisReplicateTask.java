@@ -32,8 +32,8 @@ public class RedisReplicateTask extends AbstractTask implements ReplicateTask {
 
     private JobRuntimeStorage jobRuntimeStorage;
 
-    public RedisReplicateTask(JobContext context, CycleDisposeHandler<RedisCommand> cycleDisposeHandler)  {
-        super(TASK_NAME);
+    public RedisReplicateTask(Job job, JobContext context, CycleDisposeHandler<RedisCommand> cycleDisposeHandler)  {
+        super(job, TASK_NAME);
         this.context = context;
 
         //设置redis 复制器

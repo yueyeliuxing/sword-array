@@ -70,7 +70,6 @@ public class ClusterJobRuntimeStorage implements JobRuntimeStorage {
         jobDataBackupHandler.handleBackupPiperChange(incrementBackupPipers, decreaseBackupPipers);
     }
 
-
     /**
      * 销毁
      */

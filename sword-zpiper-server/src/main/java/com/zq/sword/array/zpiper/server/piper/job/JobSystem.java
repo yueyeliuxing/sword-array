@@ -15,6 +15,8 @@ public class JobSystem {
 
     private Map<String, Job> jobs;
 
+    private TaskMonitor taskMonitor;
+
     private JobSystem() {
         jobs = new ConcurrentHashMap<>();
     }
@@ -38,6 +40,7 @@ public class JobSystem {
      */
     public void createJob(JobContext context, TaskMonitor monitor){
         Job job = new Job(context);
+        job.setTaskMonitor(monitor);
         jobs.put(job.name(), job);
     }
 

@@ -3,6 +3,7 @@ package com.zq.sword.array.zpiper.server.piper.job;
 import com.zq.sword.array.zpiper.server.piper.job.dto.*;
 import com.zq.sword.array.zpiper.server.piper.job.monitor.TaskHealth;
 import com.zq.sword.array.zpiper.server.piper.job.monitor.TaskMonitor;
+import com.zq.sword.array.zpiper.server.piper.job.storage.JobRuntimeStorage;
 import com.zq.sword.array.zpiper.server.piper.job.storage.LocalJobRuntimeStorage;
 import com.zq.sword.array.zpiper.server.piper.protocol.PiperNameProtocol;
 import com.zq.sword.array.zpiper.server.piper.protocol.PiperServiceProtocol;
@@ -19,7 +20,7 @@ import java.util.List;
  * @author: zhouqi1
  * @create: 2019-04-26 14:12
  **/
-public class JobController implements JobCommandProcessor {
+public class JobController implements JobCommandProcessor, ReplicateDataReqProcessor {
 
     private Logger logger = LoggerFactory.getLogger(JobController.class);
 
@@ -36,18 +37,21 @@ public class JobController implements JobCommandProcessor {
     /**
      * 数据分片存储系统
      */
-    private LocalJobRuntimeStorage jobRuntimeStorage;
+    private JobRuntimeStorage jobRuntimeStorage;
 
     private JobSystem jobSystem;
 
-    public JobController(PiperNameProtocol piperNameProtocol, PiperServiceProtocol piperServiceProtocol, String jobRuntimeStoragePath) {
+    private TaskMonitor taskMonitor;
+
+    public JobController(String jobRuntimeStoragePath, TaskMonitor taskMonitor) {
         this.piperNameProtocol = piperNameProtocol;
         this.piperServiceProtocol = piperServiceProtocol;
         this.jobRuntimeStorage = new LocalJobRuntimeStorage(jobRuntimeStoragePath);
+
         this.jobSystem = JobSystem.getInstance();
 
         this.piperNameProtocol.setJobCommandProcessor(this);
-        this.piperServiceProtocol.setJobRuntimeStorageProcessor(new DefaultReplicateDataReqProcessor());
+        this.piperServiceProtocol.setJobRuntimeStorageProcessor((LocalJobRuntimeStorage)jobRuntimeStorage);
     }
 
     /**
@@ -102,34 +106,20 @@ public class JobController implements JobCommandProcessor {
         }
         logger.info("获取PiperNamer命令:{}", jobCommand);
     }
-    /**
-     * Job健康监控器
-     */
-    private class JobTaskMonitor implements TaskMonitor {
 
-        @Override
-        public void monitor(TaskHealth health) {
-            piperNameProtocol.reportJobHealth(health);
-        }
+    @Override
+    public List<ReplicateData> handleReplicateDataReq(ReplicateDataReq req) {
+        return jobRuntimeStorage.readReplicateData(req);
     }
 
-    /**
-     * 默认的Job运行时存储处理器
-     */
-    private class DefaultReplicateDataReqProcessor implements ReplicateDataReqProcessor {
-        @Override
-        public List<ReplicateData> obtainReplicateData(ReplicateDataReq req) {
-            return jobRuntimeStorage.readReplicateData(req);
-        }
-
-        @Override
-        public void writeReplicateData(ReplicateData replicateData) {
-            jobRuntimeStorage.writeReplicateData(replicateData);
-        }
-
-        @Override
-        public void writeConsumeNextOffset(ConsumeNextOffset consumeNextOffset) {
-            jobRuntimeStorage.writeConsumedNextOffset(consumeNextOffset);
-        }
+    @Override
+    public void handleReplicateData(ReplicateData replicateData) {
+        jobRuntimeStorage.writeReplicateData(replicateData);
     }
-}
+
+    @Override
+    public void handleConsumeNextOffset(ConsumeNextOffset consumeNextOffset) {
+        jobRuntimeStorage.writeConsumedNextOffset(consumeNextOffset);
+    }
+
+

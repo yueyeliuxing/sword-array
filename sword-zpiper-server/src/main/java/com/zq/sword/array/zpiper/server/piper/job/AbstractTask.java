@@ -23,6 +23,11 @@ public abstract class AbstractTask extends AbstractThreadActuator implements Tas
     private int state = NEW;
 
     /**
+     * 所属的Job
+     */
+    private Job job;
+
+    /**
      * 任务名称
      */
     private String name;
@@ -32,7 +37,8 @@ public abstract class AbstractTask extends AbstractThreadActuator implements Tas
      */
     protected TaskMonitor taskMonitor;
 
-    public AbstractTask(String name) {
+    public AbstractTask(Job job, String name) {
+        this.job = job;
         this.name = name;
     }
 
@@ -52,7 +58,7 @@ public abstract class AbstractTask extends AbstractThreadActuator implements Tas
      */
     protected void state(int state) {
         this.state = state;
-        taskMonitor.monitor(new TaskHealth(name, state));
+        taskMonitor.monitor(new TaskHealth(job.name(), name, state));
     }
 
     /**
@@ -67,7 +73,7 @@ public abstract class AbstractTask extends AbstractThreadActuator implements Tas
     @Override
     public void handleEx(Throwable e) {
         state(EXCEPTION);
-        taskMonitor.monitor(new TaskHealth(name, EXCEPTION, e.getMessage()));
+        taskMonitor.monitor(new TaskHealth(job.name(), name, EXCEPTION, e.getMessage()));
     }
 
     @Override

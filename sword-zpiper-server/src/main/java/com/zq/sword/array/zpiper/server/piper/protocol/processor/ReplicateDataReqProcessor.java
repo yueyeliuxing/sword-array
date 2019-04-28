@@ -19,17 +19,17 @@ public interface ReplicateDataReqProcessor {
      * @param req
      * @return
      */
-    List<ReplicateData> obtainReplicateData(ReplicateDataReq req);
+    List<ReplicateData> handleReplicateDataReq(ReplicateDataReq req);
 
     /**
      * 处理指定消息
      * @param replicateData
      */
-    void writeReplicateData(ReplicateData replicateData);
+    void handleReplicateData(ReplicateData replicateData);
 
     /**
      * 写入要消费下一个的offset
      * @param consumeNextOffset
      */
-   void writeConsumeNextOffset(ConsumeNextOffset consumeNextOffset);
+   void handleConsumeNextOffset(ConsumeNextOffset consumeNextOffset);
 }

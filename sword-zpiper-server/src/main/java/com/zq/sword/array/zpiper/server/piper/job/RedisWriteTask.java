@@ -40,8 +40,8 @@ public class RedisWriteTask extends AbstractTask implements WriteTask {
 
     private JobDataConsumerPool jobDataConsumerPool;
 
-    public RedisWriteTask(JobContext jobContext, CycleDisposeHandler<RedisCommand> cycleDisposeHandler) {
-        super(TASK_NAME);
+    public RedisWriteTask(Job job, JobContext jobContext, CycleDisposeHandler<RedisCommand> cycleDisposeHandler) {
+        super(job, TASK_NAME);
         this.jobContext = jobContext;
         this.jobRuntimeStorage = jobContext.getJobRuntimeStorage();
 

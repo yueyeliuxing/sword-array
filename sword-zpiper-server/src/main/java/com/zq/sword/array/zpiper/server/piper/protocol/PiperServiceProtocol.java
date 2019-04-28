@@ -91,16 +91,16 @@ public class PiperServiceProtocol implements Actuator{
             logger.info("receive msg request : {}", message);
             if(message.getHeader() != null && message.getHeader().getType() == MessageType.RECEIVE_REPLICATE_DATA_REQ.value()) {
                 ReplicateDataReq msgReq = (ReplicateDataReq)message.getBody();
-                List<ReplicateData> msgs  = replicateDataReqProcessor.obtainReplicateData(msgReq);
+                List<ReplicateData> msgs  = replicateDataReqProcessor.handleReplicateDataReq(msgReq);
                 ctx.writeAndFlush(buildReceiveMessageResp(msgs));
             }else if(message.getHeader() != null && message.getHeader().getType() == MessageType.SEND_REPLICATE_DATA_REQ.value()) {
                 ReplicateData replicateData = (ReplicateData)message.getBody();
-                replicateDataReqProcessor.writeReplicateData(replicateData);
+                replicateDataReqProcessor.handleReplicateData(replicateData);
                 ctx.writeAndFlush(buildSendReplicateDataResp(new ReplicateDataId(replicateData.getPiperGroup(),
                         replicateData.getPiperGroup(), replicateData.getOffset())));
             }else if(message.getHeader() != null && message.getHeader().getType() == MessageType.SEND_CONSUME_NEXT_OFFSET_REQ.value()) {
                 ConsumeNextOffset consumeNextOffset = (ConsumeNextOffset)message.getBody();
-                replicateDataReqProcessor.writeConsumeNextOffset(consumeNextOffset);
+                replicateDataReqProcessor.handleConsumeNextOffset(consumeNextOffset);
                 ctx.writeAndFlush(buildSendConsumeNextOffsetResp(consumeNextOffset));
             }else {
                 ctx.fireChannelRead(msg);

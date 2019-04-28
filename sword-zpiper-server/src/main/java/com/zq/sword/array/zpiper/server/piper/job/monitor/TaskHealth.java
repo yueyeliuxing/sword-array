@@ -17,6 +17,11 @@ public class TaskHealth implements Serializable{
     private static final long serialVersionUID = 3949967165495904665L;
 
     /**
+     * Job名称
+     */
+    private String jobName;
+
+    /**
      * 任务名称
      */
     private String name;
@@ -32,12 +37,12 @@ public class TaskHealth implements Serializable{
      */
     private String ex;
 
-    public TaskHealth(String name, int state) {
+    public TaskHealth(String jobName, String name, int state) {
         this.name = name;
         this.state = state;
     }
 
-    public TaskHealth(String name, int state, String ex) {
+    public TaskHealth(String jobName, String name, int state, String ex) {
         this.name = name;
         this.state = state;
         this.ex = ex;

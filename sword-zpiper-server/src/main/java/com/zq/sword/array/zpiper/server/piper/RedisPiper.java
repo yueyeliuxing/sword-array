@@ -1,9 +1,13 @@
 package com.zq.sword.array.zpiper.server.piper;
 
+import com.zq.sword.array.zpiper.server.piper.config.PiperConfig;
 import com.zq.sword.array.zpiper.server.piper.job.JobController;
+import com.zq.sword.array.zpiper.server.piper.job.monitor.TaskHealth;
+import com.zq.sword.array.zpiper.server.piper.job.monitor.TaskMonitor;
+import com.zq.sword.array.zpiper.server.piper.job.storage.JobRuntimeStorage;
+import com.zq.sword.array.zpiper.server.piper.job.storage.LocalJobRuntimeStorage;
 import com.zq.sword.array.zpiper.server.piper.protocol.PiperNameProtocol;
 import com.zq.sword.array.zpiper.server.piper.protocol.PiperServiceProtocol;
-import com.zq.sword.array.zpiper.server.piper.config.PiperConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,16 +34,28 @@ public class RedisPiper implements Piper{
     private PiperNameProtocol piperNameProtocol;
 
     /**
+     * 任务运行时数据存储
+     */
+    private JobRuntimeStorage jobRuntimeStorage;
+
+    /**
      * 分布式任务执行器
      */
-    private JobController jobEnvCluster;
+    private JobController jobController;
 
 
     public RedisPiper(PiperConfig config) {
         this.namePiper = config.namePiper();
         this.piperServiceProtocol = createPiperServiceProtocol(config.piperLocation());
         this.piperNameProtocol = createPiperNameProtocol(config);
-        this.jobEnvCluster = new JobController(piperNameProtocol, piperServiceProtocol, config.dataStorePath());
+
+        this.jobRuntimeStorage = new LocalJobRuntimeStorage(config.dataStorePath());
+
+        this.jobController = new JobController(config.dataStorePath(), new JobTaskMonitor());
+
+        //设置Job命令处理器
+        this.piperNameProtocol.setJobCommandProcessor(jobController);
+        this.piperServiceProtocol.setJobRuntimeStorageProcessor(jobController);
     }
 
     /**
@@ -61,6 +77,18 @@ public class RedisPiper implements Piper{
         PiperServiceProtocol piperServiceProtocol = new PiperServiceProtocol(piperLocation);
         return piperServiceProtocol;
     }
+
+    /**
+     * Job健康监控器
+     */
+    private class JobTaskMonitor implements TaskMonitor {
+
+        @Override
+        public void monitor(TaskHealth health) {
+            piperNameProtocol.reportJobHealth(health);
+        }
+    }
+}
 
     @Override
     public void start() {
