@@ -2,10 +2,10 @@ package com.zq.sword.array.piper.job;
 
 import com.zq.sword.array.tasks.AbstractThreadActuator;
 import com.zq.sword.array.tasks.Actuator;
-import com.zq.sword.array.piper.job.dto.ReplicateData;
-import com.zq.sword.array.piper.job.dto.ReplicateDataReq;
-import com.zq.sword.array.piper.protocol.processor.ConsumeDataRespProcessor;
-import com.zq.sword.array.piper.protocol.InterPiperProtocol;
+import com.zq.sword.array.network.rpc.protocol.dto.data.ReplicateData;
+import com.zq.sword.array.network.rpc.protocol.dto.data.ReplicateDataReq;
+import com.zq.sword.array.network.rpc.protocol.processor.ConsumeDataRespProcessor;
+import com.zq.sword.array.network.rpc.protocol.InterPiperProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

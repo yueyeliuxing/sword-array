@@ -6,10 +6,10 @@ import com.zq.sword.array.data.storage.Partition;
 import com.zq.sword.array.data.storage.PartitionSystem;
 import com.zq.sword.array.id.IdGenerator;
 import com.zq.sword.array.id.SnowFlakeIdGenerator;
-import com.zq.sword.array.piper.job.dto.ConsumeNextOffset;
-import com.zq.sword.array.piper.job.dto.ReplicateData;
-import com.zq.sword.array.piper.job.dto.ReplicateDataReq;
-import com.zq.sword.array.piper.protocol.processor.ReplicateDataReqProcessor;
+import com.zq.sword.array.network.rpc.protocol.dto.data.ConsumeNextOffset;
+import com.zq.sword.array.network.rpc.protocol.dto.data.ReplicateData;
+import com.zq.sword.array.network.rpc.protocol.dto.data.ReplicateDataReq;
+import com.zq.sword.array.network.rpc.protocol.processor.ReplicateDataReqProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

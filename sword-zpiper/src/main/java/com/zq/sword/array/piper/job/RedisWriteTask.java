@@ -1,6 +1,6 @@
 package com.zq.sword.array.piper.job;
 
-import com.zq.sword.array.piper.job.dto.ConsumeNextOffset;
+import com.zq.sword.array.network.rpc.protocol.dto.data.ConsumeNextOffset;
 import com.zq.sword.array.redis.command.CommandMetadata;
 import com.zq.sword.array.redis.command.RedisCommand;
 import com.zq.sword.array.redis.command.RedisCommandDeserializer;
@@ -10,8 +10,8 @@ import com.zq.sword.array.redis.interceptor.CommandInterceptor;
 import com.zq.sword.array.redis.util.RedisConfig;
 import com.zq.sword.array.redis.writer.DefaultRedisWriter;
 import com.zq.sword.array.redis.writer.RedisWriter;
-import com.zq.sword.array.piper.job.dto.ReplicateData;
-import com.zq.sword.array.piper.job.dto.ReplicateDataReq;
+import com.zq.sword.array.network.rpc.protocol.dto.data.ReplicateData;
+import com.zq.sword.array.network.rpc.protocol.dto.data.ReplicateDataReq;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

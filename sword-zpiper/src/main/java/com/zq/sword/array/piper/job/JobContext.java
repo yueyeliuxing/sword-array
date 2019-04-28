@@ -1,6 +1,6 @@
 package com.zq.sword.array.piper.job;
 
-import com.zq.sword.array.piper.job.monitor.TaskMonitor;
+import com.zq.sword.array.network.rpc.protocol.dto.monitor.TaskMonitor;
 import com.zq.sword.array.piper.job.storage.JobRuntimeStorage;
 import lombok.Data;
 

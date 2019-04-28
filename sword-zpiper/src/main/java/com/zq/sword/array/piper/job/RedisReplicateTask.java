@@ -9,7 +9,7 @@ import com.zq.sword.array.redis.interceptor.CommandInterceptor;
 import com.zq.sword.array.redis.replicator.DefaultSlaveRedisReplicator;
 import com.zq.sword.array.redis.replicator.SlaveRedisReplicator;
 import com.zq.sword.array.redis.replicator.listener.RedisReplicatorListener;
-import com.zq.sword.array.piper.job.dto.ReplicateData;
+import com.zq.sword.array.network.rpc.protocol.dto.data.ReplicateData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

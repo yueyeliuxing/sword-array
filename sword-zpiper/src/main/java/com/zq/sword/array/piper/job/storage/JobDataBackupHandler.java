@@ -1,11 +1,11 @@
 package com.zq.sword.array.piper.job.storage;
 
-import com.zq.sword.array.piper.job.dto.ConsumeNextOffset;
-import com.zq.sword.array.piper.protocol.processor.BackupDataRespProcessor;
+import com.zq.sword.array.network.rpc.protocol.dto.data.ConsumeNextOffset;
+import com.zq.sword.array.network.rpc.protocol.processor.BackupDataRespProcessor;
 import com.zq.sword.array.tasks.SingleTaskExecutor;
 import com.zq.sword.array.tasks.TaskExecutor;
-import com.zq.sword.array.piper.job.dto.ReplicateData;
-import com.zq.sword.array.piper.protocol.InterPiperProtocol;
+import com.zq.sword.array.network.rpc.protocol.dto.data.ReplicateData;
+import com.zq.sword.array.network.rpc.protocol.InterPiperProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

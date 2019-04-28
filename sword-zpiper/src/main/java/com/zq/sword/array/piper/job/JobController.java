@@ -1,11 +1,15 @@
 package com.zq.sword.array.piper.job;
 
-import com.zq.sword.array.piper.job.dto.*;
-import com.zq.sword.array.piper.job.storage.LocalJobRuntimeStorage;
-import com.zq.sword.array.piper.protocol.processor.JobCommandProcessor;
-import com.zq.sword.array.piper.job.monitor.TaskMonitor;
+import com.zq.sword.array.network.rpc.protocol.dto.command.JobCommand;
+import com.zq.sword.array.network.rpc.protocol.dto.command.JobType;
+import com.zq.sword.array.network.rpc.protocol.dto.data.ConsumeNextOffset;
+import com.zq.sword.array.network.rpc.protocol.dto.data.ReplicateData;
+import com.zq.sword.array.network.rpc.protocol.dto.data.ReplicateDataReq;
+import com.zq.sword.array.network.rpc.protocol.processor.JobCommandProcessor;
+import com.zq.sword.array.network.rpc.protocol.processor.ReplicateDataReqProcessor;
+import com.zq.sword.array.network.rpc.protocol.dto.monitor.TaskMonitor;
 import com.zq.sword.array.piper.job.storage.JobRuntimeStorage;
-import com.zq.sword.array.piper.protocol.processor.ReplicateDataReqProcessor;
+import com.zq.sword.array.piper.job.storage.LocalJobRuntimeStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

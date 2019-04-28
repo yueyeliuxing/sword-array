@@ -1,12 +1,13 @@
 package com.zq.sword.array.piper;
 
 import com.zq.sword.array.piper.job.JobController;
-import com.zq.sword.array.piper.protocol.InterPiperProtocol;
-import com.zq.sword.array.piper.protocol.PiperNameProtocol;
-import com.zq.sword.array.piper.protocol.PiperServiceProtocol;
+import com.zq.sword.array.network.rpc.protocol.InterPiperProtocol;
+import com.zq.sword.array.network.rpc.protocol.PiperNameProtocol;
+import com.zq.sword.array.network.rpc.protocol.PiperServiceProtocol;
 import com.zq.sword.array.piper.config.PiperConfig;
-import com.zq.sword.array.piper.job.monitor.TaskHealth;
-import com.zq.sword.array.piper.job.monitor.TaskMonitor;
+import com.zq.sword.array.network.rpc.protocol.dto.monitor.TaskHealth;
+import com.zq.sword.array.network.rpc.protocol.dto.monitor.TaskMonitor;
+import com.zq.sword.array.network.rpc.protocol.dto.NamePiper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

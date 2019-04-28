@@ -1,9 +1,9 @@
 package com.zq.sword.array.transfer;
 
-import com.zq.sword.array.network.rpc.client.NettyRpcClient;
-import com.zq.sword.array.network.rpc.client.RpcClient;
-import com.zq.sword.array.network.rpc.server.NettyRpcServer;
-import com.zq.sword.array.network.rpc.server.RpcServer;
+import com.zq.sword.array.network.rpc.framework.client.NettyRpcClient;
+import com.zq.sword.array.network.rpc.framework.client.RpcClient;
+import com.zq.sword.array.network.rpc.framework.server.NettyRpcServer;
+import com.zq.sword.array.network.rpc.framework.server.RpcServer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.socket.nio.NioServerSocketChannel;

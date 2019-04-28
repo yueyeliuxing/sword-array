@@ -1,8 +1,8 @@
 package com.zq.sword.array.piper.job.storage;
 
-import com.zq.sword.array.piper.job.dto.ConsumeNextOffset;
-import com.zq.sword.array.piper.job.dto.ReplicateData;
-import com.zq.sword.array.piper.job.dto.ReplicateDataReq;
+import com.zq.sword.array.network.rpc.protocol.dto.data.ConsumeNextOffset;
+import com.zq.sword.array.network.rpc.protocol.dto.data.ReplicateData;
+import com.zq.sword.array.network.rpc.protocol.dto.data.ReplicateDataReq;
 
 import java.util.List;
 

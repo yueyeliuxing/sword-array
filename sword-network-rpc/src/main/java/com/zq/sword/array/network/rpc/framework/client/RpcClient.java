@@ -1,0 +1,41 @@
+package com.zq.sword.array.network.rpc.framework.client;
+
+import com.zq.sword.array.network.rpc.framework.handler.TransferHandler;
+
+/**
+ * @program: sword-array
+ * @description: 传输客户端
+ * @author: zhouqi1
+ * @create: 2018-08-01 20:00
+ **/
+public interface RpcClient {
+
+    /**
+     * 注册业务处理器
+     * @param transferHandler
+     */
+    void registerTransferHandler(TransferHandler transferHandler);
+
+    /**
+     * 开启
+     */
+    void connect();
+
+
+    /**
+     * 写入数据
+     * @param msg
+     */
+    void write(Object msg);
+
+    /**
+     * 关闭
+     */
+    void disconnect();
+
+    /**
+     * 是否关闭
+     * @return
+     */
+    boolean isClose();
+}
