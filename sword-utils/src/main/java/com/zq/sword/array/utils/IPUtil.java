@@ -1,4 +1,4 @@
-package com.zq.sword.array.common.utils;
+package com.zq.sword.array.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

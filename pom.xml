@@ -17,7 +17,7 @@
 	<url>https://github.com/yueyeiuxing03/sword-array</url>
 
 	<modules>
-		<module>sword-common</module>
+		<module>sword-utils</module>
 		<module>sword-tasks</module>
 		<module>sword-id-generator</module>
 		<module>sword-redis</module>

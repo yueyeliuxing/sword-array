@@ -1,9 +1,7 @@
-package com.zq.sword.array.common.utils;
+package com.zq.sword.array.utils;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

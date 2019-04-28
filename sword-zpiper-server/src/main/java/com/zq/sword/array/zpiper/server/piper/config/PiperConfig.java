@@ -1,6 +1,6 @@
 package com.zq.sword.array.zpiper.server.piper.config;
 
-import com.zq.sword.array.common.utils.IPUtil;
+import com.zq.sword.array.utils.IPUtil;
 import com.zq.sword.array.zpiper.server.piper.NamePiper;
 import org.springframework.core.env.Environment;
 

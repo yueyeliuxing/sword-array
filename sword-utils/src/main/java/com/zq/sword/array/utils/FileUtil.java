@@ -1,8 +1,7 @@
-package com.zq.sword.array.common.utils;
+package com.zq.sword.array.utils;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
-import com.google.common.io.LineProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

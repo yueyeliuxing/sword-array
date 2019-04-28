@@ -1,4 +1,4 @@
-package com.zq.sword.array.common.utils;
+package com.zq.sword.array.utils;
 
 import java.io.UnsupportedEncodingException;
 

@@ -44,9 +44,9 @@
 		<relativePath>../</relativePath>
 	</parent>
 
-	<artifactId>sword-common</artifactId>
+	<artifactId>sword-utils</artifactId>
 	<packaging>jar</packaging>
-	<name>sword-common</name>
+	<name>sword-utils</name>
 
 	<properties>
 		<slf4j.version>1.7.12</slf4j.version>

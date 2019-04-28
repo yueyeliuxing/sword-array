@@ -53,7 +53,7 @@
 
 		<dependency>
 			<groupId>com.zq.sword</groupId>
-			<artifactId>sword-common</artifactId>
+			<artifactId>sword-utils</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

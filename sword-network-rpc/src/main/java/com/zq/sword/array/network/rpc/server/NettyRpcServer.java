@@ -1,6 +1,6 @@
 package com.zq.sword.array.network.rpc.server;
 
-import com.zq.sword.array.common.utils.IPUtil;
+import com.zq.sword.array.utils.IPUtil;
 import com.zq.sword.array.network.rpc.handler.TransferHandler;
 import com.zq.sword.array.network.rpc.coder.NettyMessageDecoder;
 import com.zq.sword.array.network.rpc.coder.NettyMessageEncoder;
