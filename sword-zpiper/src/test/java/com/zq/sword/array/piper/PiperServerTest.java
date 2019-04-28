@@ -1,4 +1,4 @@
-package com.zq.sword.array.zpiper.transfer;
+package com.zq.sword.array.piper;
 
 import org.junit.Test;
 
