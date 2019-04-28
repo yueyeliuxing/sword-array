@@ -120,6 +120,9 @@ public class PiperNameProtocol implements Actuator{
             TransferMessage message = (TransferMessage)msg;
             if(message.getHeader() != null && message.getHeader().getType() == MessageType.JOB_COMMAND_RESP.value()) {
                 JobCommand jobCommand = (JobCommand)message.getBody();
+                if(jobCommand == null){
+                    return;
+                }
                 //监听器接收Job命令
                 jobCommandProcessor.accept(jobCommand);
             }else {
