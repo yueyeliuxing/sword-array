@@ -1,5 +1,6 @@
 package com.zq.sword.array.zpiper.server.piper.job;
 
+import com.zq.sword.array.zpiper.server.piper.job.monitor.TaskMonitor;
 import com.zq.sword.array.zpiper.server.piper.job.storage.JobRuntimeStorage;
 import lombok.Data;
 
@@ -15,43 +16,55 @@ import java.util.List;
 public class JobContext {
 
     /**
-     *  任务名称 唯一
+     * Job环境
      */
-    private String name;
-
-    /**
-     * 源Group
-     */
-    private String piperGroup;
-
-    /**
-     * 源redis
-     */
-    private String sourceRedis;
-
-    /**
-     * 备份的piper
-     */
-    private List<String> backupPipers;
-
-    /**
-     * 消费的piper  PiperGroup|PiperLocation
-     * 从目标piper获取数据
-     */
-    private List<String> consumePipers;
+    private JobEnv jobEnv;
 
     /**
      * Job运行时存储
      */
     private JobRuntimeStorage jobRuntimeStorage;
 
-    public JobContext(String name, String piperGroup, String sourceRedis, List<String> backupPipers, List<String> consumePipers,
-                      JobRuntimeStorage jobRuntimeStorage) {
-        this.name = name;
-        this.piperGroup = piperGroup;
-        this.sourceRedis = sourceRedis;
-        this.backupPipers = backupPipers;
-        this.consumePipers = consumePipers;
+    /**
+     * 任务监控器
+     */
+    private TaskMonitor taskMonitor;
+
+    public JobContext(JobEnv jobEnv, JobRuntimeStorage jobRuntimeStorage, TaskMonitor taskMonitor) {
+        this.jobEnv = jobEnv;
         this.jobRuntimeStorage = jobRuntimeStorage;
+        this.taskMonitor = taskMonitor;
+    }
+
+    public String getName() {
+        return jobEnv.getName();
+    }
+
+    public String getPiperGroup() {
+        return jobEnv.getPiperGroup();
+    }
+
+    public String getSourceRedis() {
+        return jobEnv.getSourceRedis();
+    }
+
+    public List<String> getBackupPipers() {
+        return jobEnv.getBackupPipers();
+    }
+
+    public List<String> getConsumePipers() {
+        return jobEnv.getConsumePipers();
+    }
+
+    public JobRuntimeStorage getJobRuntimeStorage() {
+        return jobRuntimeStorage;
+    }
+
+    public void setJobRuntimeStorage(JobRuntimeStorage jobRuntimeStorage) {
+        this.jobRuntimeStorage = jobRuntimeStorage;
+    }
+
+    public TaskMonitor getTaskMonitor() {
+        return taskMonitor;
     }
 }

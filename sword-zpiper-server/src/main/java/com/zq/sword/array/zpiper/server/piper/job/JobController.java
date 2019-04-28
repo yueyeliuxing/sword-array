@@ -1,12 +1,9 @@
 package com.zq.sword.array.zpiper.server.piper.job;
 
 import com.zq.sword.array.zpiper.server.piper.job.dto.*;
-import com.zq.sword.array.zpiper.server.piper.job.monitor.TaskHealth;
 import com.zq.sword.array.zpiper.server.piper.job.monitor.TaskMonitor;
 import com.zq.sword.array.zpiper.server.piper.job.storage.JobRuntimeStorage;
 import com.zq.sword.array.zpiper.server.piper.job.storage.LocalJobRuntimeStorage;
-import com.zq.sword.array.zpiper.server.piper.protocol.PiperNameProtocol;
-import com.zq.sword.array.zpiper.server.piper.protocol.PiperServiceProtocol;
 import com.zq.sword.array.zpiper.server.piper.protocol.processor.JobCommandProcessor;
 import com.zq.sword.array.zpiper.server.piper.protocol.processor.ReplicateDataReqProcessor;
 import org.slf4j.Logger;
@@ -25,53 +22,34 @@ public class JobController implements JobCommandProcessor, ReplicateDataReqProce
     private Logger logger = LoggerFactory.getLogger(JobController.class);
 
     /**
-     * Job环境集群处理
-     */
-    private PiperNameProtocol piperNameProtocol;
-
-    /**
-     * 本Piper服务通信
-     */
-    private PiperServiceProtocol piperServiceProtocol;
-
-    /**
      * 数据分片存储系统
      */
     private JobRuntimeStorage jobRuntimeStorage;
 
     private JobSystem jobSystem;
 
-    private TaskMonitor taskMonitor;
-
     public JobController(String jobRuntimeStoragePath, TaskMonitor taskMonitor) {
-        this.piperNameProtocol = piperNameProtocol;
-        this.piperServiceProtocol = piperServiceProtocol;
         this.jobRuntimeStorage = new LocalJobRuntimeStorage(jobRuntimeStoragePath);
-
-        this.jobSystem = JobSystem.getInstance();
-
-        this.piperNameProtocol.setJobCommandProcessor(this);
-        this.piperServiceProtocol.setJobRuntimeStorageProcessor((LocalJobRuntimeStorage)jobRuntimeStorage);
+        this.jobSystem = new JobSystem(jobRuntimeStorage, taskMonitor);
     }
 
     /**
      * 处理Job控制相关的命令
+     *
      * @param jobCommand
      */
     @Override
     public void accept(JobCommand jobCommand) {
         JobType jobType = JobType.toType(jobCommand.getType());
-        if(jobType == null){
+        if (jobType == null) {
             return;
         }
         Job job = null;
-        switch (jobType){
+        switch (jobType) {
             case JOB_NEW:
                 //创建Job
-                jobSystem.createJob(new JobContext(jobCommand.getName(), jobCommand.getPiperGroup(),
-                        jobCommand.getSourceRedis(), jobCommand.getBackupPipers(), jobCommand.getConsumePipers(),
-                                jobRuntimeStorage),
-                        new JobTaskMonitor());
+                jobSystem.createJob(new JobEnv(jobCommand.getName(), jobCommand.getPiperGroup(),
+                        jobCommand.getSourceRedis(), jobCommand.getBackupPipers(), jobCommand.getConsumePipers()));
                 break;
             case JOB_START:
                 //开启
@@ -121,5 +99,7 @@ public class JobController implements JobCommandProcessor, ReplicateDataReqProce
     public void handleConsumeNextOffset(ConsumeNextOffset consumeNextOffset) {
         jobRuntimeStorage.writeConsumedNextOffset(consumeNextOffset);
     }
+
+}
 
 

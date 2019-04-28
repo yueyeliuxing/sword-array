@@ -10,7 +10,6 @@ import com.zq.sword.array.redis.replicator.DefaultSlaveRedisReplicator;
 import com.zq.sword.array.redis.replicator.SlaveRedisReplicator;
 import com.zq.sword.array.redis.replicator.listener.RedisReplicatorListener;
 import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateData;
-import com.zq.sword.array.zpiper.server.piper.job.storage.JobRuntimeStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,18 +29,14 @@ public class RedisReplicateTask extends AbstractTask implements ReplicateTask {
 
     private SlaveRedisReplicator redisReplicator;
 
-    private JobRuntimeStorage jobRuntimeStorage;
-
     public RedisReplicateTask(Job job, JobContext context, CycleDisposeHandler<RedisCommand> cycleDisposeHandler)  {
-        super(job, TASK_NAME);
+        super(job, TASK_NAME, context.getJobRuntimeStorage(), context.getTaskMonitor());
         this.context = context;
 
         //设置redis 复制器
         redisReplicator = new DefaultSlaveRedisReplicator(this.context.getSourceRedis());
         redisReplicator.addCommandInterceptor(new CycleCommandFilterInterceptor(cycleDisposeHandler));
         redisReplicator.addRedisReplicatorListener(new RedisCommandListener());
-
-        this.jobRuntimeStorage = context.getJobRuntimeStorage();
     }
 
     /**

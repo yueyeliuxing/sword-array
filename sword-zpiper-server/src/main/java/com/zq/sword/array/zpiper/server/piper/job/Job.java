@@ -3,7 +3,6 @@ package com.zq.sword.array.zpiper.server.piper.job;
 import com.zq.sword.array.redis.command.RedisCommand;
 import com.zq.sword.array.redis.handler.CycleDisposeHandler;
 import com.zq.sword.array.redis.handler.SimpleCycleDisposeHandler;
-import com.zq.sword.array.zpiper.server.piper.job.monitor.TaskMonitor;
 import com.zq.sword.array.zpiper.server.piper.job.storage.ClusterJobRuntimeStorage;
 
 import java.util.List;
@@ -50,15 +49,6 @@ public class Job {
 
         //创建WriteTask
         writeTask = new RedisWriteTask(this, jobContext, cycleDisposeHandler);
-    }
-
-    /**
-     * 设置任务监控器
-     * @param taskMonitor
-     */
-    public void setTaskMonitor(TaskMonitor taskMonitor){
-        replicateTask.setTaskMonitor(taskMonitor);
-        writeTask.setTaskMonitor(taskMonitor);
     }
 
     /**

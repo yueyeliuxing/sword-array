@@ -1,7 +1,6 @@
 package com.zq.sword.array.zpiper.server.piper.job;
 
 import com.zq.sword.array.tasks.Actuator;
-import com.zq.sword.array.zpiper.server.piper.job.monitor.TaskMonitor;
 
 /**
  * @program: sword-array
@@ -22,10 +21,5 @@ public interface Task extends Actuator {
      * @return
      */
     String name();
-
-    /**
-     * 设置任务监控器
-     */
-    void setTaskMonitor(TaskMonitor taskMonitor);
 
 }

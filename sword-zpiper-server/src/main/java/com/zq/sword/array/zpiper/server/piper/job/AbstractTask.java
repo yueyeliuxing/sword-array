@@ -3,6 +3,7 @@ package com.zq.sword.array.zpiper.server.piper.job;
 import com.zq.sword.array.tasks.AbstractThreadActuator;
 import com.zq.sword.array.zpiper.server.piper.job.monitor.TaskHealth;
 import com.zq.sword.array.zpiper.server.piper.job.monitor.TaskMonitor;
+import com.zq.sword.array.zpiper.server.piper.job.storage.JobRuntimeStorage;
 
 /**
  * @program: sword-array
@@ -20,26 +21,33 @@ public abstract class AbstractTask extends AbstractThreadActuator implements Tas
     /**
      * 任务状态 0 未开启 1 已开启 2 发生异常
      */
-    private int state = NEW;
+    protected int state = NEW;
 
     /**
      * 所属的Job
      */
-    private Job job;
+    protected Job job;
 
     /**
      * 任务名称
      */
-    private String name;
+    protected String name;
+
+    /**
+     * job运行时数据存储
+     */
+    protected JobRuntimeStorage jobRuntimeStorage;
 
     /**
      * 任务监控器
      */
     protected TaskMonitor taskMonitor;
 
-    public AbstractTask(Job job, String name) {
+    public AbstractTask(Job job, String name, JobRuntimeStorage jobRuntimeStorage, TaskMonitor taskMonitor) {
         this.job = job;
         this.name = name;
+        this.jobRuntimeStorage = jobRuntimeStorage;
+        this.taskMonitor = taskMonitor;
     }
 
     @Override
@@ -59,15 +67,6 @@ public abstract class AbstractTask extends AbstractThreadActuator implements Tas
     protected void state(int state) {
         this.state = state;
         taskMonitor.monitor(new TaskHealth(job.name(), name, state));
-    }
-
-    /**
-     * 设置任务监控器
-     * @param taskMonitor
-     */
-    @Override
-    public void setTaskMonitor(TaskMonitor taskMonitor) {
-        this.taskMonitor = taskMonitor;
     }
 
     @Override

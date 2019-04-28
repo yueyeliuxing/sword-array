@@ -1,6 +1,7 @@
 package com.zq.sword.array.zpiper.server.piper.job;
 
 import com.zq.sword.array.zpiper.server.piper.job.monitor.TaskMonitor;
+import com.zq.sword.array.zpiper.server.piper.job.storage.JobRuntimeStorage;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,34 +14,35 @@ import java.util.concurrent.ConcurrentHashMap;
  **/
 public class JobSystem {
 
+    /**
+     * Job容器
+     */
     private Map<String, Job> jobs;
 
+    /**
+     * 数据分片存储系统
+     */
+    private JobRuntimeStorage jobRuntimeStorage;
+
+    /**
+     * 任务监控器
+     */
     private TaskMonitor taskMonitor;
 
-    private JobSystem() {
+    public JobSystem(JobRuntimeStorage jobRuntimeStorage, TaskMonitor taskMonitor) {
+        this.jobRuntimeStorage = jobRuntimeStorage;
+        this.taskMonitor = taskMonitor;
         jobs = new ConcurrentHashMap<>();
     }
 
-    private static class JobSystemBuilder {
-        public static JobSystem JOB_SYSTEM = new JobSystem();
-    }
 
-    /**
-     * 获取单例对象
-     * @return
-     */
-    public static JobSystem getInstance(){
-        return JobSystemBuilder.JOB_SYSTEM;
-    }
 
     /**
      * 创建Job
-     * @param context 任务上下文
-     * @param monitor 任务监听器
+     * @param jobEnv Job环境
      */
-    public void createJob(JobContext context, TaskMonitor monitor){
-        Job job = new Job(context);
-        job.setTaskMonitor(monitor);
+    public void createJob(JobEnv jobEnv){
+        Job job = new Job(new JobContext(jobEnv, jobRuntimeStorage, taskMonitor));
         jobs.put(job.name(), job);
     }
 

@@ -12,7 +12,6 @@ import com.zq.sword.array.redis.writer.RedisWriter;
 import com.zq.sword.array.zpiper.server.piper.job.dto.ConsumeNextOffset;
 import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateData;
 import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateDataReq;
-import com.zq.sword.array.zpiper.server.piper.job.storage.JobRuntimeStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,16 +33,13 @@ public class RedisWriteTask extends AbstractTask implements WriteTask {
 
     private JobContext jobContext;
 
-    private JobRuntimeStorage jobRuntimeStorage;
-
     private RedisWriter redisWriter;
 
     private JobDataConsumerPool jobDataConsumerPool;
 
     public RedisWriteTask(Job job, JobContext jobContext, CycleDisposeHandler<RedisCommand> cycleDisposeHandler) {
-        super(job, TASK_NAME);
+        super(job, TASK_NAME, jobContext.getJobRuntimeStorage(), jobContext.getTaskMonitor());
         this.jobContext = jobContext;
-        this.jobRuntimeStorage = jobContext.getJobRuntimeStorage();
 
         //设置redis 写入器
         redisWriter = new DefaultRedisWriter(new RedisConfig(jobContext.getSourceRedis()));
