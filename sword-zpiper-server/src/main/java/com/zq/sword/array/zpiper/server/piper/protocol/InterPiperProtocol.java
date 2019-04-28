@@ -6,6 +6,7 @@ import com.zq.sword.array.network.rpc.handler.TransferHandler;
 import com.zq.sword.array.network.rpc.message.Header;
 import com.zq.sword.array.network.rpc.message.MessageType;
 import com.zq.sword.array.network.rpc.message.TransferMessage;
+import com.zq.sword.array.tasks.Actuator;
 import com.zq.sword.array.zpiper.server.piper.job.dto.ConsumeNextOffset;
 import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateData;
 import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateDataId;
@@ -27,7 +28,7 @@ import java.util.Map;
  * @author: zhouqi1
  * @create: 2019-01-16 19:32
  **/
-public class InterPiperProtocol {
+public class InterPiperProtocol implements Actuator {
 
     private Map<String, InterPiperClient> piperRpcClients;
 
@@ -37,6 +38,18 @@ public class InterPiperProtocol {
 
     public static InterPiperProtocol getInstance(){
         return InterPiperProtocolBuilder.INTER_PIPER_PROTOCOL;
+    }
+
+    @Override
+    public void start() {
+
+    }
+
+    @Override
+    public void stop() {
+        for(InterPiperClient piperClient : piperRpcClients.values()){
+            piperClient.disconnect();
+        }
     }
 
     private static class InterPiperProtocolBuilder {

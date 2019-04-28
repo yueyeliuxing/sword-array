@@ -4,6 +4,7 @@ import com.zq.sword.array.zpiper.server.piper.config.PiperConfig;
 import com.zq.sword.array.zpiper.server.piper.job.JobController;
 import com.zq.sword.array.zpiper.server.piper.job.monitor.TaskHealth;
 import com.zq.sword.array.zpiper.server.piper.job.monitor.TaskMonitor;
+import com.zq.sword.array.zpiper.server.piper.protocol.InterPiperProtocol;
 import com.zq.sword.array.zpiper.server.piper.protocol.PiperNameProtocol;
 import com.zq.sword.array.zpiper.server.piper.protocol.PiperServiceProtocol;
 import org.slf4j.Logger;
@@ -99,5 +100,6 @@ public class RedisPiper implements Piper{
     public void stop() {
         piperNameProtocol.stop();
         piperServiceProtocol.stop();
+        InterPiperProtocol.getInstance().stop();
     }
 }
