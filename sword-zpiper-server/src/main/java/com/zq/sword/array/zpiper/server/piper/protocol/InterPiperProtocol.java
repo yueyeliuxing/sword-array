@@ -1,4 +1,4 @@
-package com.zq.sword.array.zpiper.server.piper.cluster.protocol;
+package com.zq.sword.array.zpiper.server.piper.protocol;
 
 import com.zq.sword.array.network.rpc.client.NettyRpcClient;
 import com.zq.sword.array.network.rpc.client.RpcClient;

@@ -1,12 +1,15 @@
-package com.zq.sword.array.zpiper.server.piper.cluster;
+package com.zq.sword.array.zpiper.server.piper.job.cluster;
 
 import com.zq.sword.array.common.event.HotspotEvent;
 import com.zq.sword.array.common.event.HotspotEventListener;
+import com.zq.sword.array.zpiper.server.piper.job.monitor.TaskHealth;
+import com.zq.sword.array.zpiper.server.piper.job.monitor.TaskMonitor;
 import com.zq.sword.array.zpiper.server.piper.job.processor.ReplicateDataReqProcessor;
-import com.zq.sword.array.zpiper.server.piper.cluster.protocol.PiperNameProtocol;
-import com.zq.sword.array.zpiper.server.piper.cluster.protocol.PiperServiceProtocol;
+import com.zq.sword.array.zpiper.server.piper.protocol.PiperNameProtocol;
+import com.zq.sword.array.zpiper.server.piper.protocol.PiperServiceProtocol;
 import com.zq.sword.array.zpiper.server.piper.job.dto.*;
 import com.zq.sword.array.zpiper.server.piper.job.*;
+import com.zq.sword.array.zpiper.server.piper.job.storage.JobRuntimeStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -132,12 +135,12 @@ public class JobControlCluster {
 
         @Override
         public void writeReplicateData(ReplicateData replicateData) {
-            JobControlCluster.this.jobRuntimeStorage.writeReplicateData(replicateData);
+            jobRuntimeStorage.writeReplicateData(replicateData);
         }
 
         @Override
         public void writeConsumeNextOffset(ConsumeNextOffset consumeNextOffset) {
-            JobControlCluster.this.jobRuntimeStorage.writeConsumeNextOffset(consumeNextOffset);
+            jobRuntimeStorage.writeConsumeNextOffset(consumeNextOffset);
         }
     }
 }

@@ -1,11 +1,11 @@
-package com.zq.sword.array.zpiper.server.piper.cluster;
+package com.zq.sword.array.zpiper.server.piper.job.cluster;
 
 import com.zq.sword.array.common.event.HotspotEvent;
 import com.zq.sword.array.common.event.HotspotEventListener;
 import com.zq.sword.array.tasks.SingleTaskExecutor;
 import com.zq.sword.array.tasks.TaskExecutor;
-import com.zq.sword.array.zpiper.server.piper.cluster.protocol.InterPiperProtocol;
-import com.zq.sword.array.zpiper.server.piper.cluster.protocol.PiperNameProtocol;
+import com.zq.sword.array.zpiper.server.piper.protocol.InterPiperProtocol;
+import com.zq.sword.array.zpiper.server.piper.protocol.PiperNameProtocol;
 import com.zq.sword.array.zpiper.server.piper.job.dto.*;
 import com.zq.sword.array.zpiper.server.piper.job.processor.BackupDataRespProcessor;
 import com.zq.sword.array.zpiper.server.piper.job.processor.ReplicateTaskBackupProcessor;

@@ -9,19 +9,20 @@ import com.zq.sword.array.redis.interceptor.CommandInterceptor;
 import com.zq.sword.array.redis.util.RedisConfig;
 import com.zq.sword.array.redis.writer.DefaultRedisWriter;
 import com.zq.sword.array.redis.writer.RedisWriter;
-import com.zq.sword.array.zpiper.server.piper.cluster.JobDataBackupCluster;
-import com.zq.sword.array.zpiper.server.piper.cluster.JobDataConsumeCluster;
+import com.zq.sword.array.zpiper.server.piper.job.cluster.JobDataBackupCluster;
+import com.zq.sword.array.zpiper.server.piper.job.cluster.JobDataConsumeCluster;
 import com.zq.sword.array.zpiper.server.piper.job.dto.ConsumeNextOffset;
 import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateData;
 import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateDataReq;
 import com.zq.sword.array.zpiper.server.piper.job.processor.WriteTaskBackupProcessor;
+import com.zq.sword.array.zpiper.server.piper.job.storage.JobRuntimeStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static com.zq.sword.array.zpiper.server.piper.cluster.JobDataConsumeCluster.PartitionConsumerBuilder;
-import static com.zq.sword.array.zpiper.server.piper.cluster.JobDataConsumeCluster.get;
+import static com.zq.sword.array.zpiper.server.piper.job.cluster.JobDataConsumeCluster.PartitionConsumerBuilder;
+import static com.zq.sword.array.zpiper.server.piper.job.cluster.JobDataConsumeCluster.get;
 
 /**
  * @program: sword-array
@@ -54,6 +55,7 @@ public class RedisWriteTask extends AbstractTask implements WriteTask {
         redisWriter = new DefaultRedisWriter(new RedisConfig(jobEnv.getSourceRedis()));
         redisWriter.addCommandInterceptor(new CycleCommandAddInterceptor(cycleDisposeHandler));
 
+        //Job运行时数据本分处理器
         this.jobDataBackupCluster = JobDataBackupCluster.get(jobEnv.getName());
         this.jobDataBackupCluster.setWriteTaskBackupProcessor(new WriteTaskBackupProcessor() {
             @Override
@@ -62,10 +64,11 @@ public class RedisWriteTask extends AbstractTask implements WriteTask {
             }
         });
 
+        //Job任务运行 数据消费处理器
         this.jobDataConsumeCluster = get(jobEnv.getName());
         this.jobDataConsumeCluster.setPartitionConsumerBuilder(new PartitionConsumerBuilder() {
             @Override
-            public JobDataConsumeCluster.PartitionConsumer build(String consumePiperLocation) {
+            public JobDataConsumeCluster.DataConsumer build(String consumePiperLocation) {
                 return new ReplicateDataConsumer(consumePiperLocation);
             }
         });
@@ -74,7 +77,7 @@ public class RedisWriteTask extends AbstractTask implements WriteTask {
     /**
      * 数据消费者
      */
-    public class ReplicateDataConsumer extends JobDataConsumeCluster.PartitionConsumer {
+    public class ReplicateDataConsumer extends JobDataConsumeCluster.DataConsumer {
 
         private volatile boolean isCanReq = true;
 

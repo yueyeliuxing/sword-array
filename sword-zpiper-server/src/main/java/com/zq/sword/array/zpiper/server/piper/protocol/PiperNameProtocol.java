@@ -1,4 +1,4 @@
-package com.zq.sword.array.zpiper.server.piper.cluster.protocol;
+package com.zq.sword.array.zpiper.server.piper.protocol;
 
 import com.zq.sword.array.common.event.DefaultHotspotEventEmitter;
 import com.zq.sword.array.common.event.HotspotEvent;
@@ -12,7 +12,7 @@ import com.zq.sword.array.network.rpc.message.MessageType;
 import com.zq.sword.array.network.rpc.message.TransferMessage;
 import com.zq.sword.array.tasks.Actuator;
 import com.zq.sword.array.zpiper.server.piper.NamePiper;
-import com.zq.sword.array.zpiper.server.piper.job.TaskHealth;
+import com.zq.sword.array.zpiper.server.piper.job.monitor.TaskHealth;
 import com.zq.sword.array.zpiper.server.piper.job.dto.JobCommand;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;

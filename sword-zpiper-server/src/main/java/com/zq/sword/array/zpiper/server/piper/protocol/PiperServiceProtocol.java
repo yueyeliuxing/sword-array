@@ -1,4 +1,4 @@
-package com.zq.sword.array.zpiper.server.piper.cluster.protocol;
+package com.zq.sword.array.zpiper.server.piper.protocol;
 
 import com.zq.sword.array.network.rpc.handler.TransferHandler;
 import com.zq.sword.array.network.rpc.message.Header;

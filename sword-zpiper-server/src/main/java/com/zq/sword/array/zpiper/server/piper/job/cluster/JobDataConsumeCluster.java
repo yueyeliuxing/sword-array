@@ -1,11 +1,11 @@
-package com.zq.sword.array.zpiper.server.piper.cluster;
+package com.zq.sword.array.zpiper.server.piper.job.cluster;
 
 import com.zq.sword.array.common.event.HotspotEvent;
 import com.zq.sword.array.common.event.HotspotEventListener;
 import com.zq.sword.array.tasks.AbstractThreadActuator;
 import com.zq.sword.array.tasks.Actuator;
-import com.zq.sword.array.zpiper.server.piper.cluster.protocol.InterPiperProtocol;
-import com.zq.sword.array.zpiper.server.piper.cluster.protocol.PiperNameProtocol;
+import com.zq.sword.array.zpiper.server.piper.protocol.InterPiperProtocol;
+import com.zq.sword.array.zpiper.server.piper.protocol.PiperNameProtocol;
 import com.zq.sword.array.zpiper.server.piper.job.dto.JobCommand;
 import com.zq.sword.array.zpiper.server.piper.job.dto.JobType;
 import com.zq.sword.array.zpiper.server.piper.job.dto.ReplicateData;
@@ -35,7 +35,7 @@ public class JobDataConsumeCluster {
      */
     private PiperNameProtocol piperNameProtocol;
 
-    private Map<String, PartitionConsumer> partitionConsumers;
+    private Map<String, DataConsumer> partitionConsumers;
 
     private PartitionConsumerBuilder partitionConsumerBuilder;
 
@@ -61,7 +61,7 @@ public class JobDataConsumeCluster {
     private void assignReplicateDataConsumers(List<String> consumePiperLocations) {
         if(consumePiperLocations != null && !consumePiperLocations.isEmpty()){
             for (String consumePiperLocation : consumePiperLocations){
-                PartitionConsumer consumer = newPartitionConsumer(consumePiperLocation);
+                DataConsumer consumer = newPartitionConsumer(consumePiperLocation);
                 partitionConsumers.put(consumePiperLocation, consumer);
             }
         }
@@ -90,7 +90,7 @@ public class JobDataConsumeCluster {
                     List<String> incrementConsumePipers = jobCommand.getIncrementConsumePipers();
                     if(incrementConsumePipers != null && !incrementConsumePipers.isEmpty()){
                         for (String consumePiperLocation : incrementConsumePipers){
-                            PartitionConsumer consumer = newPartitionConsumer(consumePiperLocation);
+                            DataConsumer consumer = newPartitionConsumer(consumePiperLocation);
                             partitionConsumers.put(consumePiperLocation, consumer);
                         }
                     }
@@ -98,7 +98,7 @@ public class JobDataConsumeCluster {
                     List<String> decreaseConsumePipers = jobCommand.getDecreaseConsumePipers();
                     if(decreaseConsumePipers != null && !decreaseConsumePipers.isEmpty()){
                         for (String consumePiperLocation : decreaseConsumePipers){
-                            PartitionConsumer consumer = partitionConsumers.get(consumePiperLocation);
+                            DataConsumer consumer = partitionConsumers.get(consumePiperLocation);
                             consumer.stop();
                             partitionConsumers.remove(consumePiperLocation);
                         }
@@ -111,7 +111,7 @@ public class JobDataConsumeCluster {
         }
     }
 
-    public PartitionConsumer newPartitionConsumer(String consumePiperLocation){
+    public DataConsumer newPartitionConsumer(String consumePiperLocation){
         return partitionConsumerBuilder.build(consumePiperLocation);
     }
 
@@ -119,42 +119,34 @@ public class JobDataConsumeCluster {
      * 构建器
      */
     public interface PartitionConsumerBuilder {
-        PartitionConsumer build(String consumePiperLocation);
+        DataConsumer build(String consumePiperLocation);
     }
 
     /**
      * 消息消费者
      */
-    public static abstract class PartitionConsumer extends AbstractThreadActuator implements Actuator {
+    public static abstract class DataConsumer extends AbstractThreadActuator implements Actuator {
 
-        private Logger logger = LoggerFactory.getLogger(PartitionConsumer.class);
+        private Logger logger = LoggerFactory.getLogger(DataConsumer.class);
 
         private InterPiperProtocol.InterPiperClient interPiperClient;
 
-        public PartitionConsumer(String jobName, String targetPiperLocation) {
+        public DataConsumer(String jobName, String targetPiperLocation) {
             String[] groupLocations = targetPiperLocation.split("\\|");
             this.interPiperClient = InterPiperProtocol.getInstance().getOrNewInterPiperClient(InterPiperProtocol.InterPiperClient.CONSUME_TYPE, jobName, groupLocations[1]);
             this.interPiperClient.setConsumeDataRespProcessor(new ConsumeDataRespProcessor() {
                 @Override
                 public void consumeReplicateData(List<ReplicateData> replicateData) {
-                    consumeReplicateData(replicateData);
+                    DataConsumer.this.consumeReplicateData(replicateData);
                 }
             });
-        }
-
-        /**
-         * 设置消费处理器
-         * @param consumeDataRespProcessor
-         */
-        public void setConsumeDataRespProcessor(ConsumeDataRespProcessor consumeDataRespProcessor) {
-            this.interPiperClient.setConsumeDataRespProcessor(consumeDataRespProcessor);
         }
 
         /**
          * 消费数据
          * @param replicateDatas
          */
-        public abstract void consumeReplicateData(List<ReplicateData> replicateDatas);
+        protected abstract void consumeReplicateData(List<ReplicateData> replicateDatas);
 
         /**
          * 消费数据
@@ -178,7 +170,7 @@ public class JobDataConsumeCluster {
      * 关闭
      */
     public void close(){
-        for(PartitionConsumer partitionConsumer : partitionConsumers.values()){
+        for(DataConsumer partitionConsumer : partitionConsumers.values()){
             partitionConsumer.stop();
         }
     }

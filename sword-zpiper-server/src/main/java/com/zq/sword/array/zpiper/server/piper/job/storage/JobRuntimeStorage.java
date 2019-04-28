@@ -1,4 +1,4 @@
-package com.zq.sword.array.zpiper.server.piper.job;
+package com.zq.sword.array.zpiper.server.piper.job.storage;
 
 import com.zq.sword.array.data.storage.DataEntry;
 import com.zq.sword.array.data.storage.DataPartitionSystem;
