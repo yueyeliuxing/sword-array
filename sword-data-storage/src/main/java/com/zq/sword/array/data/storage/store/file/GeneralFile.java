@@ -1,6 +1,6 @@
-package com.zq.sword.array.stream.io.file;
+package com.zq.sword.array.data.storage.store.file;
 
-import com.zq.sword.array.stream.io.RWStore;
+import com.zq.sword.array.data.storage.store.RWStore;
 
 import java.io.File;
 import java.io.FileNotFoundException;

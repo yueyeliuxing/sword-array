@@ -1,4 +1,4 @@
-package com.zq.sword.array.stream.io;
+package com.zq.sword.array.data.storage.store;
 
 import java.io.Closeable;
 import java.io.IOException;

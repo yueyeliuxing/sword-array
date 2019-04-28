@@ -1,6 +1,4 @@
-package com.zq.sword.array.stream.io;
-
-import com.zq.sword.array.stream.io.RWStore;
+package com.zq.sword.array.data.storage.store;
 
 import java.io.EOFException;
 

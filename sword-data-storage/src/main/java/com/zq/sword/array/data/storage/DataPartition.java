@@ -1,7 +1,7 @@
 package com.zq.sword.array.data.storage;
 
-import com.zq.sword.array.stream.io.file.OffsetBlockFile;
-import com.zq.sword.array.stream.io.file.OffsetSeqFile;
+import com.zq.sword.array.data.storage.store.file.OffsetBlockFile;
+import com.zq.sword.array.data.storage.store.file.OffsetSeqFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

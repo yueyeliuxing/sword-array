@@ -1,9 +1,9 @@
-package com.zq.sword.array.stream.io.file;
+package com.zq.sword.array.data.storage.store.file;
 
 import com.zq.sword.array.common.utils.ReflectUtils;
-import com.zq.sword.array.stream.io.AbstractRWStore;
-import com.zq.sword.array.stream.io.RWStore;
-import com.zq.sword.array.stream.io.DataWritable;
+import com.zq.sword.array.data.storage.store.AbstractRWStore;
+import com.zq.sword.array.data.storage.store.RWStore;
+import com.zq.sword.array.data.storage.store.DataWritable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

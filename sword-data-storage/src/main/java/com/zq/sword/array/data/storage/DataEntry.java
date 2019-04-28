@@ -1,7 +1,7 @@
 package com.zq.sword.array.data.storage;
 
-import com.zq.sword.array.stream.io.RWStore;
-import com.zq.sword.array.stream.io.DataWritable;
+import com.zq.sword.array.data.storage.store.RWStore;
+import com.zq.sword.array.data.storage.store.DataWritable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
