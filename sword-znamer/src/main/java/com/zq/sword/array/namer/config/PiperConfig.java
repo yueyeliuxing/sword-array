@@ -1,5 +1,6 @@
 package com.zq.sword.array.namer.config;
 
+import com.zq.sword.array.network.rpc.protocol.dto.piper.NamePiper;
 import com.zq.sword.array.utils.IPUtil;
 import org.springframework.core.env.Environment;
 
@@ -51,8 +52,8 @@ public class PiperConfig {
      * piper name
      * @return
      */
-    public PiperName namePiper() {
-        return new PiperName(piperId(),
+    public NamePiper namePiper() {
+        return new NamePiper(piperId(),
                 getParam(PiperConfigKey.PIPER_GROUP),
                 piperLocation());
     }
