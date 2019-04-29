@@ -6,18 +6,15 @@ import com.zq.sword.array.network.rpc.framework.handler.TransferHandler;
 import com.zq.sword.array.network.rpc.framework.message.Header;
 import com.zq.sword.array.network.rpc.framework.message.MessageType;
 import com.zq.sword.array.network.rpc.framework.message.TransferMessage;
-import com.zq.sword.array.network.rpc.protocol.dto.NamePiper;
+import com.zq.sword.array.network.rpc.protocol.dto.piper.NamePiper;
+import com.zq.sword.array.network.rpc.protocol.dto.piper.command.JobCommand;
+import com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.TaskHealth;
 import com.zq.sword.array.network.rpc.protocol.processor.JobCommandProcessor;
 import com.zq.sword.array.tasks.Actuator;
-import com.zq.sword.array.network.rpc.protocol.dto.command.JobCommand;
-import com.zq.sword.array.network.rpc.protocol.dto.monitor.TaskHealth;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @program: sword-array
@@ -65,6 +62,19 @@ public class PiperNameProtocol implements Actuator{
     }
 
     /**
+     * 请求Job命令
+     * @param namePiper
+     */
+    public void reqJobCommand(NamePiper namePiper){
+        TransferMessage message = new TransferMessage();
+        Header header = new Header();
+        header.setType(MessageType.JOB_COMMAND_REQ.value());
+        message.setHeader(header);
+        message.setBody(namePiper);
+        rpcClient.write(message);
+    }
+
+    /**
      * 汇报Job健康状态
      * @param health
      */
@@ -95,14 +105,8 @@ public class PiperNameProtocol implements Actuator{
 
         private Logger logger = LoggerFactory.getLogger(Piper2NamerMsgHandler.class);
 
-        private volatile ScheduledFuture<?> commandReqFuture;
-
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-            if(commandReqFuture != null) {
-                commandReqFuture.cancel(true);
-                commandReqFuture = null;
-            }
             ctx.fireExceptionCaught(cause);
         }
 
@@ -114,9 +118,6 @@ public class PiperNameProtocol implements Actuator{
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
             logger.info("rpcPartition receive msg request : {}", msg);
-            if(commandReqFuture == null) {
-                commandReqFuture = ctx.executor().scheduleAtFixedRate(new SendCommandReqTask(ctx), 0, 5000, TimeUnit.MILLISECONDS);
-            }
             TransferMessage message = (TransferMessage)msg;
             if(message.getHeader() != null && message.getHeader().getType() == MessageType.JOB_COMMAND_RESP.value()) {
                 JobCommand jobCommand = (JobCommand)message.getBody();
@@ -127,35 +128,6 @@ public class PiperNameProtocol implements Actuator{
                 jobCommandProcessor.accept(jobCommand);
             }else {
                 ctx.fireChannelRead(msg);
-            }
-        }
-
-        public class SendCommandReqTask implements Runnable {
-
-            private final ChannelHandlerContext ctx;
-
-            public SendCommandReqTask(ChannelHandlerContext ctx) {
-                this.ctx = ctx;
-            }
-
-            @Override
-            public void run() {
-                TransferMessage transferMessage = buildCommandReq();
-                System.out.println("Client send message to server : --> " + transferMessage);
-                ctx.writeAndFlush(transferMessage);
-            }
-
-            /**
-             * 构建命令请求
-             * @return
-             */
-            private TransferMessage buildCommandReq() {
-                TransferMessage message = new TransferMessage();
-                Header header = new Header();
-                header.setType(MessageType.JOB_COMMAND_REQ.value());
-                message.setHeader(header);
-                message.setBody(null);
-                return message;
             }
         }
     }

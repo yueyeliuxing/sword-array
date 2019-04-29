@@ -1,4 +1,4 @@
-package com.zq.sword.array.namer.piper;
+package com.zq.sword.array.network.rpc.protocol.dto.piper;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,7 +15,7 @@ import java.io.Serializable;
 @Data
 @ToString
 @NoArgsConstructor
-public class PiperName implements Serializable {
+public class NamePiper implements Serializable {
 
     /**
      * id
@@ -32,7 +32,7 @@ public class PiperName implements Serializable {
      */
     private String location;
 
-    public PiperName(long id, String group, String location) {
+    public NamePiper(long id, String group, String location) {
         this.id = id;
         this.group = group;
         this.location = location;

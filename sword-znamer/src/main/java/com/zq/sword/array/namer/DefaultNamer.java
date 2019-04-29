@@ -1,11 +1,8 @@
 package com.zq.sword.array.namer;
 
-import com.zq.sword.array.namer.job.JobController;
-import com.zq.sword.array.namer.piper.PiperName;
-import com.zq.sword.array.namer.protocol.NamerServiceProtocol;
 import com.zq.sword.array.namer.config.PiperConfig;
-import com.zq.sword.array.namer.job.monitor.TaskHealth;
-import com.zq.sword.array.namer.job.monitor.TaskMonitor;
+import com.zq.sword.array.namer.piper.PiperServerController;
+import com.zq.sword.array.network.rpc.protocol.NamerServiceProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,86 +16,39 @@ public class DefaultNamer implements Namer {
 
     private Logger logger = LoggerFactory.getLogger(DefaultNamer.class);
 
-    protected PiperName namePiper;
+    /**
+     * namer服务通信
+     */
+    private NamerServiceProtocol namerServiceProtocol;
 
     /**
-     * Piper服务提供通信
+     * piper监控器
      */
-    private NamerServiceProtocol piperServiceProtocol;
-
-    /**
-     * 请求piperNamer的客户端
-     */
-    private PiperNameProtocol piperNameProtocol;
-
-    /**
-     * 分布式任务执行器
-     */
-    private JobController jobController;
+    private PiperServerController piperNameController;
 
 
     public DefaultNamer(PiperConfig config) {
-        this.namePiper = config.namePiper();
-        this.piperServiceProtocol = createPiperServiceProtocol(config.piperLocation());
-        this.piperNameProtocol = createPiperNameProtocol(config);
 
-        /**
-         * Job控制器
-         */
-        this.jobController = new JobController(config.dataStorePath(), new JobTaskMonitor());
+        //创建namer通信服务
+        namerServiceProtocol =  new NamerServiceProtocol(config.namerLocation());
 
-        //设置Job命令处理器
-        this.piperNameProtocol.setJobCommandProcessor(jobController);
+        //创建piper控制器
+        piperNameController = new PiperServerController();
 
-        //Job运行时存储处理器
-        this.piperServiceProtocol.setJobRuntimeStorageProcessor(jobController);
-    }
+        //设置piper事件处理器
+        namerServiceProtocol.setNamerServiceProcessor(piperNameController);
 
-    /**
-     * 创建piper->namer的通信客户端
-     * @param config
-     * @return
-     */
-    private PiperNameProtocol createPiperNameProtocol(PiperConfig config) {
-        PiperNameProtocol piperNameProtocol = new PiperNameProtocol(config.namerLocation());
-        return piperNameProtocol;
-    }
 
-    /**
-     * 创建piper向外提供服务
-     * @param piperLocation
-     * @return
-     */
-    private NamerServiceProtocol createPiperServiceProtocol(String piperLocation){
-        NamerServiceProtocol piperServiceProtocol = new NamerServiceProtocol(piperLocation);
-        return piperServiceProtocol;
-    }
-
-    /**
-     * Job健康监控器
-     */
-    private class JobTaskMonitor implements TaskMonitor {
-
-        @Override
-        public void monitor(TaskHealth health) {
-            piperNameProtocol.reportJobHealth(health);
-        }
     }
 
     @Override
     public void start() {
-        piperServiceProtocol.start();
-        piperNameProtocol.start();
 
-        //向namer注册piper
-        piperNameProtocol.registerPiper(namePiper);
-
+        namerServiceProtocol.start();
     }
 
     @Override
     public void stop() {
-        piperNameProtocol.stop();
-        piperServiceProtocol.stop();
-        InterPiperProtocol.getInstance().stop();
+        namerServiceProtocol.stop();
     }
 }

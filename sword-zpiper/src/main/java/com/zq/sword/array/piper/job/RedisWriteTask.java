@@ -1,6 +1,6 @@
 package com.zq.sword.array.piper.job;
 
-import com.zq.sword.array.network.rpc.protocol.dto.data.ConsumeNextOffset;
+import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ConsumeNextOffset;
 import com.zq.sword.array.redis.command.CommandMetadata;
 import com.zq.sword.array.redis.command.RedisCommand;
 import com.zq.sword.array.redis.command.RedisCommandDeserializer;
@@ -10,12 +10,14 @@ import com.zq.sword.array.redis.interceptor.CommandInterceptor;
 import com.zq.sword.array.redis.util.RedisConfig;
 import com.zq.sword.array.redis.writer.DefaultRedisWriter;
 import com.zq.sword.array.redis.writer.RedisWriter;
-import com.zq.sword.array.network.rpc.protocol.dto.data.ReplicateData;
-import com.zq.sword.array.network.rpc.protocol.dto.data.ReplicateDataReq;
+import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateData;
+import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateDataReq;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+
+import static com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.TaskHealth.WRITE_TASK_NAME;
 
 /**
  * @program: sword-array
@@ -27,8 +29,6 @@ public class RedisWriteTask extends AbstractTask implements WriteTask {
 
     private Logger logger = LoggerFactory.getLogger(RedisWriteTask.class);
 
-    private static final String TASK_NAME = "write-task";
-
     private JobContext jobContext;
 
     private RedisWriter redisWriter;
@@ -36,7 +36,7 @@ public class RedisWriteTask extends AbstractTask implements WriteTask {
     private JobDataConsumerPool jobDataConsumerPool;
 
     public RedisWriteTask(Job job, JobContext jobContext, CycleDisposeHandler<RedisCommand> cycleDisposeHandler) {
-        super(job, TASK_NAME, jobContext.getJobRuntimeStorage(), jobContext.getTaskMonitor());
+        super(job, WRITE_TASK_NAME, jobContext.getJobRuntimeStorage(), jobContext.getTaskMonitor());
         this.jobContext = jobContext;
 
         //设置redis 写入器

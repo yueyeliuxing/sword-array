@@ -1,6 +1,6 @@
 package com.zq.sword.array.network.rpc.protocol.processor;
 
-import com.zq.sword.array.network.rpc.protocol.dto.data.ReplicateData;
+import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateData;
 
 import java.util.List;
 

@@ -1,9 +1,11 @@
 package com.zq.sword.array.piper.job;
 
 import com.zq.sword.array.tasks.AbstractThreadActuator;
-import com.zq.sword.array.network.rpc.protocol.dto.monitor.TaskHealth;
-import com.zq.sword.array.network.rpc.protocol.dto.monitor.TaskMonitor;
+import com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.TaskHealth;
+import com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.TaskMonitor;
 import com.zq.sword.array.piper.job.storage.JobRuntimeStorage;
+
+import static com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.TaskHealth.*;
 
 /**
  * @program: sword-array
@@ -12,11 +14,6 @@ import com.zq.sword.array.piper.job.storage.JobRuntimeStorage;
  * @create: 2019-04-25 14:46
  **/
 public abstract class AbstractTask extends AbstractThreadActuator implements Task {
-
-    public static final int NEW = 1;
-    public static final int START = 2;
-    public static final int STOP = 3;
-    public static final int EXCEPTION = 4;
 
     /**
      * 任务状态 1 创建完成 2 启动成功 3 停止 4发生异常

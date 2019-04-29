@@ -1,6 +1,7 @@
-package com.zq.sword.array.network.rpc.protocol.dto.command;
+package com.zq.sword.array.network.rpc.protocol.dto.piper.command;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.io.Serializable;
@@ -14,6 +15,7 @@ import java.util.List;
  **/
 @Data
 @ToString
+@NoArgsConstructor
 public class JobCommand implements Serializable{
     private static final long serialVersionUID = -5126628039718820768L;
 
@@ -69,4 +71,17 @@ public class JobCommand implements Serializable{
     private List<String> decreaseConsumePipers;
 
 
+    public JobCommand(byte type, String name) {
+        this.type = type;
+        this.name = name;
+    }
+
+    public JobCommand(byte type, String name, String piperGroup, String sourceRedis, List<String> backupPipers, List<String> consumePipers) {
+        this.type = type;
+        this.name = name;
+        this.piperGroup = piperGroup;
+        this.sourceRedis = sourceRedis;
+        this.backupPipers = backupPipers;
+        this.consumePipers = consumePipers;
+    }
 }

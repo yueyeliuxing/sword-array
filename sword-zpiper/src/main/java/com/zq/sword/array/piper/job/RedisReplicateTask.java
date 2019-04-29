@@ -9,9 +9,11 @@ import com.zq.sword.array.redis.interceptor.CommandInterceptor;
 import com.zq.sword.array.redis.replicator.DefaultSlaveRedisReplicator;
 import com.zq.sword.array.redis.replicator.SlaveRedisReplicator;
 import com.zq.sword.array.redis.replicator.listener.RedisReplicatorListener;
-import com.zq.sword.array.network.rpc.protocol.dto.data.ReplicateData;
+import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.TaskHealth.REPLICATE_TASK_NAME;
 
 /**
  * @program: sword-array
@@ -23,14 +25,12 @@ public class RedisReplicateTask extends AbstractTask implements ReplicateTask {
 
     private Logger logger = LoggerFactory.getLogger(RedisReplicateTask.class);
 
-    private static final String TASK_NAME = "replicate-task";
-
     private JobContext context;
 
     private SlaveRedisReplicator redisReplicator;
 
     public RedisReplicateTask(Job job, JobContext context, CycleDisposeHandler<RedisCommand> cycleDisposeHandler)  {
-        super(job, TASK_NAME, context.getJobRuntimeStorage(), context.getTaskMonitor());
+        super(job, REPLICATE_TASK_NAME, context.getJobRuntimeStorage(), context.getTaskMonitor());
         this.context = context;
 
         //设置redis 复制器

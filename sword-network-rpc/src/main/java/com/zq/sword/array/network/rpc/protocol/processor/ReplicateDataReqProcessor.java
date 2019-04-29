@@ -1,8 +1,8 @@
 package com.zq.sword.array.network.rpc.protocol.processor;
 
-import com.zq.sword.array.network.rpc.protocol.dto.data.ConsumeNextOffset;
-import com.zq.sword.array.network.rpc.protocol.dto.data.ReplicateData;
-import com.zq.sword.array.network.rpc.protocol.dto.data.ReplicateDataReq;
+import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ConsumeNextOffset;
+import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateData;
+import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateDataReq;
 
 import java.util.List;
 

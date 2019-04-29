@@ -33,6 +33,11 @@ public enum MessageType {
     REGISTER_PIPER_RESP((byte)12),
 
     REPORT_JOB_HEALTH((byte)13),
+
+    /**
+     * 客户端开启一个任务
+     */
+    CLIENT_START_JOB((byte)14),
     ;
 
     MessageType(byte value) {

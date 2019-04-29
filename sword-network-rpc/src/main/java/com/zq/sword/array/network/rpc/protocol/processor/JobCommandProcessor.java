@@ -1,6 +1,6 @@
 package com.zq.sword.array.network.rpc.protocol.processor;
 
-import com.zq.sword.array.network.rpc.protocol.dto.command.JobCommand;
+import com.zq.sword.array.network.rpc.protocol.dto.piper.command.JobCommand;
 
 /**
  * @program: sword-array

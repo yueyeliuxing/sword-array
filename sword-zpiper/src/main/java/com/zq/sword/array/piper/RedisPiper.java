@@ -1,15 +1,19 @@
 package com.zq.sword.array.piper;
 
-import com.zq.sword.array.piper.job.JobController;
 import com.zq.sword.array.network.rpc.protocol.InterPiperProtocol;
 import com.zq.sword.array.network.rpc.protocol.PiperNameProtocol;
 import com.zq.sword.array.network.rpc.protocol.PiperServiceProtocol;
+import com.zq.sword.array.network.rpc.protocol.dto.piper.NamePiper;
+import com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.TaskHealth;
+import com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.TaskMonitor;
 import com.zq.sword.array.piper.config.PiperConfig;
-import com.zq.sword.array.network.rpc.protocol.dto.monitor.TaskHealth;
-import com.zq.sword.array.network.rpc.protocol.dto.monitor.TaskMonitor;
-import com.zq.sword.array.network.rpc.protocol.dto.NamePiper;
+import com.zq.sword.array.piper.job.JobController;
+import com.zq.sword.array.tasks.SingleTimedTaskExecutor;
+import com.zq.sword.array.tasks.TimedTaskExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @program: sword-array
@@ -38,6 +42,11 @@ public class RedisPiper implements Piper{
      */
     private JobController jobController;
 
+    /**
+     * 定时任务执行器
+     */
+    private TimedTaskExecutor timedTaskExecutor;
+
 
     public RedisPiper(PiperConfig config) {
         this.namePiper = config.namePiper();
@@ -54,6 +63,8 @@ public class RedisPiper implements Piper{
 
         //Job运行时存储处理器
         this.piperServiceProtocol.setJobRuntimeStorageProcessor(jobController);
+
+        this.timedTaskExecutor = new SingleTimedTaskExecutor();
     }
 
     /**
@@ -83,6 +94,9 @@ public class RedisPiper implements Piper{
 
         @Override
         public void monitor(TaskHealth health) {
+            health.setId(namePiper.getId());
+            health.setGroup(namePiper.getGroup());
+            health.setLocation(namePiper.getLocation());
             piperNameProtocol.reportJobHealth(health);
         }
     }
@@ -94,6 +108,11 @@ public class RedisPiper implements Piper{
 
         //向namer注册piper
         piperNameProtocol.registerPiper(namePiper);
+
+        //定时进行Job命令请求
+        timedTaskExecutor.timedExecute(()->{
+            piperNameProtocol.reqJobCommand(namePiper);
+        },500, TimeUnit.MILLISECONDS);
 
     }
 

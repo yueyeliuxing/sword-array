@@ -1,7 +1,7 @@
 package com.zq.sword.array.network.rpc.protocol.processor;
 
-import com.zq.sword.array.network.rpc.protocol.dto.data.ConsumeNextOffset;
-import com.zq.sword.array.network.rpc.protocol.dto.data.ReplicateDataId;
+import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ConsumeNextOffset;
+import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateDataId;
 
 /**
  * @program: sword-array

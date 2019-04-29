@@ -1,4 +1,4 @@
-package com.zq.sword.array.network.rpc.protocol.dto.command;
+package com.zq.sword.array.network.rpc.protocol.dto.piper.command;
 
 /**
  * @program: sword-array

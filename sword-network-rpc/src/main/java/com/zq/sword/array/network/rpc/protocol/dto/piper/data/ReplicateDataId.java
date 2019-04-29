@@ -1,4 +1,4 @@
-package com.zq.sword.array.network.rpc.protocol.dto.data;
+package com.zq.sword.array.network.rpc.protocol.dto.piper.data;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,7 +15,7 @@ import java.io.Serializable;
 @Data
 @ToString
 @NoArgsConstructor
-public class ReplicateDataReq implements Serializable{
+public class ReplicateDataId implements Serializable{
 
     private String piperGroup;
 
@@ -23,12 +23,9 @@ public class ReplicateDataReq implements Serializable{
 
     private long offset;
 
-    private int reqSize;
-
-    public ReplicateDataReq(String piperGroup, String jobName, long offset, int reqSize) {
+    public ReplicateDataId(String piperGroup, String jobName, long offset) {
         this.piperGroup = piperGroup;
         this.jobName = jobName;
         this.offset = offset;
-        this.reqSize = reqSize;
     }
 }

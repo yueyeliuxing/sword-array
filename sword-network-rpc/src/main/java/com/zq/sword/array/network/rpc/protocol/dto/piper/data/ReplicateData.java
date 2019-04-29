@@ -1,4 +1,4 @@
-package com.zq.sword.array.network.rpc.protocol.dto.data;
+package com.zq.sword.array.network.rpc.protocol.dto.piper.data;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,6 +1,5 @@
 package com.zq.sword.array.namer.config;
 
-import com.zq.sword.array.namer.piper.PiperName;
 import com.zq.sword.array.utils.IPUtil;
 import org.springframework.core.env.Environment;
 
