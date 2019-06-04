@@ -8,7 +8,7 @@ import com.zq.sword.array.network.rpc.framework.server.NettyRpcServer;
 import com.zq.sword.array.network.rpc.protocol.dto.client.NameJob;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.NamePiper;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.command.JobCommand;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.TaskHealth;
+import com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.JobHealth;
 import com.zq.sword.array.network.rpc.protocol.processor.NamerServiceProcessor;
 import com.zq.sword.array.tasks.Actuator;
 import io.netty.channel.ChannelHandler;
@@ -96,8 +96,8 @@ public class NamerServiceProtocol implements Actuator{
                 }
                 ctx.writeAndFlush(buildJobCommandResp(command));
             }else if(message.getHeader() != null && message.getHeader().getType() == MessageType.REPORT_JOB_HEALTH.value()) {
-                TaskHealth taskHealth = (TaskHealth) message.getBody();
-                namerServiceProcessor.handleTaskHealthReport(taskHealth);
+                JobHealth jobHealth = (JobHealth) message.getBody();
+                namerServiceProcessor.handleTaskHealthReport(jobHealth);
             }else if(message.getHeader() != null && message.getHeader().getType() == MessageType.CLIENT_START_JOB.value()) {
                 NameJob nameJob = (NameJob)message.getBody();
                 namerServiceProcessor.handleClientStartJobReq(nameJob);

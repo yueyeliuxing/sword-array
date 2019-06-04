@@ -6,7 +6,7 @@ import com.zq.sword.array.network.rpc.framework.message.MessageType;
 import com.zq.sword.array.network.rpc.framework.message.TransferMessage;
 import com.zq.sword.array.network.rpc.framework.server.NettyRpcServer;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ConsumeNextOffset;
-import com.zq.sword.array.network.rpc.protocol.processor.ReplicateDataReqProcessor;
+import com.zq.sword.array.network.rpc.protocol.processor.PiperServiceProcessor;
 import com.zq.sword.array.tasks.Actuator;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateData;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateDataId;
@@ -34,7 +34,7 @@ public class PiperServiceProtocol implements Actuator{
     /**
      * broker消息处理器
      */
-    private ReplicateDataReqProcessor replicateDataReqProcessor;
+    private PiperServiceProcessor piperServiceProcessor;
 
     public PiperServiceProtocol(String piperLocation) {
         String[] params = piperLocation.split(":");
@@ -56,10 +56,10 @@ public class PiperServiceProtocol implements Actuator{
 
     /**
      * 设置Broker 消息处理器
-     * @param brokerMsgProcessor
+     * @param piperServiceProcessor
      */
-    public void setJobRuntimeStorageProcessor(ReplicateDataReqProcessor brokerMsgProcessor){
-        this.replicateDataReqProcessor = brokerMsgProcessor;
+    public void setPiperServiceProcessor(PiperServiceProcessor piperServiceProcessor){
+        this.piperServiceProcessor = piperServiceProcessor;
     }
 
     @Override
@@ -91,16 +91,16 @@ public class PiperServiceProtocol implements Actuator{
             logger.info("receive msg request : {}", message);
             if(message.getHeader() != null && message.getHeader().getType() == MessageType.RECEIVE_REPLICATE_DATA_REQ.value()) {
                 ReplicateDataReq msgReq = (ReplicateDataReq)message.getBody();
-                List<ReplicateData> msgs  = replicateDataReqProcessor.handleReplicateDataReq(msgReq);
+                List<ReplicateData> msgs  = piperServiceProcessor.handleReplicateDataReq(msgReq);
                 ctx.writeAndFlush(buildReceiveMessageResp(msgs));
             }else if(message.getHeader() != null && message.getHeader().getType() == MessageType.SEND_REPLICATE_DATA_REQ.value()) {
                 ReplicateData replicateData = (ReplicateData)message.getBody();
-                replicateDataReqProcessor.handleReplicateData(replicateData);
+                piperServiceProcessor.handleReplicateData(replicateData);
                 ctx.writeAndFlush(buildSendReplicateDataResp(new ReplicateDataId(replicateData.getPiperGroup(),
                         replicateData.getPiperGroup(), replicateData.getOffset())));
             }else if(message.getHeader() != null && message.getHeader().getType() == MessageType.SEND_CONSUME_NEXT_OFFSET_REQ.value()) {
                 ConsumeNextOffset consumeNextOffset = (ConsumeNextOffset)message.getBody();
-                replicateDataReqProcessor.handleConsumeNextOffset(consumeNextOffset);
+                piperServiceProcessor.handleConsumeNextOffset(consumeNextOffset);
                 ctx.writeAndFlush(buildSendConsumeNextOffsetResp(consumeNextOffset));
             }else {
                 ctx.fireChannelRead(msg);

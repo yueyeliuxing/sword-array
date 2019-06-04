@@ -3,7 +3,7 @@ package com.zq.sword.array.network.rpc.protocol.processor;
 import com.zq.sword.array.network.rpc.protocol.dto.client.NameJob;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.NamePiper;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.command.JobCommand;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.TaskHealth;
+import com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.JobHealth;
 
 /**
  * @program: sword-array
@@ -27,9 +27,9 @@ public interface NamerServiceProcessor {
 
     /**
      * 上报
-     * @param taskHealth
+     * @param jobHealth
      */
-    void handleTaskHealthReport(TaskHealth taskHealth);
+    void handleTaskHealthReport(JobHealth jobHealth);
 
     /**
      * 处理客户端启动任务的请求

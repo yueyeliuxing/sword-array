@@ -7,7 +7,7 @@ import com.zq.sword.array.network.rpc.protocol.dto.client.NameJob;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.NamePiper;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.command.JobCommand;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.command.JobType;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.TaskHealth;
+import com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.JobHealth;
 import com.zq.sword.array.network.rpc.protocol.processor.NamerServiceProcessor;
 import com.zq.sword.array.tasks.SingleTimedTaskExecutor;
 import com.zq.sword.array.tasks.TimedTaskExecutor;
@@ -76,17 +76,12 @@ public class PiperServerController implements NamerServiceProcessor {
                                 commandQueue = new LinkedBlockingQueue<>();
                                 commands.put(piper.getId(), commandQueue);
                             }
-                            int replicateTaskState = branchJob.getReplicateTaskState();
-                            int writeTaskState = branchJob.getWriteTaskState();
-                            if(replicateTaskState == TaskHealth.EXCEPTION && branchJob.getReplicateTaskResetCount().get() < 3){
-                                commandQueue.offer(new JobCommand(JobType.REPLICATE_TASK_RESTART.getType(), branchJob.getName()));
+                            int jobState = branchJob.getJobState();
+                            if(jobState == JobHealth.EXCEPTION && branchJob.getJobResetCount().get() < 3){
+                                commandQueue.offer(new JobCommand(JobType.JOB_RESTART.getType(), branchJob.getName()));
                             }
 
-                            if(writeTaskState == TaskHealth.EXCEPTION && branchJob.getWriteTaskResetCount().get() < 3){
-                                commandQueue.offer(new JobCommand(JobType.WRITE_TASK_RESTART.getType(), branchJob.getName()));
-                            }
-
-                            if(replicateTaskState == writeTaskState && replicateTaskState == TaskHealth.NEW){
+                            if(jobState == JobHealth.NEW){
                                 commandQueue.offer(new JobCommand(JobType.JOB_START.getType(), branchJob.getName()));
                             }
                         }
@@ -114,17 +109,12 @@ public class PiperServerController implements NamerServiceProcessor {
     }
 
     @Override
-    public void handleTaskHealthReport(TaskHealth taskHealth) {
-        MainJob mainJob = mainJobSystem.getMainJob(taskHealth.getJobName());
+    public void handleTaskHealthReport(JobHealth jobHealth) {
+        MainJob mainJob = mainJobSystem.getMainJob(jobHealth.getName());
         if(mainJob != null){
-            BranchJob job = mainJob.getBranchJob(taskHealth.getGroup());
-            if(taskHealth.isReplicateTask()){
-                job.setReplicateTaskState(taskHealth.getState());
-                job.setReplicateTaskEx(taskHealth.getEx());
-            }else {
-                job.setWriteTaskState(taskHealth.getState());
-                job.setWriteTaskEx(taskHealth.getEx());
-            }
+            BranchJob job = mainJob.getBranchJob(jobHealth.getGroup());
+            job.setJobState(jobHealth.getState());
+            job.setJobEx(jobHealth.getEx());
         }
     }
 

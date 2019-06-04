@@ -1,4 +1,4 @@
-package com.zq.sword.array.piper.job.storage;
+package com.zq.sword.array.piper.storage;
 
 import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ConsumeNextOffset;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateData;
@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Job运行时存储
  */
-public interface JobRuntimeStorage {
+public interface RedisDataStorage {
 
     /**
      * 写入数据

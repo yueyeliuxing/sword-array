@@ -12,7 +12,7 @@ import java.util.List;
  * @author: zhouqi1
  * @create: 2019-04-24 20:42
  **/
-public interface ReplicateDataReqProcessor {
+public interface PiperServiceProcessor {
 
     /**
      * 获取指定消息

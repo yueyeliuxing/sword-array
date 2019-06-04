@@ -1,7 +1,6 @@
 package com.zq.sword.array.piper.job;
 
-import com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.TaskMonitor;
-import com.zq.sword.array.piper.job.storage.JobRuntimeStorage;
+import com.zq.sword.array.piper.storage.RedisDataStorage;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,27 +21,28 @@ public class JobSystem {
     /**
      * 数据分片存储系统
      */
-    private JobRuntimeStorage jobRuntimeStorage;
+    private RedisDataStorage redisDataStorage;
 
     /**
      * 任务监控器
      */
-    private TaskMonitor taskMonitor;
+    private JobMonitor jobMonitor;
 
-    public JobSystem(JobRuntimeStorage jobRuntimeStorage, TaskMonitor taskMonitor) {
-        this.jobRuntimeStorage = jobRuntimeStorage;
-        this.taskMonitor = taskMonitor;
+    public JobSystem(RedisDataStorage redisDataStorage) {
+        this.redisDataStorage = redisDataStorage;
         jobs = new ConcurrentHashMap<>();
     }
 
-
+    public void setJobMonitor(JobMonitor jobMonitor) {
+        this.jobMonitor = jobMonitor;
+    }
 
     /**
      * 创建Job
-     * @param jobEnv Job环境
+     * @param jobContext Job环境
      */
-    public void createJob(JobEnv jobEnv){
-        Job job = new Job(new JobContext(jobEnv, jobRuntimeStorage, taskMonitor));
+    public void createJob(JobContext jobContext){
+        Job job = new RedisJob(jobContext, redisDataStorage, jobMonitor);
         jobs.put(job.name(), job);
     }
 

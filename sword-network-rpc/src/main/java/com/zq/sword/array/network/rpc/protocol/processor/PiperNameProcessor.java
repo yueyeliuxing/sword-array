@@ -8,11 +8,11 @@ import com.zq.sword.array.network.rpc.protocol.dto.piper.command.JobCommand;
  * @author: zhouqi1
  * @create: 2019-04-28 09:48
  **/
-public interface JobCommandProcessor {
+public interface PiperNameProcessor {
 
     /**
      * 接收Job命令
      * @param command
      */
-    void accept(JobCommand command);
+    void acceptJobCommand(JobCommand command);
 }

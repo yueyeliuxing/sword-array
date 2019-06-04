@@ -1,4 +1,4 @@
-package com.zq.sword.array.piper.job.storage;
+package com.zq.sword.array.piper.storage;
 
 import com.zq.sword.array.data.storage.DataEntry;
 import com.zq.sword.array.data.storage.DataPartitionSystem;
@@ -9,7 +9,7 @@ import com.zq.sword.array.id.SnowFlakeIdGenerator;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ConsumeNextOffset;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateData;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateDataReq;
-import com.zq.sword.array.network.rpc.protocol.processor.ReplicateDataReqProcessor;
+import com.zq.sword.array.network.rpc.protocol.processor.PiperServiceProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,9 +22,9 @@ import java.util.List;
  * @author: zhouqi1
  * @create: 2019-04-26 16:19
  **/
-public class LocalJobRuntimeStorage implements JobRuntimeStorage, ReplicateDataReqProcessor {
+public class LocalRedisDataStorage implements RedisDataStorage, PiperServiceProcessor {
 
-    private Logger logger = LoggerFactory.getLogger(LocalJobRuntimeStorage.class);
+    private Logger logger = LoggerFactory.getLogger(LocalRedisDataStorage.class);
 
     private static final String DATA_GROUP = "commands";
 
@@ -37,7 +37,7 @@ public class LocalJobRuntimeStorage implements JobRuntimeStorage, ReplicateDataR
      */
     private PartitionSystem partitionSystem;
 
-    public LocalJobRuntimeStorage(String jobRuntimeStoragePath) {
+    public LocalRedisDataStorage(String jobRuntimeStoragePath) {
         partitionSystem = DataPartitionSystem.get(jobRuntimeStoragePath);
         idGenerator = new SnowFlakeIdGenerator();
     }

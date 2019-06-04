@@ -1,8 +1,7 @@
 package com.zq.sword.array.piper.job;
 
-import com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.TaskMonitor;
-import com.zq.sword.array.piper.job.storage.JobRuntimeStorage;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -13,58 +12,40 @@ import java.util.List;
  * @create: 2019-04-28 10:30
  **/
 @Data
+@ToString
 public class JobContext {
 
     /**
-     * Job环境
+     *  任务名称 唯一
      */
-    private JobEnv jobEnv;
+    private String name;
 
     /**
-     * Job运行时存储
+     * 源Group
      */
-    private JobRuntimeStorage jobRuntimeStorage;
+    private String piperGroup;
 
     /**
-     * 任务监控器
+     * 源redis
      */
-    private TaskMonitor taskMonitor;
+    private String sourceRedis;
 
-    public JobContext(JobEnv jobEnv, JobRuntimeStorage jobRuntimeStorage, TaskMonitor taskMonitor) {
-        this.jobEnv = jobEnv;
-        this.jobRuntimeStorage = jobRuntimeStorage;
-        this.taskMonitor = taskMonitor;
-    }
+    /**
+     * 备份的piper
+     */
+    private List<String> backupPipers;
 
-    public String getName() {
-        return jobEnv.getName();
-    }
+    /**
+     * 消费的piper  PiperGroup|PiperLocation
+     * 从目标piper获取数据
+     */
+    private List<String> consumePipers;
 
-    public String getPiperGroup() {
-        return jobEnv.getPiperGroup();
-    }
-
-    public String getSourceRedis() {
-        return jobEnv.getSourceRedis();
-    }
-
-    public List<String> getBackupPipers() {
-        return jobEnv.getBackupPipers();
-    }
-
-    public List<String> getConsumePipers() {
-        return jobEnv.getConsumePipers();
-    }
-
-    public JobRuntimeStorage getJobRuntimeStorage() {
-        return jobRuntimeStorage;
-    }
-
-    public void setJobRuntimeStorage(JobRuntimeStorage jobRuntimeStorage) {
-        this.jobRuntimeStorage = jobRuntimeStorage;
-    }
-
-    public TaskMonitor getTaskMonitor() {
-        return taskMonitor;
+    public JobContext(String name, String piperGroup, String sourceRedis, List<String> backupPipers, List<String> consumePipers) {
+        this.name = name;
+        this.piperGroup = piperGroup;
+        this.sourceRedis = sourceRedis;
+        this.backupPipers = backupPipers;
+        this.consumePipers = consumePipers;
     }
 }

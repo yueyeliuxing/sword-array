@@ -19,22 +19,17 @@ public enum JobType {
     JOB_START((byte)1),
 
     /**
+     * 重启
+     */
+    JOB_RESTART((byte)2),
+
+    /**
      * 销毁
      */
-    JOB_DESTROY((byte)2),
+    JOB_DESTROY((byte)3),
 
     /**
-     * 重启ReplicateTask
-     */
-    REPLICATE_TASK_RESTART((byte)3),
-
-    /**
-     * 重启WriteTask
-     */
-    WRITE_TASK_RESTART((byte)4),
-
-    /**
-     * 增加任务复制piper
+     * 任务复制piper改变
      */
     BACKUP_PIPERS_CHANGE((byte)5),
 

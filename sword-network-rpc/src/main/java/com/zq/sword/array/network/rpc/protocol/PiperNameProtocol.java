@@ -8,8 +8,8 @@ import com.zq.sword.array.network.rpc.framework.message.MessageType;
 import com.zq.sword.array.network.rpc.framework.message.TransferMessage;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.NamePiper;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.command.JobCommand;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.TaskHealth;
-import com.zq.sword.array.network.rpc.protocol.processor.JobCommandProcessor;
+import com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.JobHealth;
+import com.zq.sword.array.network.rpc.protocol.processor.PiperNameProcessor;
 import com.zq.sword.array.tasks.Actuator;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -32,7 +32,7 @@ public class PiperNameProtocol implements Actuator{
     /**
      * Job命令处理器
      */
-    private JobCommandProcessor jobCommandProcessor;
+    private PiperNameProcessor piperNameProcessor;
 
     public PiperNameProtocol(String namerLocation) {
         String[] ps = namerLocation.split(":");
@@ -42,10 +42,10 @@ public class PiperNameProtocol implements Actuator{
 
     /**
      * 添加Job任务命令处理器
-     * @param jobCommandProcessor
+     * @param piperNameProcessor
      */
-    public void setJobCommandProcessor(JobCommandProcessor jobCommandProcessor){
-        this.jobCommandProcessor = jobCommandProcessor;
+    public void setPiperNameProcessor(PiperNameProcessor piperNameProcessor){
+        this.piperNameProcessor = piperNameProcessor;
     }
 
     /**
@@ -78,7 +78,7 @@ public class PiperNameProtocol implements Actuator{
      * 汇报Job健康状态
      * @param health
      */
-    public void reportJobHealth(TaskHealth health){
+    public void reportJobHealth(JobHealth health){
         TransferMessage message = new TransferMessage();
         Header header = new Header();
         header.setType(MessageType.REPORT_JOB_HEALTH.value());
@@ -125,7 +125,7 @@ public class PiperNameProtocol implements Actuator{
                     return;
                 }
                 //监听器接收Job命令
-                jobCommandProcessor.accept(jobCommand);
+                piperNameProcessor.acceptJobCommand(jobCommand);
             }else {
                 ctx.fireChannelRead(msg);
             }

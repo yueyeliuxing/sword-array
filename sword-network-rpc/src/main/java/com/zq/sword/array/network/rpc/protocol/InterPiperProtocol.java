@@ -67,7 +67,6 @@ public class InterPiperProtocol implements Actuator {
             synchronized (piperRpcClients){
                 if(interPiperClient == null){
                     interPiperClient = new InterPiperClient(type, jobName, piperLocation);
-                    interPiperClient.connect();
                 }
             }
         }

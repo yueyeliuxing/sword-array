@@ -1,6 +1,7 @@
 package com.zq.sword.array.namer.piper.job;
 
 import com.zq.sword.array.network.rpc.protocol.dto.piper.NamePiper;
+import com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.JobHealth;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -47,34 +48,19 @@ public class BranchJob {
     private List<NamePiper> consumePipers;
 
     /**
-     * replicateTask 状态 1 创建完成 2 启动成功 3 停止 4发生异常 {@linkplain com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.TaskHealth}
+     * Job 状态 1 创建完成 2 启动成功 3 停止 4发生异常 {@linkplain JobHealth}
      */
-    private int replicateTaskState;
+    private int jobState;
 
     /**
-     * replicateTask 异常信息
+     * Job 异常信息
      */
-    private String replicateTaskEx;
+    private String jobEx;
 
     /**
      * replicateTask 重启次数
      */
-    private AtomicInteger replicateTaskResetCount = new AtomicInteger(0);
-
-    /**
-     * writeTask 状态 1 创建完成 2 启动成功 3 停止 4发生异常 {@linkplain com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.TaskHealth}
-     */
-    private int writeTaskState;
-
-    /**
-     * writeTask信息
-     */
-    private String writeTaskEx;
-
-    /**
-     * WriteTask 重启次数
-     */
-    private AtomicInteger writeTaskResetCount = new AtomicInteger(0);
+    private AtomicInteger jobResetCount = new AtomicInteger(0);
 
 
     public BranchJob(String name, String piperGroup, String sourceRedis) {
@@ -83,8 +69,7 @@ public class BranchJob {
         this.sourceRedis = sourceRedis;
         this.backupPipers = new ArrayList<>();
         this.consumePipers = new ArrayList<>();
-        replicateTaskState = 0;
-        writeTaskState = 0;
+        jobState = 0;
     }
 
     /**
