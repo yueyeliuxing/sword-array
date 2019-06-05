@@ -4,7 +4,8 @@ import com.zq.sword.array.network.rpc.framework.coder.NettyMessageDecoder;
 import com.zq.sword.array.network.rpc.framework.coder.NettyMessageEncoder;
 import com.zq.sword.array.network.rpc.framework.handler.HeartBeatReqHandler;
 import com.zq.sword.array.network.rpc.framework.handler.LoginAuthReqHandler;
-import com.zq.sword.array.network.rpc.framework.handler.TransferHandler;
+import com.zq.sword.array.network.rpc.framework.handler.ProtocolHandler;
+import com.zq.sword.array.network.rpc.framework.handler.ProtocolProcessor;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -14,8 +15,8 @@ import io.netty.handler.timeout.ReadTimeoutHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -32,7 +33,7 @@ public class NettyRpcClient implements RpcClient {
 
     private int port;
 
-    private List<TransferHandler> transferHandlers;
+    private List<ProtocolProcessor> protocolProcessors;
 
     private EventLoopGroup group = new NioEventLoopGroup();
 
@@ -41,16 +42,16 @@ public class NettyRpcClient implements RpcClient {
     public NettyRpcClient(String host, int port) {
         this.host = host;
         this.port = port;
-        transferHandlers = new ArrayList<>();
+        protocolProcessors = new CopyOnWriteArrayList<>();
     }
 
     @Override
-    public void registerTransferHandler(TransferHandler transferHandler) {
-        transferHandlers.add(transferHandler);
+    public void registerProtocolProcessor(ProtocolProcessor protocolProcessor) {
+        protocolProcessors.add(protocolProcessor);
     }
 
     @Override
-    public void connect() {
+    public void start() {
         try{
             Bootstrap b = new Bootstrap();
             b.group(group)
@@ -64,13 +65,8 @@ public class NettyRpcClient implements RpcClient {
                                     .addLast("MessageEncoder", new NettyMessageEncoder())
                                     .addLast("readTimeoutHandler", new ReadTimeoutHandler(50))
                                     .addLast("LoginAuthHandler", new LoginAuthReqHandler())
-                                    .addLast("HeartBeatHandler", new HeartBeatReqHandler());
-
-                            if(transferHandlers != null && !transferHandlers.isEmpty()){
-                                transferHandlers.forEach(transferHandler -> {
-                                    pipeline.addLast(transferHandler);
-                                });
-                            }
+                                    .addLast("HeartBeatHandler", new HeartBeatReqHandler())
+                                    .addLast(new ProtocolHandler(protocolProcessors));
                         }
                     });
             logger.info("连接服务：{}:{}", host, port);
@@ -86,7 +82,7 @@ public class NettyRpcClient implements RpcClient {
                     try{
                         TimeUnit.SECONDS.sleep(5);
                         try{
-                            connect();
+                            start();
                         }catch (Exception e){
                             e.printStackTrace();
                         }
@@ -106,7 +102,7 @@ public class NettyRpcClient implements RpcClient {
     }
 
     @Override
-    public void disconnect() {
+    public void close() {
         if(channel != null && channel.isOpen()){
             channel.close();
         }

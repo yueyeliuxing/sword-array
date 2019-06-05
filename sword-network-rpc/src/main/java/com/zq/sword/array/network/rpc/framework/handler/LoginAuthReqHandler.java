@@ -3,6 +3,7 @@ package com.zq.sword.array.network.rpc.framework.handler;
 import com.zq.sword.array.network.rpc.framework.message.TransferMessage;
 import com.zq.sword.array.network.rpc.framework.message.Header;
 import com.zq.sword.array.network.rpc.framework.message.MessageType;
+import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 
 /**
@@ -11,7 +12,7 @@ import io.netty.channel.ChannelHandlerContext;
  * @author: zhouqi1
  * @create: 2018-07-06 13:52
  **/
-public class LoginAuthReqHandler extends TransferHandler {
+public class LoginAuthReqHandler extends ChannelHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         ctx.fireExceptionCaught(cause);

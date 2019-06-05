@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
  * @author: zhouqi1
  * @create: 2019-01-23 15:50
  **/
-public class RedisPiper implements Piper{
+public class RedisPiper extends AbstractPiper implements Piper{
 
     private Logger logger = LoggerFactory.getLogger(RedisPiper.class);
 
@@ -43,11 +43,6 @@ public class RedisPiper implements Piper{
      * 任务数据存储
      */
     private RedisDataStorage redisDataStorage;
-
-    /**
-     * Piper服务提供通信
-     */
-    private PiperServiceProtocol piperServiceProtocol;
 
     /**
      * 请求piperNamer的客户端
@@ -66,18 +61,18 @@ public class RedisPiper implements Piper{
 
 
     public RedisPiper(PiperConfig config) {
+        super(config.piperLocation());
         namePiper = config.namePiper();
+
+        /**
+         * 注册服务处理器
+         */
+        registerServiceProcessor(new DefaultPiperServiceProcessor());
 
         /**
          * 分片存储系统
          */
         redisDataStorage =  new LocalRedisDataStorage(config.dataStorePath());
-
-        /**
-         * Piper服务 接收其他piper或者namer的数据
-         */
-        piperServiceProtocol = new PiperServiceProtocol(config.piperLocation());
-        piperServiceProtocol.setPiperServiceProcessor(new DefaultPiperServiceProcessor());
 
         /**
          *  连接Namer的客户端  发送数据 接收命令
@@ -96,7 +91,7 @@ public class RedisPiper implements Piper{
 
     @Override
     public void start() {
-        piperServiceProtocol.start();
+        super.start();
         piperNameProtocol.start();
 
         //向namer注册piper
@@ -110,16 +105,16 @@ public class RedisPiper implements Piper{
     }
 
     @Override
-    public void stop() {
+    public void close() {
+        super.close();
         piperNameProtocol.stop();
-        piperServiceProtocol.stop();
         InterPiperProtocol.getInstance().stop();
     }
 
     /**
      * PiperName处理器
      */
-    private class DefaultPiperNameProcessor implements PiperNameProcessor {
+    private class DefaultPiperNameProcessor extends PiperNameProcessor {
 
         @Override
         public void acceptJobCommand(JobCommand command) {
@@ -130,7 +125,7 @@ public class RedisPiper implements Piper{
     /**
      * PipserService 处理器
      */
-    private class DefaultPiperServiceProcessor implements PiperServiceProcessor {
+    private class DefaultPiperServiceProcessor extends PiperServiceProcessor {
 
         @Override
         public List<ReplicateData> handleReplicateDataReq(ReplicateDataReq req) {

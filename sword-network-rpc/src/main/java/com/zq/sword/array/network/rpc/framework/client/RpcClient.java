@@ -1,6 +1,6 @@
 package com.zq.sword.array.network.rpc.framework.client;
 
-import com.zq.sword.array.network.rpc.framework.handler.TransferHandler;
+import com.zq.sword.array.network.rpc.framework.handler.ProtocolProcessor;
 
 /**
  * @program: sword-array
@@ -12,14 +12,14 @@ public interface RpcClient {
 
     /**
      * 注册业务处理器
-     * @param transferHandler
+     * @param protocolProcessor
      */
-    void registerTransferHandler(TransferHandler transferHandler);
+    void registerProtocolProcessor(ProtocolProcessor protocolProcessor);
 
     /**
      * 开启
      */
-    void connect();
+    void start();
 
 
     /**
@@ -31,7 +31,7 @@ public interface RpcClient {
     /**
      * 关闭
      */
-    void disconnect();
+    void close();
 
     /**
      * 是否关闭

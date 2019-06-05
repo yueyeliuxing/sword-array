@@ -33,7 +33,7 @@ public class NettyTest {
     @Test
     public void testClient()throws Exception{
         RpcClient transferClient = new NettyRpcClient("127.0.0.1", 8975);
-        transferClient.connect();
+        transferClient.start();
         System.in.read();
     }
 

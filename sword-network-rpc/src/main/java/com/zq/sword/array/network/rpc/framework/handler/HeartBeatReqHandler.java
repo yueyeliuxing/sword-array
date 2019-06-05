@@ -3,6 +3,7 @@ package com.zq.sword.array.network.rpc.framework.handler;
 import com.zq.sword.array.network.rpc.framework.message.MessageType;
 import com.zq.sword.array.network.rpc.framework.message.TransferMessage;
 import com.zq.sword.array.network.rpc.framework.message.Header;
+import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 
 import java.util.concurrent.ScheduledFuture;
@@ -14,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  * @author: zhouqi1
  * @create: 2018-07-06 14:54
  **/
-public class HeartBeatReqHandler extends TransferHandler {
+public class HeartBeatReqHandler extends ChannelHandlerAdapter {
 
     private volatile ScheduledFuture<?> heartBeat;
 

@@ -22,7 +22,7 @@ import java.util.List;
  * @author: zhouqi1
  * @create: 2019-04-26 16:19
  **/
-public class LocalRedisDataStorage implements RedisDataStorage, PiperServiceProcessor {
+public class LocalRedisDataStorage implements RedisDataStorage {
 
     private Logger logger = LoggerFactory.getLogger(LocalRedisDataStorage.class);
 
@@ -144,20 +144,5 @@ public class LocalRedisDataStorage implements RedisDataStorage, PiperServiceProc
                 String.valueOf(consumeNextOffset.getNextOffset()).getBytes());
         dataEntry.setTimestamp(System.currentTimeMillis());
         partition.append(dataEntry);
-    }
-
-    @Override
-    public List<ReplicateData> handleReplicateDataReq(ReplicateDataReq req) {
-        return readReplicateData(req);
-    }
-
-    @Override
-    public void handleReplicateData(ReplicateData replicateData) {
-        writeReplicateData(replicateData);
-    }
-
-    @Override
-    public void handleConsumeNextOffset(ConsumeNextOffset consumeNextOffset) {
-        writeConsumedNextOffset(consumeNextOffset);
     }
 }

@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  * @author: zhouqi1
  * @create: 2019-04-28 20:12
  **/
-public class PiperServerController implements NamerServiceProcessor {
+public class PiperServerController extends NamerServiceProcessor {
 
     /**
      * piper系统

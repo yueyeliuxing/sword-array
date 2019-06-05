@@ -1,7 +1,8 @@
 package com.zq.sword.array.network.rpc.framework.server;
 
+import com.zq.sword.array.network.rpc.framework.handler.ProtocolHandler;
+import com.zq.sword.array.network.rpc.framework.handler.ProtocolProcessor;
 import com.zq.sword.array.utils.IPUtil;
-import com.zq.sword.array.network.rpc.framework.handler.TransferHandler;
 import com.zq.sword.array.network.rpc.framework.coder.NettyMessageDecoder;
 import com.zq.sword.array.network.rpc.framework.coder.NettyMessageEncoder;
 import com.zq.sword.array.network.rpc.framework.handler.HeartBeatRespHandler;
@@ -31,44 +32,26 @@ public class NettyRpcServer implements RpcServer {
 
     private Logger logger = LoggerFactory.getLogger(NettyRpcServer.class);
 
-    private String host;
-
     private int port;
 
-    private List<TransferHandler> transferHandlers;
+    private List<ProtocolProcessor> protocolProcessors;
 
     private ServerBootstrap bootstrap;
 
     private volatile boolean started = false;
 
     public NettyRpcServer(int port) {
-        this.host = IPUtil.getServerIp();
         this.port = port;
-        transferHandlers = new CopyOnWriteArrayList<>();
-    }
-
-    public NettyRpcServer(String host, int port) {
-        this(port);
-        this.host = host;
-
+        protocolProcessors = new CopyOnWriteArrayList<>();
     }
 
     public static void main(String[] args) throws Exception{
         new NettyRpcServer(6440).start();
     }
 
-    public void registerTransferHandler(TransferHandler transferHandler) {
-        transferHandlers.add(transferHandler);
-    }
-
     @Override
-    public String host() {
-        return host;
-    }
-
-    @Override
-    public int port() {
-        return port;
+    public void registerProtocolProcessor(ProtocolProcessor protocolProcessor) {
+        protocolProcessors.add(protocolProcessor);
     }
 
     @Override
@@ -89,12 +72,8 @@ public class NettyRpcServer implements RpcServer {
                                    .addLast(new NettyMessageEncoder())
                                     .addLast("readTimeoutHandler", new ReadTimeoutHandler(50))
                                     .addLast(new LoginAuthRespHandler())
-                                    .addLast("HeartBeatHandler", new HeartBeatRespHandler());
-                            if(transferHandlers != null && !transferHandlers.isEmpty()){
-                                transferHandlers.forEach(transferHandler -> {
-                                    pipeline.addLast(transferHandler);
-                                });
-                            }
+                                    .addLast("HeartBeatHandler", new HeartBeatRespHandler())
+                                    .addLast(new ProtocolHandler(protocolProcessors));
                         }
                     });
             logger.info("Netty server start ok :" + port);
@@ -114,8 +93,7 @@ public class NettyRpcServer implements RpcServer {
     }
 
     @Override
-    public void shutdown() {
-
+    public void close() {
     }
 
     @Override

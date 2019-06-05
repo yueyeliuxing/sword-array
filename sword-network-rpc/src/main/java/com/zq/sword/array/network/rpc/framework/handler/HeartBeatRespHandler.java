@@ -3,6 +3,7 @@ package com.zq.sword.array.network.rpc.framework.handler;
 import com.zq.sword.array.network.rpc.framework.message.TransferMessage;
 import com.zq.sword.array.network.rpc.framework.message.Header;
 import com.zq.sword.array.network.rpc.framework.message.MessageType;
+import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 
 import java.io.IOException;
@@ -13,7 +14,7 @@ import java.io.IOException;
  * @author: zhouqi1
  * @create: 2018-07-06 15:07
  **/
-public class HeartBeatRespHandler extends TransferHandler {
+public class HeartBeatRespHandler extends ChannelHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         if (cause instanceof IOException){

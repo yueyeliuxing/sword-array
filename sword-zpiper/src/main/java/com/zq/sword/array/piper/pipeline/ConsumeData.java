@@ -20,11 +20,6 @@ public class ConsumeData {
     public static final int REPLICATE_DATA_REQ = 2;
 
     /**
-     * 标签
-     */
-    private String tag;
-
-    /**
      * 数据类型
      */
     private int type;
@@ -33,12 +28,6 @@ public class ConsumeData {
      * 数据
      */
     private Object data;
-
-    public ConsumeData(String tag, int type, Object data) {
-        this.tag = tag;
-        this.type = type;
-        this.data = data;
-    }
 
     public ConsumeData(int type, Object data) {
         this.type = type;

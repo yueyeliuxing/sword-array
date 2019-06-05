@@ -3,7 +3,7 @@ package com.zq.sword.array.piper.pipeline;
 import com.zq.sword.array.network.rpc.protocol.InterPiperProtocol;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateData;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateDataReq;
-import com.zq.sword.array.network.rpc.protocol.processor.ConsumeDataRespProcessor;
+import com.zq.sword.array.network.rpc.protocol.processor.ConsumeDataResultProcessor;
 import com.zq.sword.array.tasks.AbstractThreadActuator;
 import com.zq.sword.array.tasks.Actuator;
 import org.slf4j.Logger;
@@ -130,9 +130,9 @@ public class ConsumePipeline implements AutoInflowPipeline<ConsumeData> {
         public DataConsumer(String jobName, String targetPiperLocation) {
             String[] groupLocations = targetPiperLocation.split("\\|");
             this.interPiperClient = InterPiperProtocol.getInstance().getOrNewInterPiperClient(InterPiperProtocol.InterPiperClient.CONSUME_TYPE, jobName, groupLocations[1]);
-            this.interPiperClient.setConsumeDataRespProcessor(new ConsumeDataRespProcessor() {
+            this.interPiperClient.setConsumeDataResultProcessor(new ConsumeDataResultProcessor() {
                 @Override
-                public void consumeReplicateData(List<ReplicateData> replicateData) {
+                public void handleReplicateData(List<ReplicateData> replicateData) {
                     outflowListener.outflow(new ConsumeData(ConsumeData.REPLICATE_DATA, replicateData));
                     //数据消费完 可以继续请求数据了
                     isCanReq = true;

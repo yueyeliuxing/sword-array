@@ -1,5 +1,7 @@
 package com.zq.sword.array.network.rpc.framework.server;
 
+import com.zq.sword.array.network.rpc.framework.handler.ProtocolProcessor;
+
 /**
  * @program: sword-array
  * @description: 传输服务
@@ -9,16 +11,10 @@ package com.zq.sword.array.network.rpc.framework.server;
 public interface RpcServer {
 
     /**
-     *  地址
-     * @return
+     * 注册协议处理器
+     * @param protocolProcessor
      */
-    String host();
-
-    /**
-     * 端口
-     * @return
-     */
-    int port();
+    void registerProtocolProcessor(ProtocolProcessor protocolProcessor);
 
     /**
      * 开启
@@ -28,7 +24,7 @@ public interface RpcServer {
     /**
      * 关闭
      */
-    void shutdown();
+    void close();
 
     /**
      * 是否启动成功

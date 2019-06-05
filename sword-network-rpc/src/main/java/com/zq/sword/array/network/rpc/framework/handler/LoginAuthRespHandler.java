@@ -3,6 +3,7 @@ package com.zq.sword.array.network.rpc.framework.handler;
 import com.zq.sword.array.network.rpc.framework.message.TransferMessage;
 import com.zq.sword.array.network.rpc.framework.message.Header;
 import com.zq.sword.array.network.rpc.framework.message.MessageType;
+import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 
 import java.net.InetSocketAddress;
@@ -15,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author: zhouqi1
  * @create: 2018-07-06 14:30
  **/
-public class LoginAuthRespHandler extends TransferHandler {
+public class LoginAuthRespHandler extends ChannelHandlerAdapter {
 
     private Map<String, Boolean> nodeCheck = new ConcurrentHashMap<>();
 

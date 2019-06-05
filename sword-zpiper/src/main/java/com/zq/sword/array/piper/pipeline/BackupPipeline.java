@@ -2,10 +2,9 @@ package com.zq.sword.array.piper.pipeline;
 
 import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ConsumeNextOffset;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateDataId;
-import com.zq.sword.array.network.rpc.protocol.processor.BackupDataRespProcessor;
+import com.zq.sword.array.network.rpc.protocol.processor.BackupDataResultProcessor;
 import com.zq.sword.array.tasks.Actuator;
 import com.zq.sword.array.tasks.SingleTaskExecutor;
-import com.zq.sword.array.tasks.Task;
 import com.zq.sword.array.tasks.TaskExecutor;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateData;
 import com.zq.sword.array.network.rpc.protocol.InterPiperProtocol;
@@ -57,15 +56,15 @@ public class BackupPipeline implements RefreshPipeline<BackupData> {
     private InterPiperProtocol.InterPiperClient createBackupInterPiperClient(String piperLocation) {
         InterPiperProtocol.InterPiperClient interPiperClient = InterPiperProtocol.getInstance().getOrNewInterPiperClient(InterPiperProtocol.InterPiperClient.BACKUP_TYPE,
                 jobName, piperLocation);
-        interPiperClient.setBackupDataRespProcessor(new BackupDataRespProcessor(){
+        interPiperClient.setBackupDataResultProcessor(new BackupDataResultProcessor(){
 
             @Override
-            public void backupReplicateData(ReplicateDataId replicateDataId) {
+            public void handleBackupReplicateDataResult(ReplicateDataId replicateDataId) {
                 listener.outflow(new BackupData(BackupData.REPLICATE_DATA_RESP, replicateDataId));
             }
 
             @Override
-            public void backupConsumeNextOffset(ConsumeNextOffset consumeNextOffset) {
+            public void handleBackupConsumeNextOffsetResult(ConsumeNextOffset consumeNextOffset) {
                 listener.outflow(new BackupData(BackupData.CONSUME_DATA_RESP, consumeNextOffset));
             }
         });

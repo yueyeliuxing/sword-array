@@ -7,9 +7,8 @@ import com.zq.sword.array.network.rpc.framework.message.Header;
 import com.zq.sword.array.network.rpc.framework.message.MessageType;
 import com.zq.sword.array.network.rpc.framework.message.TransferMessage;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ConsumeNextOffset;
-import com.zq.sword.array.network.rpc.protocol.processor.BackupDataRespProcessor;
-import com.zq.sword.array.network.rpc.protocol.processor.ConsumeDataRespProcessor;
-import com.zq.sword.array.tasks.Actuator;
+import com.zq.sword.array.network.rpc.protocol.processor.BackupDataResultProcessor;
+import com.zq.sword.array.network.rpc.protocol.processor.ConsumeDataResultProcessor;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateData;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateDataId;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateDataReq;
@@ -28,7 +27,7 @@ import java.util.Map;
  * @author: zhouqi1
  * @create: 2019-01-16 19:32
  **/
-public class InterPiperProtocol implements Actuator {
+public class InterPiperProtocol implements Protocol {
 
     private Map<String, InterPiperClient> piperRpcClients;
 
@@ -100,37 +99,32 @@ public class InterPiperProtocol implements Actuator {
 
         private RpcClient rpcClient;
 
-        private volatile BackupDataRespProcessor backupDataRespProcessor;
-
-        private volatile ConsumeDataRespProcessor consumeDataRespProcessor;
-
         public InterPiperClient(String type, String jobName, String piperLocation) {
             this.type = type;
             this.jobName = jobName;
             this.piperLocation = piperLocation;
             String[] ps = piperLocation.split(":");
             rpcClient = new NettyRpcClient(ps[0], Integer.parseInt(ps[1]));
-            rpcClient.registerTransferHandler(new InterPiperTransferHandler());
         }
 
         /**
          * 设置备份数据 返回处理器
-         * @param backupDataRespProcessor
+         * @param backupDataResultProcessor
          */
-        public void setBackupDataRespProcessor(BackupDataRespProcessor backupDataRespProcessor) {
-            this.backupDataRespProcessor = backupDataRespProcessor;
+        public void setBackupDataResultProcessor(BackupDataResultProcessor backupDataResultProcessor) {
+            rpcClient.registerProtocolProcessor(backupDataResultProcessor);
         }
 
         /**
          * 设置消费数据返回处理器
-         * @param consumeDataRespProcessor
+         * @param consumeDataResultProcessor
          */
-        public void setConsumeDataRespProcessor(ConsumeDataRespProcessor consumeDataRespProcessor) {
-            this.consumeDataRespProcessor = consumeDataRespProcessor;
+        public void setConsumeDataResultProcessor(ConsumeDataResultProcessor consumeDataResultProcessor) {
+            rpcClient.registerProtocolProcessor(consumeDataResultProcessor);
         }
 
         public void connect() {
-            rpcClient.connect();
+            rpcClient.start();
         }
 
         /**
@@ -159,7 +153,7 @@ public class InterPiperProtocol implements Actuator {
         }
 
         public void disconnect() {
-            rpcClient.disconnect();
+            rpcClient.close();
             synchronized (InterPiperProtocol.getInstance().piperRpcClients){
                 String interPiperClientId = InterPiperProtocol.getInstance().generateInterPiperClientId(type, jobName, piperLocation);
                 if(InterPiperProtocol.getInstance().piperRpcClients.containsKey(interPiperClientId)){
@@ -215,55 +209,6 @@ public class InterPiperProtocol implements Actuator {
             message.setHeader(header);
             message.setBody(consumeNextOffset);
             return message;
-        }
-
-        /**
-         * 发送数据到远程broker
-         */
-        @ChannelHandler.Sharable
-        private class InterPiperTransferHandler extends TransferHandler {
-
-            private Logger logger = LoggerFactory.getLogger(InterPiperTransferHandler.class);
-
-            public InterPiperTransferHandler() {
-            }
-
-            @Override
-            public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-                ctx.fireExceptionCaught(cause);
-            }
-
-            @Override
-            public void channelActive(ChannelHandlerContext ctx) throws Exception {
-                super.channelActive(ctx);
-            }
-
-            @Override
-            public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-                logger.info("rpcPartition receive msg request : {}", msg);
-                TransferMessage message = (TransferMessage)msg;
-                if(message.getHeader() != null && message.getHeader().getType() == MessageType.SEND_REPLICATE_DATA_RESP.value()) {
-                    ReplicateDataId replicateDataId = (ReplicateDataId)message.getBody();
-                    if(backupDataRespProcessor != null){
-                        backupDataRespProcessor.backupReplicateData(replicateDataId);
-                    }
-                    logger.info("获取已经消费的消息ID:{}", replicateDataId);
-                }else if(message.getHeader() != null && message.getHeader().getType() == MessageType.RECEIVE_REPLICATE_DATA_RESP.value()) {
-                    List<ReplicateData> replicateData = (List<ReplicateData>)message.getBody();
-                    if(consumeDataRespProcessor != null){
-                        consumeDataRespProcessor.consumeReplicateData(replicateData);
-                    }
-                    logger.info("获取要查询的数据:{}", replicateData);
-                }else if(message.getHeader() != null && message.getHeader().getType() == MessageType.SEND_CONSUME_NEXT_OFFSET_RESP.value()) {
-                    ConsumeNextOffset consumeNextOffset = (ConsumeNextOffset)message.getBody();
-                    if(backupDataRespProcessor != null){
-                        backupDataRespProcessor.backupConsumeNextOffset(consumeNextOffset);
-                    }
-                    logger.info("获取已经成功同步的消费offset信息:{}", consumeNextOffset);
-                }else {
-                    ctx.fireChannelRead(msg);
-                }
-            }
         }
     }
 }
