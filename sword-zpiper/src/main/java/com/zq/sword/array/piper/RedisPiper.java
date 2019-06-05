@@ -17,6 +17,7 @@ import com.zq.sword.array.piper.job.JobController;
 import com.zq.sword.array.piper.storage.RedisDataStorage;
 import com.zq.sword.array.piper.storage.LocalRedisDataStorage;
 import com.zq.sword.array.tasks.SingleTimedTaskExecutor;
+import com.zq.sword.array.tasks.TaskExecutorPool;
 import com.zq.sword.array.tasks.TimedTaskExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +87,7 @@ public class RedisPiper extends AbstractPiper implements Piper{
         jobController = new JobController(redisDataStorage);
         jobController.setJobMonitor(new DefaultJobMonitor());
 
-        timedTaskExecutor = new SingleTimedTaskExecutor();
+        timedTaskExecutor = TaskExecutorPool.getCommonTimedTaskExecutor();
     }
 
     @Override

@@ -15,6 +15,7 @@ import com.zq.sword.array.redis.replicator.listener.RedisReplicatorListeners;
 import com.zq.sword.array.redis.replicator.util.RedisCommandBuilder;
 import com.zq.sword.array.tasks.SingleTaskExecutor;
 import com.zq.sword.array.tasks.TaskExecutor;
+import com.zq.sword.array.tasks.TaskExecutorPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +54,7 @@ public class DefaultSlaveRedisReplicator implements SlaveRedisReplicator {
             throw new RuntimeException(e);
         }
 
-        this.taskExecutor = new SingleTaskExecutor();
+        this.taskExecutor = TaskExecutorPool.buildTaskExecutor(1);
     }
 
     @Override
@@ -72,6 +73,7 @@ public class DefaultSlaveRedisReplicator implements SlaveRedisReplicator {
     public void stop() {
         try {
             replicator.close();
+            TaskExecutorPool.releaseTaskExecutor(taskExecutor);
         } catch (IOException e) {
             logger.error("error", e);
             throw new RuntimeException(e);

@@ -13,4 +13,9 @@ public interface TaskExecutor {
      * @param task
      */
     void execute(Task task);
+
+    /**
+     * 关闭
+     */
+    void shutdown();
 }

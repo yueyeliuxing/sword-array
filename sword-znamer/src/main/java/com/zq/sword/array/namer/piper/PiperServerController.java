@@ -10,6 +10,7 @@ import com.zq.sword.array.network.rpc.protocol.dto.piper.command.JobType;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.JobHealth;
 import com.zq.sword.array.network.rpc.protocol.processor.NamerServiceProcessor;
 import com.zq.sword.array.tasks.SingleTimedTaskExecutor;
+import com.zq.sword.array.tasks.TaskExecutorPool;
 import com.zq.sword.array.tasks.TimedTaskExecutor;
 
 import java.util.*;
@@ -51,7 +52,7 @@ public class PiperServerController extends NamerServiceProcessor {
         this.namePiperSystem = new NamePiperSystem();
         this.mainJobSystem = new MainJobSystem();
         this.commands = new ConcurrentHashMap<>();
-        this.timedTaskExecutor = new SingleTimedTaskExecutor();
+        this.timedTaskExecutor = TaskExecutorPool.getCommonTimedTaskExecutor();
 
         //设置定时任务执行
         initTimedTasks();

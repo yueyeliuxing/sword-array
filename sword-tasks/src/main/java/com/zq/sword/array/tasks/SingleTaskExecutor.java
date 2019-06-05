@@ -25,4 +25,9 @@ public class SingleTaskExecutor implements TaskExecutor {
     public void execute(Task task) {
         executor.submit(()->{task.execute();});
     }
+
+    @Override
+    public void shutdown() {
+        executor.shutdown();
+    }
 }

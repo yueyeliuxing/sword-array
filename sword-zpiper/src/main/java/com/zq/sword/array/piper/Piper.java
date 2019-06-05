@@ -16,7 +16,7 @@ public interface Piper {
     void start();
 
     /**
-     * 关闭
+     *
      */
     void close();
 }

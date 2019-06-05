@@ -3,6 +3,8 @@ package com.zq.sword.array.redis.handler;
 
 import com.zq.sword.array.redis.command.RedisCommand;
 import com.zq.sword.array.tasks.SingleTimedTaskExecutor;
+import com.zq.sword.array.tasks.TaskExecutor;
+import com.zq.sword.array.tasks.TaskExecutorPool;
 import com.zq.sword.array.tasks.TimedTaskExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +29,7 @@ public class SimpleCycleDisposeHandler implements CycleDisposeHandler<RedisComma
 
     private DelayQueue<DelayedCommand> commandDelayQueue;
 
-    private TimedTaskExecutor taskExecutor;
+    private TaskExecutor taskExecutor;
 
     private volatile boolean isRun = true;
 
@@ -35,7 +37,7 @@ public class SimpleCycleDisposeHandler implements CycleDisposeHandler<RedisComma
         logger.info("SwordCommandCycleDisposeBridge 模块启动成功");
         consumedSwordDataSet = new CopyOnWriteArraySet<>();
         commandDelayQueue = new DelayQueue<>();
-        taskExecutor = new SingleTimedTaskExecutor();
+        taskExecutor = TaskExecutorPool.getCommonTaskExecutor();
         startTasks();
     }
 

@@ -67,7 +67,7 @@ public class JobSystem {
         if(job == null){
             throw new NullPointerException("job is not exits");
         }
-        job.destroy();
+        job.stop();
         jobs.remove(jobName);
     }
 

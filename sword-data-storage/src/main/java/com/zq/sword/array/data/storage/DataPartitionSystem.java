@@ -1,6 +1,7 @@
 package com.zq.sword.array.data.storage;
 
 import com.zq.sword.array.tasks.SingleTimedTaskExecutor;
+import com.zq.sword.array.tasks.TaskExecutorPool;
 import com.zq.sword.array.tasks.TimedTaskExecutor;
 
 import java.io.File;
@@ -60,7 +61,7 @@ public class DataPartitionSystem implements PartitionSystem {
         this.partitionOfGroupNames = new HashMap<>();
         this.partitionOfGroups = new HashMap<>();
         this.deletedPartitions = new ArrayList<>();
-        this.executor = new SingleTimedTaskExecutor();
+        this.executor = TaskExecutorPool.getCommonTimedTaskExecutor();
 
         //加载已存在的分片数据
         loadResources(storePath);
@@ -136,7 +137,6 @@ public class DataPartitionSystem implements PartitionSystem {
 
     @Override
     public void destroy() {
-
     }
 
     @Override

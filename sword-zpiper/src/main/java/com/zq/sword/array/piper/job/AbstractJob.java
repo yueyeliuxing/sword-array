@@ -58,6 +58,8 @@ public abstract class AbstractJob extends AbstractThreadActuator implements Job 
         jobMonitor.monitor(new JobHealth(name, EXCEPTION, e.getMessage()));
     }
 
+
+
     @Override
     public void run() {
         state(START);
@@ -65,6 +67,7 @@ public abstract class AbstractJob extends AbstractThreadActuator implements Job 
 
     @Override
     public void stop() {
+        super.stop();
         state(STOP);
     }
 }

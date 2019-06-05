@@ -13,22 +13,23 @@ import java.util.concurrent.TimeUnit;
  **/
 public class SingleTimedTaskExecutor implements TimedTaskExecutor {
 
-    private ExecutorService executor;
-
-    private ScheduledExecutorService tomedExecutor;
+    private ScheduledExecutorService timedExecutor;
 
     public SingleTimedTaskExecutor() {
-        executor = Executors.newFixedThreadPool(1);
-        tomedExecutor = Executors.newScheduledThreadPool(1);
+        timedExecutor = Executors.newScheduledThreadPool(1);
     }
 
-    @Override
-    public void execute(Task task) {
-        executor.submit(()->{task.execute();});
+    public SingleTimedTaskExecutor(int num) {
+        timedExecutor = Executors.newScheduledThreadPool(num);
     }
 
     @Override
     public void timedExecute(Task task, long delay, TimeUnit timeUnit) {
-        tomedExecutor.scheduleWithFixedDelay(()->{task.execute();}, 0, delay, timeUnit);
+        timedExecutor.scheduleWithFixedDelay(()->{task.execute();}, 0, delay, timeUnit);
+    }
+
+    @Override
+    public void shutdown() {
+        timedExecutor.shutdown();
     }
 }

@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
  * @author: zhouqi1
  * @create: 2018-10-17 16:18
  **/
-public interface TimedTaskExecutor extends TaskExecutor {
+public interface TimedTaskExecutor {
 
     /**
      * 定时执行任务
@@ -17,4 +17,10 @@ public interface TimedTaskExecutor extends TaskExecutor {
      * @param timeUnit
      */
     void timedExecute(Task task, long delay, TimeUnit timeUnit);
+
+
+    /**
+     * 关闭
+     */
+    void shutdown();
 }

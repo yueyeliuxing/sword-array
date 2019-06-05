@@ -8,6 +8,7 @@ import com.zq.sword.array.tasks.SingleTaskExecutor;
 import com.zq.sword.array.tasks.TaskExecutor;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateData;
 import com.zq.sword.array.network.rpc.protocol.InterPiperProtocol;
+import com.zq.sword.array.tasks.TaskExecutorPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -158,7 +159,7 @@ public class BackupPipeline implements RefreshPipeline<BackupData> {
 
         public ReplicateDataBackuper(String replicatePiperLocation) {
             this.interPiperClient = createBackupInterPiperClient(replicatePiperLocation);
-            this.taskExecutor = new SingleTaskExecutor();
+            this.taskExecutor = TaskExecutorPool.buildTaskExecutor(1);
         }
 
         /**
@@ -185,6 +186,7 @@ public class BackupPipeline implements RefreshPipeline<BackupData> {
         @Override
         public void stop() {
             interPiperClient.disconnect();
+            TaskExecutorPool.releaseTaskExecutor(taskExecutor);
         }
     }
 }

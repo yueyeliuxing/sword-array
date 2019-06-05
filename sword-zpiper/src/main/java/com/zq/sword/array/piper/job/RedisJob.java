@@ -139,15 +139,12 @@ public class RedisJob extends AbstractJob implements Job {
         backupPipeline.refresh(pipeConfig);
     }
 
-
-    /**
-     * 任务启动
-     */
     @Override
-    public void start() {
+    public void run() {
         redisPipeline.open();
         consumePipeline.open();
         backupPipeline.open();
+        super.run();
     }
 
     /**
@@ -155,17 +152,18 @@ public class RedisJob extends AbstractJob implements Job {
      */
     @Override
     public void restart(){
-        destroy();
+        stop();
         start();
     }
     /**
      * 任务销毁
      */
     @Override
-    public void destroy() {
+    public void stop() {
         redisPipeline.close();
         consumePipeline.close();
         backupPipeline.close();
+        super.stop();
     }
 
 }
