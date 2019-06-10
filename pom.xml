@@ -27,6 +27,7 @@
         <module>sword-network-rpc</module>
 		<module>sword-zpiper</module>
 		<module>sword-znamer</module>
+		<module>sword-zadmin</module>
 	</modules>
 
 	<licenses>
