@@ -18,7 +18,7 @@ public class RedisCommandBuilder {
      * @param command
      * @return
      */
-    public static RedisCommand buildSwordCommand(Command command){
+    public static RedisCommand buildRedisCommand(Command command){
         RedisCommand swordCommand = new RedisCommand();
         if(command instanceof SetCommand){
             SetCommand setCommand = (SetCommand) command;

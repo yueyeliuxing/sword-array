@@ -13,7 +13,6 @@ import com.zq.sword.array.redis.interceptor.CommandInterceptors;
 import com.zq.sword.array.redis.replicator.listener.RedisReplicatorListener;
 import com.zq.sword.array.redis.replicator.listener.RedisReplicatorListeners;
 import com.zq.sword.array.redis.replicator.util.RedisCommandBuilder;
-import com.zq.sword.array.tasks.SingleTaskExecutor;
 import com.zq.sword.array.tasks.TaskExecutor;
 import com.zq.sword.array.tasks.TaskExecutorPool;
 import org.slf4j.Logger;
@@ -99,7 +98,7 @@ public class DefaultSlaveRedisReplicator implements SlaveRedisReplicator {
         public void onEvent(Replicator replicator, Event event) {
             if(event instanceof Command){
                 Command command = (Command) event;
-                RedisCommand redisCommand = RedisCommandBuilder.buildSwordCommand(command);
+                RedisCommand redisCommand = RedisCommandBuilder.buildRedisCommand(command);
                 if(redisCommand.getType() == 0
                         || (redisCommand = commandInterceptors.interceptor(redisCommand)) == null){
                     return;
