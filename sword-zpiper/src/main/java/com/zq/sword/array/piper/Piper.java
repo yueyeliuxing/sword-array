@@ -18,5 +18,5 @@ public interface Piper {
     /**
      *
      */
-    void close();
+    void shutdown();
 }

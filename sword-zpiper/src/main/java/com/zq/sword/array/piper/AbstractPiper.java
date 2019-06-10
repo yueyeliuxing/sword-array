@@ -37,7 +37,7 @@ public abstract class AbstractPiper implements Piper {
     }
 
     @Override
-    public void close() {
+    public void shutdown() {
         piperServiceProtocol.stop();
     }
 }

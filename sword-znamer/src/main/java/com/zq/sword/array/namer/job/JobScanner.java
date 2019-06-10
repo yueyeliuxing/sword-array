@@ -1,4 +1,4 @@
-package com.zq.sword.array.namer.piper.job;
+package com.zq.sword.array.namer.job;
 
 /**
  * @program: sword-array

@@ -2,7 +2,6 @@ package com.zq.sword.array.piper;
 
 import com.zq.sword.array.network.rpc.protocol.InterPiperProtocol;
 import com.zq.sword.array.network.rpc.protocol.PiperNameProtocol;
-import com.zq.sword.array.network.rpc.protocol.PiperServiceProtocol;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.NamePiper;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.command.JobCommand;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ConsumeNextOffset;
@@ -16,7 +15,6 @@ import com.zq.sword.array.piper.config.PiperConfig;
 import com.zq.sword.array.piper.job.JobController;
 import com.zq.sword.array.piper.storage.RedisDataStorage;
 import com.zq.sword.array.piper.storage.LocalRedisDataStorage;
-import com.zq.sword.array.tasks.SingleTimedTaskExecutor;
 import com.zq.sword.array.tasks.TaskExecutorPool;
 import com.zq.sword.array.tasks.TimedTaskExecutor;
 import org.slf4j.Logger;
@@ -106,8 +104,8 @@ public class RedisPiper extends AbstractPiper implements Piper{
     }
 
     @Override
-    public void close() {
-        super.close();
+    public void shutdown() {
+        super.shutdown();
         piperNameProtocol.stop();
         InterPiperProtocol.getInstance().stop();
     }

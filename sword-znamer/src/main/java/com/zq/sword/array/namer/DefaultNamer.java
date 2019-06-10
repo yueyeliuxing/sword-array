@@ -1,8 +1,13 @@
 package com.zq.sword.array.namer;
 
 import com.zq.sword.array.namer.config.PiperConfig;
-import com.zq.sword.array.namer.piper.PiperServerController;
-import com.zq.sword.array.network.rpc.protocol.NamerServiceProtocol;
+import com.zq.sword.array.namer.job.MetaJobSupervisor;
+import com.zq.sword.array.namer.piper.MetaPiperSupervisor;
+import com.zq.sword.array.network.rpc.protocol.dto.client.NameJob;
+import com.zq.sword.array.network.rpc.protocol.dto.piper.NamePiper;
+import com.zq.sword.array.network.rpc.protocol.dto.piper.command.JobCommand;
+import com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.JobHealth;
+import com.zq.sword.array.network.rpc.protocol.processor.NamerServiceProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,43 +17,74 @@ import org.slf4j.LoggerFactory;
  * @author: zhouqi1
  * @create: 2019-01-23 15:50
  **/
-public class DefaultNamer implements Namer {
+public class DefaultNamer extends AbstractNamer implements Namer {
 
     private Logger logger = LoggerFactory.getLogger(DefaultNamer.class);
 
     /**
-     * namer服务通信
+     * Piper管理器
      */
-    private NamerServiceProtocol namerServiceProtocol;
+    private MetaPiperSupervisor metaPiperSupervisor;
 
     /**
-     * piper监控器
+     * Job管理器
      */
-    private PiperServerController piperNameController;
+    private MetaJobSupervisor metaJobSupervisor;
 
 
     public DefaultNamer(PiperConfig config) {
+        super(config.namerLocation());
+        //创建piper管理器
+        metaPiperSupervisor = new MetaPiperSupervisor();
 
-        //创建namer通信服务
-        namerServiceProtocol =  new NamerServiceProtocol(config.namerLocation());
-
-        //创建piper控制器
-        piperNameController = new PiperServerController();
+        //创建Job管理器
+        metaJobSupervisor = new MetaJobSupervisor(metaPiperSupervisor);
 
         //设置piper事件处理器
-        namerServiceProtocol.setNamerServiceProcessor(piperNameController);
-
-
+        setNamerServiceProcessor(new DefaultNamerServiceProcessor());
     }
 
     @Override
     public void start() {
-
-        namerServiceProtocol.start();
     }
 
     @Override
-    public void stop() {
-        namerServiceProtocol.stop();
+    public void shutdown() {
+
+    }
+
+    /**
+     * 处理器
+     */
+    private class DefaultNamerServiceProcessor extends NamerServiceProcessor {
+        @Override
+        public void handlePiperRegister(NamePiper namePiper) {
+            metaPiperSupervisor.registerPiper(namePiper);
+        }
+
+        @Override
+        public JobCommand handleJobCommandReq(NamePiper namePiper) {
+            return metaJobSupervisor.getJobCommand(namePiper);
+        }
+
+        @Override
+        public void handleTaskHealthReport(JobHealth jobHealth) {
+            metaJobSupervisor.reportJobHealth(jobHealth);
+        }
+
+        @Override
+        public void handleClientCreateJobReq(NameJob nameJob) {
+            metaJobSupervisor.createJob(nameJob);
+        }
+
+        @Override
+        public void handleClientStartJobReq(String jobName) {
+            metaJobSupervisor.startJob(jobName);
+        }
+
+        @Override
+        public void handleClientRemoveJobReq(String jobName) {
+            metaJobSupervisor.removeJob(jobName);
+        }
     }
 }

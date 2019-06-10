@@ -8,6 +8,16 @@ import com.zq.sword.array.tasks.Actuator;
  * @author: zhouqi1
  * @create: 2019-01-21 21:07
  **/
-public interface Namer extends Actuator {
+public interface Namer {
 
+
+    /**
+     * 启动
+     */
+    void start();
+
+    /**
+     *
+     */
+    void shutdown();
 }

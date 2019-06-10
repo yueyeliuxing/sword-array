@@ -44,10 +44,26 @@ public class NamerServiceProcessor implements ProtocolProcessor {
     }
 
     /**
-     * 处理客户端启动任务的请求
+     * 处理客户端创建任务的请求
      * @param nameJob
      */
-    public void handleClientStartJobReq(NameJob nameJob){
+    public void handleClientCreateJobReq(NameJob nameJob){
+
+    }
+
+    /**
+     * 处理客户端启动任务的请求
+     * @param jobName
+     */
+    public void handleClientStartJobReq(String jobName){
+
+    }
+
+    /**
+     * 处理客户端删除任务的请求
+     * @param jobName
+     */
+    public void handleClientRemoveJobReq(String jobName){
 
     }
 
@@ -57,7 +73,9 @@ public class NamerServiceProcessor implements ProtocolProcessor {
                 && (message.getHeader().getType() == MessageType.REGISTER_PIPER_REQ.value()
                 || message.getHeader().getType() == MessageType.JOB_COMMAND_REQ.value()
                 || message.getHeader().getType() == MessageType.REPORT_JOB_HEALTH.value()
-                || message.getHeader().getType() == MessageType.CLIENT_START_JOB.value());
+                || message.getHeader().getType() == MessageType.CLIENT_CREATE_JOB.value()
+                || message.getHeader().getType() == MessageType.CLIENT_START_JOB.value()
+                || message.getHeader().getType() == MessageType.CLIENT_REMOVE_JOB.value());
     }
 
     @Override
@@ -76,9 +94,15 @@ public class NamerServiceProcessor implements ProtocolProcessor {
         }else if(message.getHeader() != null && message.getHeader().getType() == MessageType.REPORT_JOB_HEALTH.value()) {
             JobHealth jobHealth = (JobHealth) message.getBody();
             handleTaskHealthReport(jobHealth);
-        }else if(message.getHeader() != null && message.getHeader().getType() == MessageType.CLIENT_START_JOB.value()) {
+        }else if(message.getHeader() != null && message.getHeader().getType() == MessageType.CLIENT_CREATE_JOB.value()) {
             NameJob nameJob = (NameJob)message.getBody();
-            handleClientStartJobReq(nameJob);
+            handleClientCreateJobReq(nameJob);
+        }else if(message.getHeader() != null && message.getHeader().getType() == MessageType.CLIENT_START_JOB.value()) {
+            String jobName = (String)message.getBody();
+            handleClientStartJobReq(jobName);
+        }else if(message.getHeader() != null && message.getHeader().getType() == MessageType.CLIENT_REMOVE_JOB.value()) {
+            String jobName = (String)message.getBody();
+            handleClientRemoveJobReq(jobName);
         }
         return transferMessage;
     }

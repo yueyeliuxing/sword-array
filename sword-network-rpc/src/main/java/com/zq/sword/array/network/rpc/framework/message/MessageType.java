@@ -35,9 +35,20 @@ public enum MessageType {
     REPORT_JOB_HEALTH((byte)13),
 
     /**
+     * 客户端创建一个任务
+     */
+    CLIENT_CREATE_JOB((byte)14),
+
+    /**
      * 客户端开启一个任务
      */
-    CLIENT_START_JOB((byte)14),
+    CLIENT_START_JOB((byte)15),
+
+
+    /**
+     * 客户端删除一个任务
+     */
+    CLIENT_REMOVE_JOB((byte)14),
     ;
 
     MessageType(byte value) {

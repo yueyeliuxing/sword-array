@@ -1,5 +1,6 @@
-package com.zq.sword.array.namer.piper.job;
+package com.zq.sword.array.namer.job;
 
+import com.zq.sword.array.namer.piper.MetaPiper;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.NamePiper;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.JobHealth;
 import lombok.Data;
@@ -35,17 +36,17 @@ public class BranchJob {
     /**
      * 任务所在的piper
      */
-    private NamePiper piper;
+    private MetaPiper piper;
 
     /**
      * 需要备份的pipers
      */
-    private List<NamePiper> backupPipers;
+    private List<MetaPiper> backupPipers;
 
     /**
      * 需要消费的piper
      */
-    private List<NamePiper> consumePipers;
+    private List<MetaPiper> consumePipers;
 
     /**
      * Job 状态 1 创建完成 2 启动成功 3 停止 4发生异常 {@linkplain JobHealth}
@@ -76,7 +77,7 @@ public class BranchJob {
      * 添加备份piper
      * @param piper
      */
-    public void addBackupPiper(NamePiper piper){
+    public void addBackupPiper(MetaPiper piper){
         this.backupPipers.add(piper);
     }
 
@@ -84,7 +85,7 @@ public class BranchJob {
      * 添加消费piper
      * @param piper
      */
-    public void addConsumePiper(NamePiper piper){
+    public void addConsumePiper(MetaPiper piper){
         this.consumePipers.add(piper);
     }
 

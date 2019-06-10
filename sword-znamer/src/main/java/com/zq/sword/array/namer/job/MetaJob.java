@@ -1,4 +1,4 @@
-package com.zq.sword.array.namer.piper.job;
+package com.zq.sword.array.namer.job;
 
 import lombok.Data;
 
@@ -13,7 +13,7 @@ import java.util.Map;
  * @create: 2019-04-29 09:56
  **/
 @Data
-public class MainJob {
+public class MetaJob {
 
     /**
      * JobName
