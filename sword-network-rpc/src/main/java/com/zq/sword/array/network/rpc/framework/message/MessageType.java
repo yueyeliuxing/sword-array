@@ -44,11 +44,46 @@ public enum MessageType {
      */
     CLIENT_START_JOB((byte)15),
 
+    /**
+     * 客户端暂停一个任务
+     */
+    CLIENT_STOP_JOB((byte)15),
+
 
     /**
      * 客户端删除一个任务
      */
     CLIENT_REMOVE_JOB((byte)14),
+
+    /**
+     * 客户端查询piper
+     */
+    CLIENT_SEARCH_PIPERS((byte)15),
+
+    /**
+     * 客户端查询piper结果
+     */
+    CLIENT_SEARCH_PIPERS_RESULT((byte)16),
+
+    /**
+     * 客户端查询job
+     */
+    CLIENT_SEARCH_JOB((byte)17),
+
+    /**
+     * 客户端查询job结果
+     */
+    CLIENT_SEARCH_JOB_RESULT((byte)18),
+
+    /**
+     * 客户端查询 分支job
+     */
+    CLIENT_SEARCH_BRANCH_JOB((byte)19),
+
+    /**
+     * 客户端查询 分支job结果
+     */
+    CLIENT_SEARCH_BRANCH_JOB_RESULT((byte)20),
     ;
 
     MessageType(byte value) {

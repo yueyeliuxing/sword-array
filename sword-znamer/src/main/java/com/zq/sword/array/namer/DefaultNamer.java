@@ -3,6 +3,7 @@ package com.zq.sword.array.namer;
 import com.zq.sword.array.namer.config.PiperConfig;
 import com.zq.sword.array.namer.job.MetaJobSupervisor;
 import com.zq.sword.array.namer.piper.MetaPiperSupervisor;
+import com.zq.sword.array.network.rpc.protocol.dto.client.NameBranchJob;
 import com.zq.sword.array.network.rpc.protocol.dto.client.NameJob;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.NamePiper;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.command.JobCommand;
@@ -10,6 +11,9 @@ import com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.JobHealth;
 import com.zq.sword.array.network.rpc.protocol.processor.NamerServiceProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @program: sword-array
@@ -83,8 +87,30 @@ public class DefaultNamer extends AbstractNamer implements Namer {
         }
 
         @Override
+        public void handleClientStopJobReq(String jobName) {
+            metaJobSupervisor.stopJob(jobName);
+        }
+
+        @Override
         public void handleClientRemoveJobReq(String jobName) {
             metaJobSupervisor.removeJob(jobName);
+        }
+
+        @Override
+        public List<NamePiper> handleClientSearchPipersReq() {
+            List<NamePiper> pipers = new ArrayList<>();
+            pipers.addAll(metaPiperSupervisor.allNamePipers());
+            return pipers;
+        }
+
+        @Override
+        public NameJob handleClientSearchJobReq(String jobName) {
+            return metaJobSupervisor.getNameJob(jobName);
+        }
+
+        @Override
+        public List<NameBranchJob> handleClientSearchBranchJobReq(String jobName) {
+            return metaJobSupervisor.listNameBranchJob(jobName);
         }
     }
 }

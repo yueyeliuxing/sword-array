@@ -4,6 +4,7 @@ import com.zq.sword.array.namer.piper.MetaPiper;
 import com.zq.sword.array.namer.piper.MetaPiperGroup;
 import com.zq.sword.array.namer.piper.MetaPiperListener;
 import com.zq.sword.array.namer.piper.MetaPiperSupervisor;
+import com.zq.sword.array.network.rpc.protocol.dto.client.NameBranchJob;
 import com.zq.sword.array.network.rpc.protocol.dto.client.NameJob;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.NamePiper;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.command.JobCommand;
@@ -11,6 +12,7 @@ import com.zq.sword.array.network.rpc.protocol.dto.piper.command.JobType;
 import com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.JobHealth;
 import com.zq.sword.array.tasks.TaskExecutorPool;
 import com.zq.sword.array.tasks.TimedTaskExecutor;
+import org.springframework.beans.BeanUtils;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -208,7 +210,29 @@ public class MetaJobSupervisor {
      * 删除任务
      * @param jobName
      */
+    public void stopJob(String jobName) {
+        MetaJob metaJob = jobs.get(jobName);
+        if(metaJob != null){
+            Collection<BranchJob> branchJobs =  metaJob.allBranchJobs();
+            for (BranchJob branchJob : branchJobs){
+                MetaPiper piper = branchJob.getPiper();
+                LinkedBlockingQueue<JobCommand> commandQueue = commands.get(piper.location());
+                if(commandQueue == null){
+                    commandQueue = new LinkedBlockingQueue<>();
+                    commands.put(piper.location(), commandQueue);
+                }
+                commandQueue.offer(new JobCommand(JobType.JOB_DESTROY.getType(), branchJob.getName()));
+            }
+        }
+
+    }
+
+    /**
+     * 删除任务
+     * @param jobName
+     */
     public void removeJob(String jobName) {
+        stopJob(jobName);
         nameJobs.remove(jobName);
         jobs.remove(jobName);
 
@@ -229,6 +253,51 @@ public class MetaJobSupervisor {
      */
     private MetaJob getMetaJob(String jobName) {
         return jobs.get(jobName);
+    }
+
+    /**
+     * 获取NameJob
+     * @param jobName
+     * @return
+     */
+    public NameJob getNameJob(String jobName){
+        return nameJobs.get(jobName);
+    }
+
+    /**
+     * 获取Job的分支job
+     * @param jobName
+     * @return
+     */
+    public List<NameBranchJob> listNameBranchJob(String jobName){
+        List<NameBranchJob> nameBranchJobs = new ArrayList<>();
+        MetaJob metaJob = getMetaJob(jobName);
+        if(metaJob != null){
+            Collection<BranchJob> branchJobs = metaJob.allBranchJobs();
+            branchJobs.forEach(branchJob -> nameBranchJobs.add(toNameBranchJob(branchJob)));
+        }
+        return nameBranchJobs;
+    }
+
+    private NameBranchJob toNameBranchJob(BranchJob branchJob) {
+        NameBranchJob nameBranchJob = new NameBranchJob();
+        BeanUtils.copyProperties(branchJob, nameBranchJob);
+        MetaPiper piper = branchJob.getPiper();
+        if(piper != null){
+            nameBranchJob.setPiper(new NamePiper(0, branchJob.getPiperGroup(), piper.location()));
+        }
+
+        List<MetaPiper> consumePipers = branchJob.getConsumePipers();
+        if(consumePipers != null){
+            nameBranchJob.setConsumePipers(consumePipers.stream().map(p->new NamePiper(0, branchJob.getPiperGroup(), p.location())).collect(Collectors.toList()));
+        }
+
+        List<MetaPiper> backupPipers = branchJob.getBackupPipers();
+        if(backupPipers != null){
+            nameBranchJob.setBackupPipers(backupPipers.stream().map(p->new NamePiper(0, branchJob.getPiperGroup(), p.location())).collect(Collectors.toList()));
+        }
+
+        return nameBranchJob;
     }
 
 

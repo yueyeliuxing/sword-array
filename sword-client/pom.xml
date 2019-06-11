@@ -44,13 +44,12 @@
 		<relativePath>../</relativePath>
 	</parent>
 
-	<artifactId>sword-data-storage</artifactId>
+	<artifactId>sword-client</artifactId>
 	<packaging>jar</packaging>
-	<name>sword-data-storage</name>
+	<name>sword-client</name>
 
 
 	<dependencies>
-
 		<dependency>
 			<groupId>com.zq.sword</groupId>
 			<artifactId>sword-utils</artifactId>
@@ -67,17 +66,11 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.zq.sword</groupId>
-			<artifactId>sword-id-generator</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>RELEASE</version>
 			<scope>provided</scope>
 		</dependency>
-
 
     </dependencies>
 

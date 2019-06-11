@@ -13,11 +13,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
  **/
 public class MetaPiperSupervisor {
 
+    private Map<String, NamePiper> namePipers;
+
     private Map<String, MetaPiperGroup> groups;
 
     private List<MetaPiperListener> listeners;
 
     public MetaPiperSupervisor() {
+        namePipers = new HashMap<>();
         groups = new HashMap<>();
         listeners = new CopyOnWriteArrayList<>();
     }
@@ -45,6 +48,8 @@ public class MetaPiperSupervisor {
 
             //触发监听器
             listeners.forEach(listener->listener.add(piper));
+
+            namePipers.put(piper.getLocation(), piper);
         }
 
 
@@ -65,6 +70,8 @@ public class MetaPiperSupervisor {
                 listeners.forEach(listener->listener.remove(piper));
 
             }
+
+            namePipers.remove(piper.getLocation());
         }
     }
 
@@ -83,5 +90,13 @@ public class MetaPiperSupervisor {
      */
     public Collection<MetaPiperGroup> getAllPiperGroup(){
         return Collections.unmodifiableCollection(groups.values());
+    }
+
+    /**
+     * 得到所有的Piper元数据
+     * @return
+     */
+    public Collection<NamePiper> allNamePipers(){
+        return Collections.unmodifiableCollection(namePipers.values());
     }
 }

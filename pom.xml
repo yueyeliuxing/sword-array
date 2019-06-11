@@ -28,6 +28,7 @@
 		<module>sword-zpiper</module>
 		<module>sword-znamer</module>
 		<module>sword-zadmin</module>
+		<module>sword-client</module>
 	</modules>
 
 	<licenses>
