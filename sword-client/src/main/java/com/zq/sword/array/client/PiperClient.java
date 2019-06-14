@@ -1,9 +1,8 @@
 package com.zq.sword.array.client;
 
-import com.zq.sword.array.network.rpc.protocol.dto.client.NameBranchJob;
-import com.zq.sword.array.network.rpc.protocol.dto.client.NameJob;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.NamePiper;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.JobHealth;
+import com.zq.sword.array.rpc.api.namer.dto.NameBranchJob;
+import com.zq.sword.array.rpc.api.namer.dto.NameJob;
+import com.zq.sword.array.rpc.api.namer.dto.NamePiper;
 
 import java.util.List;
 

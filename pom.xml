@@ -25,6 +25,7 @@
 		<module>sword-redis-writer</module>
 		<module>sword-redis-replicator</module>
         <module>sword-network-rpc</module>
+        <module>sword-rpc-api</module>
 		<module>sword-zpiper</module>
 		<module>sword-znamer</module>
 		<module>sword-zadmin</module>

@@ -1,13 +1,12 @@
 package com.zq.sword.array.piper.pipeline;
 
-import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ConsumeNextOffset;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateDataId;
-import com.zq.sword.array.network.rpc.protocol.processor.BackupDataResultProcessor;
+import com.zq.sword.array.network.rpc.framework.NettyRpcClient;
+import com.zq.sword.array.network.rpc.framework.RpcClient;
+import com.zq.sword.array.rpc.api.piper.ReplicateDataService;
+import com.zq.sword.array.rpc.api.piper.dto.ConsumeNextOffset;
+import com.zq.sword.array.rpc.api.piper.dto.ReplicateData;
 import com.zq.sword.array.tasks.Actuator;
-import com.zq.sword.array.tasks.SingleTaskExecutor;
 import com.zq.sword.array.tasks.TaskExecutor;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateData;
-import com.zq.sword.array.network.rpc.protocol.InterPiperProtocol;
 import com.zq.sword.array.tasks.TaskExecutorPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,29 +48,6 @@ public class BackupPipeline implements RefreshPipeline<BackupData> {
         }
     }
 
-    /**
-     * 创建InterPiperClient
-     * @param piperLocation
-     * @return
-     */
-    private InterPiperProtocol.InterPiperClient createBackupInterPiperClient(String piperLocation) {
-        InterPiperProtocol.InterPiperClient interPiperClient = InterPiperProtocol.getInstance().getOrNewInterPiperClient(InterPiperProtocol.InterPiperClient.BACKUP_TYPE,
-                jobName, piperLocation);
-        interPiperClient.setBackupDataResultProcessor(new BackupDataResultProcessor(){
-
-            @Override
-            public void handleBackupReplicateDataResult(ReplicateDataId replicateDataId) {
-                listener.outflow(new BackupData(BackupData.REPLICATE_DATA_RESP, replicateDataId));
-            }
-
-            @Override
-            public void handleBackupConsumeNextOffsetResult(ConsumeNextOffset consumeNextOffset) {
-                listener.outflow(new BackupData(BackupData.CONSUME_DATA_RESP, consumeNextOffset));
-            }
-        });
-        return interPiperClient;
-    }
-
     @Override
     public void refresh(PipeConfig config) {
         List<String> incrementBackupPipers = (List<String>)config.get("incrementBackupPipers");
@@ -107,7 +83,7 @@ public class BackupPipeline implements RefreshPipeline<BackupData> {
         switch(data.getType()){
             case BackupData.REPLICATE_DATA :
                 //异步发送数据到备份机器上
-                callbackReplicateDataBackuper((backuper)->backuper.backupReplicateData((ReplicateData) data.getData()));
+                replicateDataBackupers.values().forEach((backuper)->backuper.backupReplicateData((ReplicateData) data.getData()));
                 break;
             case BackupData.CONSUME_DATA:
                 //异步发送数据到备份机器上
@@ -153,12 +129,18 @@ public class BackupPipeline implements RefreshPipeline<BackupData> {
 
         private Logger logger = LoggerFactory.getLogger(ReplicateDataBackuper.class);
 
-        private InterPiperProtocol.InterPiperClient interPiperClient;
+        private RpcClient rpcClient;
+
+        private ReplicateDataService replicateDataService;
 
         private TaskExecutor taskExecutor;
 
         public ReplicateDataBackuper(String replicatePiperLocation) {
-            this.interPiperClient = createBackupInterPiperClient(replicatePiperLocation);
+            String[] ps = replicatePiperLocation.split(":");
+            rpcClient = new NettyRpcClient(ps[0], Integer.parseInt(ps[1]));
+
+            replicateDataService = (ReplicateDataService)rpcClient.getProxy(ReplicateDataService.class);
+
             this.taskExecutor = TaskExecutorPool.buildTaskExecutor(1);
         }
 
@@ -167,7 +149,7 @@ public class BackupPipeline implements RefreshPipeline<BackupData> {
          * @param replicateData
          */
         public void backupReplicateData(ReplicateData replicateData){
-            taskExecutor.execute(()->interPiperClient.sendReplicateData(replicateData));
+            taskExecutor.execute(()->replicateDataService.addReplicateData(replicateData));
         }
 
         /**
@@ -175,17 +157,17 @@ public class BackupPipeline implements RefreshPipeline<BackupData> {
          * @param consumeNextOffset
          */
         public void backupConsumeNextOffset(ConsumeNextOffset consumeNextOffset){
-            taskExecutor.execute(()->interPiperClient.sendConsumeNextOffset(consumeNextOffset));
+            taskExecutor.execute(()->replicateDataService.addConsumeNextOffset(consumeNextOffset));
         }
 
         @Override
         public void start() {
-            interPiperClient.connect();
+            rpcClient.start();
         }
 
         @Override
         public void stop() {
-            interPiperClient.disconnect();
+            rpcClient.close();
             TaskExecutorPool.releaseTaskExecutor(taskExecutor);
         }
     }

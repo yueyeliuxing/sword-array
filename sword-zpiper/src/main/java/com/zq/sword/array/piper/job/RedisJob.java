@@ -1,11 +1,11 @@
 package com.zq.sword.array.piper.job;
 
-import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ConsumeNextOffset;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateData;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateDataId;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateDataReq;
 import com.zq.sword.array.piper.pipeline.*;
 import com.zq.sword.array.piper.storage.RedisDataStorage;
+import com.zq.sword.array.rpc.api.piper.dto.ConsumeNextOffset;
+import com.zq.sword.array.rpc.api.piper.dto.ReplicateData;
+import com.zq.sword.array.rpc.api.piper.dto.ReplicateDataId;
+import com.zq.sword.array.rpc.api.piper.dto.ReplicateDataQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +75,7 @@ public class RedisJob extends AbstractJob implements Job {
             logger.info("消费者开始消费消息");
             long offset = redisDataStorage.getConsumeNextOffset(piperGroup, context.getName());
             logger.info("消费者消费offset->{}, piperGroup->{} jobName->{}", offset, piperGroup, context.getName());
-            return new ConsumeData(ConsumeData.REPLICATE_DATA_REQ, new ReplicateDataReq(piperGroup, context.getName(), offset, 1));
+            return new ConsumeData(ConsumeData.REPLICATE_DATA_REQ, new ReplicateDataQuery(piperGroup, context.getName(), offset, 1));
         });
         consumePipeline.outflow((data)->{
             List<ReplicateData> replicateDatas = (List<ReplicateData>) data.getData();

@@ -1,7 +1,5 @@
 package com.zq.sword.array.namer.piper;
 
-import com.zq.sword.array.network.rpc.protocol.dto.piper.NamePiper;
-
 /**
  * @program: sword-array
  * @description: 元Piper

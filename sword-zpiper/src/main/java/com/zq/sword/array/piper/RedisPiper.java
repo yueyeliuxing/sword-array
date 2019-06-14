@@ -1,26 +1,21 @@
 package com.zq.sword.array.piper;
 
-import com.zq.sword.array.network.rpc.protocol.InterPiperProtocol;
-import com.zq.sword.array.network.rpc.protocol.PiperNameProtocol;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.NamePiper;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.command.JobCommand;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ConsumeNextOffset;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateData;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateDataReq;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.JobHealth;
 import com.zq.sword.array.piper.job.JobMonitor;
-import com.zq.sword.array.network.rpc.protocol.processor.PiperNameProcessor;
-import com.zq.sword.array.network.rpc.protocol.processor.PiperServiceProcessor;
 import com.zq.sword.array.piper.config.PiperConfig;
 import com.zq.sword.array.piper.job.JobController;
+import com.zq.sword.array.piper.service.RedisReplicateDataService;
 import com.zq.sword.array.piper.storage.RedisDataStorage;
 import com.zq.sword.array.piper.storage.LocalRedisDataStorage;
+import com.zq.sword.array.rpc.api.namer.JobHandleService;
+import com.zq.sword.array.rpc.api.namer.PiperHandleService;
+import com.zq.sword.array.rpc.api.namer.dto.JobCommand;
+import com.zq.sword.array.rpc.api.namer.dto.JobHealth;
+import com.zq.sword.array.rpc.api.namer.dto.NamePiper;
 import com.zq.sword.array.tasks.TaskExecutorPool;
 import com.zq.sword.array.tasks.TimedTaskExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -44,9 +39,14 @@ public class RedisPiper extends AbstractPiper implements Piper{
     private RedisDataStorage redisDataStorage;
 
     /**
-     * 请求piperNamer的客户端
+     * piper处理服务
      */
-    private PiperNameProtocol piperNameProtocol;
+    private PiperHandleService piperHandleService;
+
+    /**
+     * 任务处理服务
+     */
+    private JobHandleService jobHandleService;
 
     /**
      * 分布式任务执行器
@@ -60,24 +60,28 @@ public class RedisPiper extends AbstractPiper implements Piper{
 
 
     public RedisPiper(PiperConfig config) {
-        super(config.piperLocation());
+        super(config);
         namePiper = config.namePiper();
 
         /**
          * 注册服务处理器
          */
-        registerServiceProcessor(new DefaultPiperServiceProcessor());
+        registerService(new RedisReplicateDataService(redisDataStorage));
+
+        /**
+         * 得到远程PiperHandleService
+         */
+        piperHandleService = getService(PiperHandleService.class);
+
+        /**
+         * 得到远程JobHandleService
+         */
+        jobHandleService = getService(JobHandleService.class);
 
         /**
          * 分片存储系统
          */
         redisDataStorage =  new LocalRedisDataStorage(config.dataStorePath());
-
-        /**
-         *  连接Namer的客户端  发送数据 接收命令
-         */
-        piperNameProtocol = new PiperNameProtocol(config.namerLocation());
-        piperNameProtocol.setPiperNameProcessor(new DefaultPiperNameProcessor());
 
         /**
          * Job控制器
@@ -91,14 +95,14 @@ public class RedisPiper extends AbstractPiper implements Piper{
     @Override
     public void start() {
         super.start();
-        piperNameProtocol.start();
 
         //向namer注册piper
-        piperNameProtocol.registerPiper(namePiper);
+        piperHandleService.registerPiper(namePiper);
 
         //定时进行Job命令请求
         timedTaskExecutor.timedExecute(()->{
-            piperNameProtocol.reqJobCommand(namePiper);
+            JobCommand jobCommand = piperHandleService.requestJobCommand(namePiper);
+            jobController.handleJobCommand(jobCommand);
         },500, TimeUnit.MILLISECONDS);
 
     }
@@ -106,40 +110,6 @@ public class RedisPiper extends AbstractPiper implements Piper{
     @Override
     public void shutdown() {
         super.shutdown();
-        piperNameProtocol.stop();
-        InterPiperProtocol.getInstance().stop();
-    }
-
-    /**
-     * PiperName处理器
-     */
-    private class DefaultPiperNameProcessor extends PiperNameProcessor {
-
-        @Override
-        public void acceptJobCommand(JobCommand command) {
-            jobController.handleJobCommand(command);
-        }
-    }
-
-    /**
-     * PipserService 处理器
-     */
-    private class DefaultPiperServiceProcessor extends PiperServiceProcessor {
-
-        @Override
-        public List<ReplicateData> handleReplicateDataReq(ReplicateDataReq req) {
-            return redisDataStorage.readReplicateData(req);
-        }
-
-        @Override
-        public void handleReplicateData(ReplicateData replicateData) {
-            redisDataStorage.writeReplicateData(replicateData);
-        }
-
-        @Override
-        public void handleConsumeNextOffset(ConsumeNextOffset consumeNextOffset) {
-            redisDataStorage.writeConsumedNextOffset(consumeNextOffset);
-        }
     }
 
     /**
@@ -152,7 +122,7 @@ public class RedisPiper extends AbstractPiper implements Piper{
             health.setId(namePiper.getId());
             health.setGroup(namePiper.getGroup());
             health.setLocation(namePiper.getLocation());
-            piperNameProtocol.reportJobHealth(health);
+            jobHandleService.reportJobHealth(health);
         }
     }
 }

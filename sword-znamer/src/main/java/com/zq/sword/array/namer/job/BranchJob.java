@@ -1,8 +1,6 @@
 package com.zq.sword.array.namer.job;
 
 import com.zq.sword.array.namer.piper.MetaPiper;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.NamePiper;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.JobHealth;
 import lombok.Data;
 
 import java.util.ArrayList;

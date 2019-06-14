@@ -1,9 +1,10 @@
 package com.zq.sword.array.piper.pipeline;
 
-import com.zq.sword.array.network.rpc.protocol.InterPiperProtocol;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateData;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateDataReq;
-import com.zq.sword.array.network.rpc.protocol.processor.ConsumeDataResultProcessor;
+import com.zq.sword.array.network.rpc.framework.NettyRpcClient;
+import com.zq.sword.array.network.rpc.framework.RpcClient;
+import com.zq.sword.array.rpc.api.piper.ReplicateDataService;
+import com.zq.sword.array.rpc.api.piper.dto.ReplicateData;
+import com.zq.sword.array.rpc.api.piper.dto.ReplicateDataQuery;
 import com.zq.sword.array.tasks.AbstractThreadActuator;
 import com.zq.sword.array.tasks.Actuator;
 import org.slf4j.Logger;
@@ -123,27 +124,22 @@ public class ConsumePipeline implements AutoInflowPipeline<ConsumeData> {
 
         private String piperGroup;
 
-        private InterPiperProtocol.InterPiperClient interPiperClient;
+        private RpcClient rpcClient;
 
-        private volatile boolean isCanReq = true;
+        private ReplicateDataService replicateDataService;
 
         public DataConsumer(String jobName, String targetPiperLocation) {
             String[] groupLocations = targetPiperLocation.split("\\|");
-            this.interPiperClient = InterPiperProtocol.getInstance().getOrNewInterPiperClient(InterPiperProtocol.InterPiperClient.CONSUME_TYPE, jobName, groupLocations[1]);
-            this.interPiperClient.setConsumeDataResultProcessor(new ConsumeDataResultProcessor() {
-                @Override
-                public void handleReplicateData(List<ReplicateData> replicateData) {
-                    outflowListener.outflow(new ConsumeData(ConsumeData.REPLICATE_DATA, replicateData));
-                    //数据消费完 可以继续请求数据了
-                    isCanReq = true;
-                }
-            });
+            String[] ps = targetPiperLocation.split(":");
+            rpcClient = new NettyRpcClient(ps[0], Integer.parseInt(ps[1]));
+
+            replicateDataService = (ReplicateDataService)rpcClient.getProxy(ReplicateDataService.class);
             this.piperGroup = groupLocations[0];
         }
 
         @Override
         public void start(){
-            interPiperClient.connect();
+            rpcClient.start();
             super.start();
         }
 
@@ -151,23 +147,16 @@ public class ConsumePipeline implements AutoInflowPipeline<ConsumeData> {
         public void run() {
             logger.info("消费者开始消费消息");
             while (!isClose && !Thread.currentThread().isInterrupted()) {
-                if (isCanReq) {
-                    ConsumeData consumeData = inflowTask.execute(piperGroup);
-                    interPiperClient.sendReplicateDataReq((ReplicateDataReq) consumeData.getData());
-                    isCanReq = false;
-                    try {
-                        Thread.sleep(5);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
+                ConsumeData consumeData = inflowTask.execute(piperGroup);
+                List<ReplicateData> replicateData = replicateDataService.listReplicateData((ReplicateDataQuery) consumeData.getData());
+                outflowListener.outflow(new ConsumeData(ConsumeData.REPLICATE_DATA, replicateData));
             }
         }
 
         @Override
         public void stop() {
             super.stop();
-            interPiperClient.disconnect();
+            rpcClient.close();
         }
     }
 }

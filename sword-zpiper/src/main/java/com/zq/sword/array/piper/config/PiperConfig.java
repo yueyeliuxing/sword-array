@@ -1,6 +1,6 @@
 package com.zq.sword.array.piper.config;
 
-import com.zq.sword.array.network.rpc.protocol.dto.piper.NamePiper;
+import com.zq.sword.array.rpc.api.namer.dto.NamePiper;
 import com.zq.sword.array.utils.IPUtil;
 import org.springframework.core.env.Environment;
 

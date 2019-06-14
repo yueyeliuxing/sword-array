@@ -6,10 +6,9 @@ import com.zq.sword.array.data.storage.Partition;
 import com.zq.sword.array.data.storage.PartitionSystem;
 import com.zq.sword.array.id.IdGenerator;
 import com.zq.sword.array.id.SnowFlakeIdGenerator;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ConsumeNextOffset;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateData;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateDataReq;
-import com.zq.sword.array.network.rpc.protocol.processor.PiperServiceProcessor;
+import com.zq.sword.array.rpc.api.piper.dto.ConsumeNextOffset;
+import com.zq.sword.array.rpc.api.piper.dto.ReplicateData;
+import com.zq.sword.array.rpc.api.piper.dto.ReplicateDataQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,24 +60,24 @@ public class LocalRedisDataStorage implements RedisDataStorage {
 
     /**
      * 读取复制数据
-     * @param req
+     * @param replicateDataQuery
      * @return
      */
     @Override
-    public List<ReplicateData> readReplicateData(ReplicateDataReq req){
+    public List<ReplicateData> readReplicateData(ReplicateDataQuery replicateDataQuery){
         List<ReplicateData> replicateData = new ArrayList<>();
-        Partition partition = partitionSystem.getPartition(getJobDataPartGroup(req.getJobName()),
-                buildPartName(req.getPiperGroup(), req.getJobName()));
+        Partition partition = partitionSystem.getPartition(getJobDataPartGroup(replicateDataQuery.getJobName()),
+                buildPartName(replicateDataQuery.getPiperGroup(), replicateDataQuery.getJobName()));
         if(partition == null){
-            logger.warn("查询的分片不存在, group:{} name:{}", req.getPiperGroup(), req.getJobName());
+            logger.warn("查询的分片不存在, group:{} name:{}", replicateDataQuery.getPiperGroup(), replicateDataQuery.getJobName());
             return null;
         }
-        long nextOffset = req.getOffset();
-        List<DataEntry> dataEntries = partition.orderGet(req.getOffset(), req.getReqSize());
+        long nextOffset = replicateDataQuery.getOffset();
+        List<DataEntry> dataEntries = partition.orderGet(replicateDataQuery.getOffset(), replicateDataQuery.getReqSize());
         if(dataEntries != null && !dataEntries.isEmpty()){
             for(DataEntry dataEntry : dataEntries){
                 nextOffset += dataEntry.length();
-                replicateData.add(new ReplicateData(req.getPiperGroup(), req.getJobName(), dataEntry.getBody(), nextOffset));
+                replicateData.add(new ReplicateData(replicateDataQuery.getPiperGroup(), replicateDataQuery.getJobName(), dataEntry.getBody(), nextOffset));
             }
         }
         return replicateData;

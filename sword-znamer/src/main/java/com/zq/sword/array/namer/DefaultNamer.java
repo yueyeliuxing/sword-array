@@ -3,12 +3,9 @@ package com.zq.sword.array.namer;
 import com.zq.sword.array.namer.config.PiperConfig;
 import com.zq.sword.array.namer.job.MetaJobSupervisor;
 import com.zq.sword.array.namer.piper.MetaPiperSupervisor;
-import com.zq.sword.array.network.rpc.protocol.dto.client.NameBranchJob;
-import com.zq.sword.array.network.rpc.protocol.dto.client.NameJob;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.NamePiper;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.command.JobCommand;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.JobHealth;
-import com.zq.sword.array.network.rpc.protocol.processor.NamerServiceProcessor;
+import com.zq.sword.array.namer.service.MetaJobHandleService;
+import com.zq.sword.array.namer.service.MetaJobSearchService;
+import com.zq.sword.array.namer.service.MetaPiperHandleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,72 +42,19 @@ public class DefaultNamer extends AbstractNamer implements Namer {
         metaJobSupervisor = new MetaJobSupervisor(metaPiperSupervisor);
 
         //设置piper事件处理器
-        setNamerServiceProcessor(new DefaultNamerServiceProcessor());
+        registerService(new MetaJobHandleService(metaJobSupervisor));
+        registerService(new MetaJobSearchService(metaJobSupervisor));
+        registerService(new MetaPiperHandleService(metaPiperSupervisor, metaJobSupervisor));
     }
 
     @Override
     public void start() {
+        super.start();
     }
 
     @Override
     public void shutdown() {
-
+        super.shutdown();
     }
 
-    /**
-     * 处理器
-     */
-    private class DefaultNamerServiceProcessor extends NamerServiceProcessor {
-        @Override
-        public void handlePiperRegister(NamePiper namePiper) {
-            metaPiperSupervisor.registerPiper(namePiper);
-        }
-
-        @Override
-        public JobCommand handleJobCommandReq(NamePiper namePiper) {
-            return metaJobSupervisor.getJobCommand(namePiper);
-        }
-
-        @Override
-        public void handleTaskHealthReport(JobHealth jobHealth) {
-            metaJobSupervisor.reportJobHealth(jobHealth);
-        }
-
-        @Override
-        public void handleClientCreateJobReq(NameJob nameJob) {
-            metaJobSupervisor.createJob(nameJob);
-        }
-
-        @Override
-        public void handleClientStartJobReq(String jobName) {
-            metaJobSupervisor.startJob(jobName);
-        }
-
-        @Override
-        public void handleClientStopJobReq(String jobName) {
-            metaJobSupervisor.stopJob(jobName);
-        }
-
-        @Override
-        public void handleClientRemoveJobReq(String jobName) {
-            metaJobSupervisor.removeJob(jobName);
-        }
-
-        @Override
-        public List<NamePiper> handleClientSearchPipersReq() {
-            List<NamePiper> pipers = new ArrayList<>();
-            pipers.addAll(metaPiperSupervisor.allNamePipers());
-            return pipers;
-        }
-
-        @Override
-        public NameJob handleClientSearchJobReq(String jobName) {
-            return metaJobSupervisor.getNameJob(jobName);
-        }
-
-        @Override
-        public List<NameBranchJob> handleClientSearchBranchJobReq(String jobName) {
-            return metaJobSupervisor.listNameBranchJob(jobName);
-        }
-    }
 }

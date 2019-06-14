@@ -90,6 +90,11 @@
 			<artifactId>sword-redis-writer</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.zq.sword</groupId>
+			<artifactId>sword-rpc-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 	</dependencies>
 

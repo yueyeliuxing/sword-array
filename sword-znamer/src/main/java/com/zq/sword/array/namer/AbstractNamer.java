@@ -1,7 +1,7 @@
 package com.zq.sword.array.namer;
 
-import com.zq.sword.array.network.rpc.protocol.NamerServiceProtocol;
-import com.zq.sword.array.network.rpc.protocol.processor.NamerServiceProcessor;
+import com.zq.sword.array.network.rpc.framework.NettyRpcServer;
+import com.zq.sword.array.network.rpc.framework.RpcServer;
 
 /**
  * @program: sword-array
@@ -12,31 +12,31 @@ import com.zq.sword.array.network.rpc.protocol.processor.NamerServiceProcessor;
 public abstract class AbstractNamer implements Namer {
 
     /**
-     * namer服务通信
+     * Piper服务提供通信
      */
-    private NamerServiceProtocol namerServiceProtocol;
+    private RpcServer rpcServer;
 
     public AbstractNamer(String location) {
         //创建namer通信服务
-        namerServiceProtocol =  new NamerServiceProtocol(location);
+        String[] params = location.split(":");
+        this.rpcServer = new NettyRpcServer(Integer.parseInt(params[1]));
     }
 
     /**
-     * 设置处理器
-     * @param namerServiceProcessor
+     * 注册服务
+     * @param service
      */
-    public void setNamerServiceProcessor(NamerServiceProcessor namerServiceProcessor) {
-        namerServiceProtocol.setNamerServiceProcessor(namerServiceProcessor);
+    public void registerService(Object service){
+        rpcServer.registerService(service);
     }
 
     @Override
     public void start() {
-
-        namerServiceProtocol.start();
+        rpcServer.start();
     }
 
     @Override
     public void shutdown() {
-        namerServiceProtocol.stop();
+        rpcServer.shutdown();
     }
 }

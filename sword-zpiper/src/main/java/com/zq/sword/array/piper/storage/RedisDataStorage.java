@@ -1,8 +1,9 @@
 package com.zq.sword.array.piper.storage;
 
-import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ConsumeNextOffset;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateData;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.data.ReplicateDataReq;
+
+import com.zq.sword.array.rpc.api.piper.dto.ConsumeNextOffset;
+import com.zq.sword.array.rpc.api.piper.dto.ReplicateData;
+import com.zq.sword.array.rpc.api.piper.dto.ReplicateDataQuery;
 
 import java.util.List;
 
@@ -20,10 +21,10 @@ public interface RedisDataStorage {
 
     /***
      * 数据请求
-     * @param req
+     * @param replicateDataQuery
      * @return
      */
-    List<ReplicateData> readReplicateData(ReplicateDataReq req);
+    List<ReplicateData> readReplicateData(ReplicateDataQuery replicateDataQuery);
 
     /**
      * 获取消费的下一个索引信息

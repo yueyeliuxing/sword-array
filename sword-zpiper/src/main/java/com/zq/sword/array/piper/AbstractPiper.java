@@ -1,7 +1,10 @@
 package com.zq.sword.array.piper;
 
-import com.zq.sword.array.network.rpc.protocol.PiperServiceProtocol;
-import com.zq.sword.array.network.rpc.protocol.processor.PiperServiceProcessor;
+import com.zq.sword.array.network.rpc.framework.NettyRpcClient;
+import com.zq.sword.array.network.rpc.framework.NettyRpcServer;
+import com.zq.sword.array.network.rpc.framework.RpcClient;
+import com.zq.sword.array.network.rpc.framework.RpcServer;
+import com.zq.sword.array.piper.config.PiperConfig;
 
 /**
  * @program: sword-array
@@ -14,30 +17,50 @@ public abstract class AbstractPiper implements Piper {
     /**
      * Piper服务提供通信
      */
-    private PiperServiceProtocol piperServiceProtocol;
+    private RpcServer rpcServer;
 
-    public AbstractPiper(String piperLocation) {
-        /**
-         * Piper服务 接收其他piper或者namer的数据
-         */
-        piperServiceProtocol = new PiperServiceProtocol(piperLocation);
+    /**
+     * name客户端
+     */
+    private RpcClient namerRpcClient;
+
+    public AbstractPiper(PiperConfig config) {
+        String piperLocation = config.piperLocation();
+        String[] params = piperLocation.split(":");
+        this.rpcServer = new NettyRpcServer(Integer.parseInt(params[1]));
+
+        String namerLocation = config.namerLocation();
+        String[] ps = namerLocation.split(":");
+        namerRpcClient = new NettyRpcClient(ps[0], Integer.parseInt(ps[1]));
     }
 
     /**
-     * 注册服务处理器
-     * @param piperServiceProcessor
+     * 注册服务
+     * @param service
      */
-    public void registerServiceProcessor(PiperServiceProcessor piperServiceProcessor){
-        piperServiceProtocol.setPiperServiceProcessor(piperServiceProcessor);
+    public void registerService(Object service){
+        rpcServer.registerService(service);
+    }
+
+    /**
+     * 获取服务
+     * @param serviceType
+     * @param <T>
+     * @return
+     */
+    public <T>  T getService(Class<T> serviceType){
+        return (T)namerRpcClient.getProxy(serviceType);
     }
 
     @Override
     public void start() {
-        piperServiceProtocol.start();
+        rpcServer.start();
+        namerRpcClient.start();
     }
 
     @Override
     public void shutdown() {
-        piperServiceProtocol.stop();
+        rpcServer.shutdown();
+        namerRpcClient.close();
     }
 }

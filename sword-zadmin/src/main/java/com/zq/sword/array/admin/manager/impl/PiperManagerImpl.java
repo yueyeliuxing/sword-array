@@ -2,7 +2,7 @@ package com.zq.sword.array.admin.manager.impl;
 
 import com.zq.sword.array.admin.manager.PiperManager;
 import com.zq.sword.array.client.PiperClient;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.NamePiper;
+import com.zq.sword.array.rpc.api.namer.dto.NamePiper;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;

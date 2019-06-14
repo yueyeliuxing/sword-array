@@ -1,9 +1,9 @@
 package com.zq.sword.array.piper.job;
 
-import com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.JobHealth;
+import com.zq.sword.array.rpc.api.namer.dto.JobHealth;
 import com.zq.sword.array.tasks.AbstractThreadActuator;
 
-import static com.zq.sword.array.network.rpc.protocol.dto.piper.monitor.JobHealth.*;
+import static com.zq.sword.array.rpc.api.namer.dto.JobHealth.*;
 
 /**
  * @program: sword-array

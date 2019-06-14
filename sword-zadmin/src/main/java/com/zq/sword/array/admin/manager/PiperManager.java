@@ -1,6 +1,7 @@
 package com.zq.sword.array.admin.manager;
 
-import com.zq.sword.array.network.rpc.protocol.dto.piper.NamePiper;
+
+import com.zq.sword.array.rpc.api.namer.dto.NamePiper;
 
 import java.util.List;
 

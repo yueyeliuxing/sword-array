@@ -1,8 +1,8 @@
 package com.zq.sword.array.piper.job;
 
-import com.zq.sword.array.network.rpc.protocol.dto.piper.command.JobCommand;
-import com.zq.sword.array.network.rpc.protocol.dto.piper.command.JobType;
 import com.zq.sword.array.piper.storage.RedisDataStorage;
+import com.zq.sword.array.rpc.api.namer.dto.JobCommand;
+import com.zq.sword.array.rpc.api.namer.dto.JobType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
